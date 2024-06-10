@@ -1,0 +1,24 @@
+ailu:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: 127.0.0.1
+    port: 3306
+    database: tiny_universe
+    username: root
+    password: 123456
+
+    minio:
+      endpoint: http://127.0.0.1:9000
+      accessKey: ailu
+      secretKey: 12345678
+      bucket: public
+
+  redis:
+    database: 2
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+
+
+
+

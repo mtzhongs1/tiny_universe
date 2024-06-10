@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" href="./src/assets/家.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name=renderer content=webkit>
+  <title>小小世界</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+<style>
+/* 定义全局变量 */
+:root{
+
+    /*黑色*/
+    --header-black-color: rgba(0,0,0,0.3);
+    --main-black-color:#0D0D0D;
+    --main-beside-black-color: #181818;
+    --text-black-color:#fff;
+    --message-black-color:#141414;
+    --message-text-black-color:#fff;
+    --shadow-black-color: 0 0 0.7em #fff, 0 0 0.2em #fff;
+
+
+    /*白色*/
+    --header-white-color: rgba(255,255,255,0.4);
+    --main-white-color: #f1f1f1;
+    --main-beside-white-color: #ffffff;
+    --text-white-color:#000;
+    --message-white-color: #ebebeb;
+    --message-text-white-color:#000;
+    --shadow-white-color: 0 0 0.7em #676767, 0 0 0.2em #626161;
+
+    --header-color: var(--header-black-color);
+    --main-color: var(--main-black-color);
+    --main-beside-color: var(--main-beside-black-color);
+    --text-color: var(--text-black-color);
+    --message-color: var(--message-black-color);
+    --message-text-color: var(--message-text-black-color);
+    --shadow-color: var(--shadow-black-color);
+    --common-color: #00aaff
+
+}
+
+.el-message-box {
+    background-color: var(--message-color);
+    --el-messagebox-title-color: var(--message-text-color);
+}
+.el-message-box__content {
+    color: var(--message-text-color);
+}
+
+
+/*TODO:滚动条颜色*/
+/*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+    width: 5px; /*对垂直流动条有效*/
+    height: 5px; /*对水平流动条有效*/
+}
+
+/*滚动条颜色*/
+::-webkit-scrollbar-thumb {
+    background:#353535;
+    border-radius: 4px;
+
+}
+/*背景颜色*/
+::-webkit-scrollbar-track {
+    background: #0D0D0D;
+}
+
+/* 隐藏滚动条 */
+/*::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
+
+body{
+  margin: 0px;
+  /* TODO:非常beautify字体！ */
+  font-family: SimHei;
+}
+</style>
+</html>

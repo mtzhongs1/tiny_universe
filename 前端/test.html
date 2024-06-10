@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  const switchColors = () => {
+    const color1 = getComputedStyle(document.documentElement).getPropertyValue('--background-color1');
+    const color2 = getComputedStyle(document.documentElement).getPropertyValue('--background-color2');
+    if (document.documentElement.style.getPropertyValue('--background-color') === color1) {
+      document.documentElement.style.setProperty('--background-color', color2);
+    } else {
+      document.documentElement.style.setProperty('--background-color', color1);
+    }
+  }
+</script>
+
+<div class="myDiv">
+  哈哈，小丑
+  <button onclick="switchColors()">点击我切换颜色</button>
+</div>
+</body>
+
+<style>
+  :root {
+    --background-color1: #fff;
+    --background-color2: #000;
+    --background-color: var(--background-color1);
+  }
+
+  .myDiv {
+    background-color: var(--background-color);
+  }
+</style>
+</html>

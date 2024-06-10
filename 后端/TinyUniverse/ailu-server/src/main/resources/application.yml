@@ -1,0 +1,58 @@
+server:
+  port: 8082
+
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+
+  datasource:
+    druid:
+      driver-class-name: ${ailu.datasource.driver-class-name}
+      url: jdbc:mysql://${ailu.datasource.host}:${ailu.datasource.port}/${ailu.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${ailu.datasource.username}
+      password: ${ailu.datasource.password}
+  redis:
+    database: ${ailu.redis.database}
+    host: ${ailu.redis.host}
+    port: ${ailu.redis.port}
+    password: ${ailu.redis.password}
+  mail:
+    host: smtp.qq.com  #SMTP服务器地址
+    username: 2568315961@qq.com #登陆账号
+    password: jqefjzyibkbkecfb #登陆密码（或授权码）
+    port: 587
+    properties:
+      from: 2568315961@qq.com #邮件发信人（即真实邮箱）
+
+minio:
+  endpoint: ${ailu.datasource.minio.endpoint}
+  accessKey: ${ailu.datasource.minio.accessKey}
+  secretKey: ${ailu.datasource.minio.secretKey}
+  bucket: ${ailu.datasource.minio.bucket}
+
+ailu:
+  jwt:
+    secret: ailu
+    expiration: 604800000
+
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ailu.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com:
+      ailu:
+        mapper: debug
+        service: info
+        controller: info
+
+
