@@ -1,0 +1,21 @@
+.custom-input {
+    background-color: var(--main-beside-color);
+    border: 0 solid;
+    box-shadow: var(--common-shadow-color);
+    border-radius: 4px;
+    padding: 10px;
+    color: var(--text-color);
+    outline: none;
+    width: 80%;
+    transition: background-color 0.3s ease;
+}
+
+.custom-input:focus {
+    background-color: var(--main-beside-color);
+    border: 0.2px solid rgb(189, 189, 189);
+}
+
+.custom-input::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+}

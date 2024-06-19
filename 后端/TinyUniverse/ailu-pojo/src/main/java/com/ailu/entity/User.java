@@ -12,11 +12,11 @@ public class User {
   private String username;
   private String password;
   private LocalDate birthday;
-  private Character sex;
+  private Integer sex;
   private String avatar;
   private String email;
   private String description;
-  private Character status;
+  private Boolean status;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 

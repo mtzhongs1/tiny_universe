@@ -1,0 +1,15 @@
+文章表设计
+article: id , user_id , html_url(content) , title , description , cover ,tag , time
+文章社交表
+article_active: love , forward , comment_count , collection_count , watch
+收藏表
+collection: id,article_id,user_id，time
+评论表
+comment: id,article_id,to_id,to_user_id,user_id，content,tyoe(文章的评论，评论的评论)，love,time
+tag
+tag: id,name,count,article_id
+
+
+
+
+

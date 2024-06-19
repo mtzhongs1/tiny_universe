@@ -1,42 +1,57 @@
 <template>
-    <!-- TODO：动态样式 -->
-    <div class="headerDiv" :style="{ backgroundImage: `url(${bgImagePath})` }">
-      <Location></Location>
-      <el-icon id="leftIcon" @click="setIndex(true)"><ArrowLeft /></el-icon>
-      <el-icon id="rightIcon" @click="setIndex(false)"><ArrowRight /></el-icon>
+  <div class="outerDiv">
+    <!-- TODO：动态样式，注意：路径中不能有空格！！！ -->
+    <div class="headerDiv" :style="{ 'background-image': `url(${bgImagePath})` }">
+      <Location class="location"></Location>
+      <el-icon id="leftIcon" v-show="upDown" @click="setIndex(true)">
+        <ArrowLeftBold />
+      </el-icon>
+      <el-icon id="rightIcon" v-show="upDown" @click="setIndex(false)">
+        <ArrowRightBold />
+      </el-icon>
+      <el-icon class="upDownIcon" @click="setUpDown" v-if="upDown">
+        <ArrowUpBold />
+      </el-icon>
+      <el-icon class="upDownIcon" @click="setUpDown" v-else>
+        <ArrowDownBold />
+      </el-icon>
     </div>
-  <div class = ”mainDiv“ :style="{'background-color':color.main_color}">
-    <router-view></router-view>
-    <Setting></Setting>
+    <div class="mainDiv">
+      <router-view style="margin: 50px auto auto;"></router-view>
+      <Setting :images = "images" :updateBgImage="updateBgImage"></Setting>
+    </div>
+    <div class="footer">
+      &copy; 2024 By ailu &nbsp
+      <a href="https://github.com/mtzhongs1/tiny_universe" target="_blank">
+        <img src="../../assets/GitHub.svg" alt="GitHub" width="30" class="github">
+      </a>
+    </div>
   </div>
 
-
 </template>
-
 <script setup>
 //导入区
-import {computed, onMounted, ref, reactive, provide} from 'vue';
-import {doGet} from '@/http/httpRequest.js'
+import {onMounted, ref, reactive, provide, computed} from 'vue';
+import { doGet } from '@/http/httpRequest.js'
 // TODO：导入资源
-import flowerSea from '@/assets/花海.jpg'; // 导入图片
-import ailu1 from '@/assets/test/ailu1.jpg'; // 导入图片
-import ailu2 from '@/assets/test/ailu2.jpg'; // 导入图片
-import ailu3 from '@/assets/test/ailu3.jpg'; // 导入图片
 import Location from '@/components/dashboard/Location.vue';
 import Setting from "@/components/dashboard/Setting.vue";
-
+import { setCssVariable, setProperty} from "@/util/util.js";
+import {ElMessage} from "element-plus";
 
 //生命周期区
 onMounted(() => {
+  getImages();
+  switchTheme();
   getUser();
 })
 
 
 //变量区
 // TODO:轮播图切换
-const images = [
-    ailu1, ailu2, ailu3, flowerSea
-];
+let upDown = ref(true);
+let isfooter = ref(true);
+const images = ref([]);
 let user = reactive({
   id: '',
   username: '',
@@ -47,26 +62,64 @@ let user = reactive({
   description: '',
 });
 let index = ref(0);
-let bgImagePath = computed(() => {return images[index.value]}); // 初始图片路径
-
-
+let bgImagePath = computed(() => {return images.value[index.value]}); // 初始图片路径
 //方法区
-function setIndex(isLeft){
-  index.value = isLeft
-      ? (index.value - 1 + images.length) % images.length
-      : (index.value + 1) % images.length;
+const setUpDown = () => {
+  if (upDown.value) {
+    //  点击向上的箭头
+    setProperty('--header-height','60px');
+    // 修改底部的样式
+
+  }else{
+    setProperty('--header-height','100vh');
+  }
+  upDown.value = !upDown.value
+  setTimeout(() => {
+    isfooter.value = !isfooter.value;
+  },500);
 }
+function setIndex(isLeft) {
+  index.value = isLeft
+    ? (index.value - 1 + images.value.length) % images.value.length
+    : (index.value + 1) % images.value.length;
+}
+
+const updateBgImage = (index,url) => {
+  images[index] = url;
+}
+
 //TODO:异步函数定义
 //async声明异步函数，await等待axios调用完后获取相应对象
-async function getUser(){
+async function getUser() {
   const resp = await doGet("/user");
-  if(resp.data.code === 1){
+  if (resp.data.code === 1) {
     const tempUser = resp.data.data;
-    console.log(tempUser.birthday);
-    Object.assign(user,tempUser);
+    Object.assign(user, tempUser);
     emailHide();
-
   }
+}
+const getImages = async () => {
+  const resp = await doGet("/setting/background");
+  if(resp.data.code === 1) {
+    var tempImages = resp.data.data;
+    tempImages = tempImages.split(",");
+    for(var i = 0 ; i < tempImages.length; i++) {
+      images.value[i] = tempImages[i];
+    }
+    // images.value = tempImages;
+  }else{
+    ElMessage.error("获取背景图失败，服务器繁忙");
+  }
+}
+const switchTheme = () => {
+  let theme = window.localStorage.getItem("theme");
+  if (theme === null) {
+    theme = true;
+    window.localStorage.setItem("theme", JSON.stringify(theme));
+  } else {
+    theme = JSON.parse(theme);
+  }
+  setCssVariable(theme, color);
 }
 //邮箱脱敏
 function emailHide() {
@@ -78,58 +131,94 @@ function emailHide() {
   const email2 = splitted[1];
   user.email = email1 + '***@' + email2;
 }
-//TODO:获取css全局变量
-const getCssVariable = (varName) => {
-  const rootStyle = window.getComputedStyle(document.documentElement);
-  return rootStyle.getPropertyValue(varName);
-}
 let color = reactive({
-  header_color : getCssVariable('--header-color'),
-  main_color : getCssVariable('--main-color'),
-  main_beside_color: getCssVariable('--main-beside-color'),
-  text_color: getCssVariable('--text-color'),
-  message_color: getCssVariable('--message-color'),
-  message_text_color: getCssVariable('--message-text-color'),
-  shadow_color:getCssVariable('--shadow-color'),
+  header_color: '',
+  main_color: '',
+  main_beside_color: '',
+  text_color: '',
+  message_color: '',
+  message_text_color: '',
+  shadow_color: '',
 })
 
 
 //其他区
-provide("user",user);
-provide("color",color);
+provide("user", user);
+provide("color", color);
 
 </script>
 
 <style scoped>
 .headerDiv {
   width: 100%;
-  height: 100vh;
+  height: var(--header-height);
   position: relative;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   transition: all 1s;
 }
-.el-icon{
+
+.mainDiv {
+  width: 100%;
+  position: relative;
+  background-color: var(--main-color);
+  overflow: auto;
+}
+
+.upDownIcon {
+  position: absolute;
+  left:50%;
+  bottom: 10px;
+  cursor: pointer;
+  z-index:1;
+}
+
+.el-icon {
   color: #e8e8e8;
 }
+
 #leftIcon {
   position: absolute;
-  top:50%;
-  left:1px;
-  padding: 10px;
-}
-#rightIcon {
-  position: absolute;
-  top:50%;
-  right:1px;
+  top: 50%;
+  left: 1px;
   padding: 10px;
 }
 
-#leftIcon:hover,#rightIcon:hover{
-  background:rgb(0,0,0,0.3);
+#rightIcon {
+  position: absolute;
+  top: 50%;
+  right: 1px;
+  padding: 10px;
+}
+
+.location{
+  z-index:0;
+}
+
+.el-icon:hover{
+  color: var(--common-color);
   cursor: pointer;
 }
 
+.github:hover{
+  cursor: pointer;
+}
+
+.outerDiv{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.footer {
+  width: 100%;
+  background: #42ace8;
+  color: white;
+  text-align: center;
+  margin-top: 400px;
+  padding: 40px 0 40px 0;
+  font-size: 18px;
+}
 
 </style>

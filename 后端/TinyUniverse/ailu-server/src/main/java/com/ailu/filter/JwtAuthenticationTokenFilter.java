@@ -67,6 +67,7 @@ public class JwtAuthenticationTokenFilter implements Filter{
         }
 
         String token = request.getHeader("token");
+        token = StringUtils.isEmpty(token) ? request.getParameter("token") : token;
         if(StringUtils.isEmpty(token)){
             WebUtils.renderString(response, Result.errorToken("未登录"));
             return;

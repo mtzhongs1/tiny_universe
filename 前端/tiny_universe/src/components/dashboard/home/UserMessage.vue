@@ -1,9 +1,9 @@
 <template>
   <!-- 个人基本信息 -->
-  <div class="own-aside" :style="{'background' : color.main_beside_color}">
-    <div class="personal-detail" :style="{'color' : color.text_color}">
-      <el-avatar @click="toUser" style="margin: 0 auto;" :size="100" :src="user.avatar" />
-      <span class="name" :style="{'text-shadow' : color.shadow_color}">{{user.username}}</span>
+  <div class="own-aside">
+    <div class="personal-detail">
+      <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="100" :src="user.avatar" />
+      <span class="name">{{user.username}}</span>
       <span class="description" style="font-size: 10px">{{user.description}}</span>
     </div>
   </div>
@@ -35,17 +35,20 @@ function toUser(){
   grid-template-rows: auto auto auto;
   gap: 20px;
   padding: 40px;
+  color: var(--text-color);
 }
 .el-avatar{
   transition: all 0.5s;
 }
 .el-avatar:hover {
   cursor: pointer;
-  animation: spin 1s linear infinite;
+  animation: spin 0.3s linear 1;
 }
 
-.oew-avatar{
+.own-aside{
   text-align: center;
+  background: var(--main-beside-color);
+
 }
 
 

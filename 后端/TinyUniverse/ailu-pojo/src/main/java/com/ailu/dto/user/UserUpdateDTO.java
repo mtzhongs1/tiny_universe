@@ -20,7 +20,7 @@ public class UserUpdateDTO {
     @NotBlank(message = "用户名不能为空")
     @Size(max = 15, message = "用户名不能超过15个字符")
     private String username;
-    private Character sex;
+    private Integer sex;
     private String avatar;
     private LocalDate birthday;
     private String description;

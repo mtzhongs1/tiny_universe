@@ -1,5 +1,6 @@
 <template>
-    <button class = "btn">{{ message }}</button>
+    <!-- 添加tupe是为了防止提交表单 -->
+    <button type="button" class = "btn">{{ message }}</button>
 </template>
 <script setup>
 // 父组件传递内容

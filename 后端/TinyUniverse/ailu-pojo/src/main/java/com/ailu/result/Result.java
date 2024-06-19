@@ -16,6 +16,9 @@ public class Result<T> implements Serializable {
     private String msg; //错误信息
     private T data; //数据
 
+    private Integer errno; //文章图片
+    private String message;//文章错误信息
+
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();
         result.code = 1;
@@ -40,6 +43,20 @@ public class Result<T> implements Serializable {
         Result result = new Result();
         result.msg = msg;
         result.code = 900;
+        return result;
+    }
+
+    public static <T> Result<T> errorArticle(String msg){
+        Result result = new Result();
+        result.errno = 1;
+        result.message = msg;
+        return result;
+    }
+
+    public static <T> Result<T> successArticle(T data){
+        Result result = new Result();
+        result.data = data;
+        result.errno = 0;
         return result;
     }
 

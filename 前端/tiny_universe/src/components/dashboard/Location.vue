@@ -1,13 +1,11 @@
 <template>
   <el-menu
-      :default-active="activeIndex"
       class="el-menu-demo"
       mode="horizontal"
       :ellipsis="false"
       :background-color="color.header_color"
       :text-color="color.text_color"
       active-text-color="#00f0fc"
-      :style="{'text-shadow':color.shadow_color}"
       router
   >
   <!--@select="handleSelect" -->
@@ -16,7 +14,6 @@
     </el-menu-item>
 
     <div class="flex-grow" />
-
     <el-menu-item v-for="(menuItem,index) in menuItems" :index = "menuItem.path">
       {{menuItem.name}}
     </el-menu-item>
@@ -62,7 +59,7 @@ const menuItems = [
   {name:'首页',path:'/dashboard'},
   {name:'娱乐',path:'/dashboard/entertainment'},
   {name:'动态',path:'/dashboard/moment'},
-  {name:'文章',path:'/dashboard/work'},
+  {name:'文章',path:'/dashboard/article'},
   {name:'收藏',path:'/dashboard/collection'},
   {name:'其他',path:'/dashboard/other'},
 ]
@@ -78,11 +75,11 @@ let color = inject('color');
   flex-grow: 1;
 }
 .el-menu{
-
   height: 60px;
+  text-shadow: var(--shadow-color);
 }
 .el-menu--horizontal.el-menu {
-    border-bottom: none;
+  border-bottom: none;
 }
 .menu-sticky {
   position: sticky;

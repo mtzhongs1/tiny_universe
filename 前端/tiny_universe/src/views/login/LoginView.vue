@@ -2,29 +2,35 @@
 	<div class="center">
 		<div class="logon">
 			<div :class="overlaylong">
-				<div class="overlaylong-Signin" v-if="disfiex == 0">
+				<form :ref="LoginFormRef" class="overlaylong-Signin" v-if="disfiex === 0">
 					<h2 class="overlaylongH2">Sign in</h2>
-					<input v-model = "user.username" type="text" placeholder="username">
-					<input v-model = "user.password" type="text" placeholder="password">
+          <label v-show="false" for="username"></label>
+					<input name="username" id=“username” v-model = "user.username" type="text" placeholder="username">
+          <label v-show="false" for="password"></label>
+					<input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
 					<h3>Forgot your password?</h3>
 					<!-- TODO:自定义按钮组件 -->
 					<WowButton message="Sign in" @click = "login"></WowButton>
 					<!-- <button @click="login" class="btn">Sign in</button> -->
-				</div>
-				<div class="overlaylong-Signup" v-if="disfiex == 1">
+				</form>
+				<form :ref="RegisterFormRef" class="overlaylong-Signup" v-if="disfiex === 1">
 					<h2 class="overlaylongH2">Sign up</h2>
-					<input v-model = "user.username" type="text" placeholder="username">
-					<input v-model = "user.password" type="text" placeholder="password">
-					<input v-model = "user.email" type="text" placeholder="email">
+          <label v-show="false" for="username"></label>
+					<input name="username" id="username" v-model = "user.username" type="text" placeholder="username">
+          <label v-show="false" for="password"></label>
+					<input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
+          <label v-show="false" for="email"></label>
+					<input name="email" id="email" v-model = "user.email" type="text" placeholder="email">
 					<span>
-						<input v-model = "user.code" style="width: 55px;" type="text" placeholder="code">
+            <label v-show="false" for="code"></label>
+						<input name="code" id="code" v-model = "user.code" style="width: 55px;" type="text" placeholder="code">
 						<button :disabled="codeProp.isTimerActive" @click="sendCode" class="sendBtn">
 							<span class="button_top"> {{ codeProp.msg }} </span>
 						</button>
 					</span>
 					<WowButton message="Sign up" @click = "register"></WowButton>
 					<!-- <button @click = "register" class="btn">Sign up</button> -->
-				</div>
+				</form>
 
 			</div>
 			<div :class="overlaytitle">
@@ -51,10 +57,11 @@
 
 import { doPost, doPostxwww } from '@/http/httpRequest';
 import { ElMessage } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { reactive, ref} from 'vue';
 import WowButton from '@/components/common/button/WowButton.vue';
 import { useRouter } from 'vue-router';
 import { setToken } from '@/util/util';
+import {Validator} from "@/util/validator.js";
 let overlaylong = ref('overlaylong');
 let overlaytitle = ref('overlaytitle');
 let disfiex = ref(0);
@@ -69,13 +76,63 @@ let codeProp = reactive({
 	isTimerActive: false
 })
 const router = useRouter();
+let LoginFormRef = ref(null);
+let RegisterFormRef = ref(null);
+const validateLogin = () => {
+  var validator = new Validator();
+  validator.add(user.username,[{
+    strategy: 'isNotEmpty',
+    errorMsg: '用户名不能为空'
+  },{
+    strategy: 'minLength:2',
+    errorMsg: '用户名长度不能小于2位'
+  }])
+
+  validator.add(user.password,[{
+    strategy: 'isNotEmpty',
+    errorMsg: '密码不能为空'
+  },{
+    strategy: 'minLength:6',
+    errorMsg: '密码长度不能小于6位'
+  }])
+  return validator.start();
+}
+const validateRegister = () => {
+  var validator = new Validator();
+  validator.add(user.username,[{
+    strategy: 'isNotEmpty',
+    errorMsg: '用户名不能为空'
+  },{
+    strategy: 'minLength:2',
+    errorMsg: '用户名长度不能小于2位'
+  }])
+  validator.add(user.password,[{
+    strategy: 'isNotEmpty',
+    errorMsg: '密码不能为空'
+  },{
+    strategy: 'minLength:6',
+    errorMsg: '密码长度不能小于6位'
+  }])
+  validator.add(user.email,[{
+   strategy: 'isNotEmpty',
+   errorMsg: '邮箱不能为空'
+  },{
+    strategy: 'isEmail',
+    errorMsg: '邮箱格式不正确'
+  }])
+  validator.add(user.code,[{
+    strategy: 'isNotEmpty',
+    errorMsg: '验证码不能为空'
+  }])
+  return validator.start();
+}
 function Signin() {
 	overlaylong.value = "overlaylongleft"
 	overlaytitle.value = "overlaytitleright"
 	setTimeout(() => {
 		disfiex.value = 1
 	}, 200)
-};
+}
 function Signup() {
 	overlaylong.value = "overlaylongright"
 	overlaytitle.value = "overlaytitleleft"
@@ -107,6 +164,11 @@ function sendCode() {
 }
 
 function login(){
+  const errorMsg = validateLogin();
+  if(errorMsg){
+    ElMessage.error(errorMsg);
+    return;
+  }
 	let formData = new FormData();
 	formData.append('username',user.username);
 	formData.append('password',user.password);
@@ -121,6 +183,11 @@ function login(){
 	})
 }
 function register(){
+  const errorMsg = validateRegister();
+  if(errorMsg){
+    ElMessage.error(errorMsg);
+    return;
+  }
 	let formData = new FormData();
 	formData.append('username',user.username);
 	formData.append('password',user.password);

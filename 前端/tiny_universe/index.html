@@ -17,6 +17,16 @@
 <style>
 /* 定义全局变量 */
 :root{
+    --w-e-textarea-border-color: var(--text-color);
+    --w-e-modal-button-bg-color: var(--main-color);
+    --w-e-toolbar-bg-color: var(--main-beside-color);
+    --w-e-toolbar-color: var(--text-color);
+    --w-e-textarea-bg-color: var(--main-beside-color);
+    --w-e-textarea-color: var(--text-color);
+    --w-e-textarea-slight-bg-color: var(--main-color);
+    --w-e-toolbar-border-color: var(--main-color);
+    --w-e-toolbar-active-bg-color: rgb(131, 133, 129,0.3);
+    --w-e-toolbar-active-color: var(--common-color);
 
     /*黑色*/
     --header-black-color: rgba(0,0,0,0.3);
@@ -25,7 +35,7 @@
     --text-black-color:#fff;
     --message-black-color:#141414;
     --message-text-black-color:#fff;
-    --shadow-black-color: 0 0 0.7em #fff, 0 0 0.2em #fff;
+    --shadow-black-color: 0px 0px 10px #fff;
 
 
     /*白色*/
@@ -35,7 +45,7 @@
     --text-white-color:#000;
     --message-white-color: #ebebeb;
     --message-text-white-color:#000;
-    --shadow-white-color: 0 0 0.7em #676767, 0 0 0.2em #626161;
+    --shadow-white-color: 0px 0px 10px #676767;
 
     --header-color: var(--header-black-color);
     --main-color: var(--main-black-color);
@@ -44,8 +54,26 @@
     --message-color: var(--message-black-color);
     --message-text-color: var(--message-text-black-color);
     --shadow-color: var(--shadow-black-color);
-    --common-color: #00aaff
+    --common-color: #62b9ec;
+    --common-shadow-color: 1px 1px 1px 1px rgb(131, 133, 129),
+    -1px -1px 1px 1px rgb(100, 100, 100);
 
+    --header-height:100vh;
+}
+
+/*element-ui全局变量*/
+:root {
+    /*ElmessageBox背景颜色*/
+    --el-bg-color: var(--main-beside-color);
+    /*ElmessageBox字体颜色*/
+    --el-text-color-primary: var(--text-color);
+    /*ElmessageBox悬浮的背景颜色*/
+    --el-color-primary-light-9: var(--main-beside-color);
+    --el-color-primary-light-3: var(--main-beside-color);
+    --el-color-white: var(--common-color);
+    --el-bg-color-overlay: var(--main-beside-color);
+    --el-color-info-light-7: var(--main-color);
+    --el-color-info-light-9: var(--main-color);
 }
 
 .el-message-box {
@@ -56,6 +84,21 @@
     color: var(--message-text-color);
 }
 
+@font-face{
+    font-family: 'ZKXLOGOT';
+    font-display: swap;
+    src: url('./src/assets/ZhanKuXiaoLOGOTi-2.otf') format("truetype");
+}
+body {
+    font-family: 'ZKXLOGOT';
+    margin: 0px;
+    color: var(--text-color);
+    background-color: var(--main-color);
+    height: 100%;
+}
+html {
+    height: 100%;
+}
 
 /*TODO:滚动条颜色*/
 /*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/
@@ -66,13 +109,13 @@
 
 /*滚动条颜色*/
 ::-webkit-scrollbar-thumb {
-    background:#353535;
+    background:var(--main-beside-color);
     border-radius: 4px;
 
 }
 /*背景颜色*/
 ::-webkit-scrollbar-track {
-    background: #0D0D0D;
+    background: var(--main-color);
 }
 
 /* 隐藏滚动条 */
@@ -80,10 +123,6 @@
 /*    display: none;*/
 /*}*/
 
-body{
-  margin: 0px;
-  /* TODO:非常beautify字体！ */
-  font-family: SimHei;
-}
+
 </style>
 </html>

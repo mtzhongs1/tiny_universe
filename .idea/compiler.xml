@@ -11,12 +11,6 @@
         <module name="ailu-server" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ailu-common" target="1.8" />
-      <module name="ailu-pojo" target="1.8" />
-      <module name="ailu-server" target="1.8" />
-      <module name="TinyUniverse" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
