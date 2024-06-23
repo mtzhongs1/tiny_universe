@@ -25,7 +25,7 @@ public interface UserMapper {
             "values(#{username},#{password},#{email},#{updateTime},#{createTime})")
     void saveUser(User user);
 
-    @Select("select username,sex,email,avatar,description,birthday from user where id = #{userId}")
+    @Select("select id,username,sex,email,avatar,description,birthday from user where id = #{userId}")
     UserVO getUser(Long userId);
 
     @AutoFill(InsertOrUpdate.UPDATE)

@@ -93,7 +93,7 @@ async function confirmImg(){
   await cropper.getBlob().then((data) => tempImage.value = data);
   const formData = new FormData();
   formData.append("image",tempImage.value);
-  const resp = await doPostFile("/file/uploadImg",formData)
+  doPostFile("/file/uploadImg",formData).then((resp) => {
     if(resp.data.code === 1){
       if(curr === index){
         images[index++] = resp.data.data;
@@ -106,6 +106,7 @@ async function confirmImg(){
       ElMessage.error("服务器繁忙");
       dialogVisible.value = false;
     }
+  })
 }
 </script>
 <style scoped>

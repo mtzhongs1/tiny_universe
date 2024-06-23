@@ -12,6 +12,7 @@ import java.time.LocalDate;
 
 @Data
 public class UserVO {
+    private Long id;
     private String username;
     private String email;
     private Character sex;

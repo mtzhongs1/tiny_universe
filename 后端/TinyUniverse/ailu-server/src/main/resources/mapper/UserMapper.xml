@@ -13,7 +13,7 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <update id="updateMsg">
+    <update id="updateMsg" parameterType="com.ailu.entity.User">
         update user
         <set>
             <if test="username != null and username != ''">

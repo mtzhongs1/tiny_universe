@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ailu.mapper.ArticleTagMapper">
+    <!--TODO:属性映射 -->
+    <resultMap id="UserResultMap" type="com.ailu.entity.Article">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="content" jdbcType="INTEGER" property="content"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="tag" jdbcType="VARCHAR" property="tag"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <insert id="saveArticleTag">
+        insert into article_tag(article_id,tag_id)
+        values
+        <foreach collection="tags" item="tagId" separator="),(" open="(" close=")">
+            #{articleId},#{tagId}
+        </foreach>
+    </insert>
+
+</mapper>

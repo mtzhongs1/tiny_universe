@@ -1,20 +1,17 @@
 <template>
   <!-- 个人基本信息 -->
   <div class="own-aside">
-    <div class="personal-detail">
-      <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="100" :src="user.avatar" />
+      <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="120" :src="user.avatar" />
       <span class="name">{{user.username}}</span>
       <span class="description" style="font-size: 10px">{{user.description}}</span>
-    </div>
   </div>
 
 </template>
 <script setup>
 import { ref } from 'vue'
 import {useRouter} from "vue-router";
-const props = defineProps(['user','color'])
+const props = defineProps(['user']);
 let user = ref(props.user);
-let color = ref(props.color);
 const router = useRouter();
 function toUser(){
   const routerUrl = router.resolve({
@@ -27,16 +24,7 @@ function toUser(){
 .name{
   font-size: 20px;
 }
-.own-aside span,div{
-  text-align: center;
-}
-.personal-detail{
-  display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 20px;
-  padding: 40px;
-  color: var(--text-color);
-}
+
 .el-avatar{
   transition: all 0.5s;
 }
@@ -48,14 +36,13 @@ function toUser(){
 .own-aside{
   text-align: center;
   background: var(--main-beside-color);
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  gap: 20px;
+  padding: 30px 20px;
 
-}
-
-
-@media (max-width:900px) {
-  .own-aside{
-    display: block;
-  }
+  color: var(--text-color);
 }
 
 @keyframes spin {

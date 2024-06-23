@@ -1,31 +1,25 @@
 <template>
   <div class="common-layout">
-    <el-container>
-      <el-main>
-        <div>
-          哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈
-        </div>
-      </el-main>
-      <el-aside width="250px">
-        <UserMessage :user="user" :color="color" ></UserMessage>
-      </el-aside>
-    </el-container>
+    <el-row style="margin: 0 50px" :gutter="40">
+      <el-col :md="18" :span="22">
+        <ArtilceList></ArtilceList>
+      </el-col>
+      <el-col :md="5" :span="22">
+        <UserMessage  :user="user" :color="color" ></UserMessage>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup>
 import {inject} from "vue";
 import UserMessage from "@/components/dashboard/home/UserMessage.vue";
+import ArtilceList from "@/components/dashboard/home/ArticleList.vue"
 
 let user = inject('user')
 let color = inject('color')
 </script>
 
 <style scoped>
-
-.el-aside{
-  margin: 50px 150px 50px 0;
-  box-shadow: var(--shadow-color);
-}
 
 </style>

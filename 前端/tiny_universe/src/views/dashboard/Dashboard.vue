@@ -1,18 +1,18 @@
 <template>
   <div class="outerDiv">
     <!-- TODO：动态样式，注意：路径中不能有空格！！！ -->
-    <div class="headerDiv" :style="{ 'background-image': `url(${bgImagePath})` }">
+    <div :style="{ 'background-image': `url(${bgImagePath})` }" class="headerDiv">
       <Location class="location"></Location>
-      <el-icon id="leftIcon" v-show="upDown" @click="setIndex(true)">
+      <el-icon v-show="upDown" id="leftIcon" @click="setIndex(true)">
         <ArrowLeftBold />
       </el-icon>
-      <el-icon id="rightIcon" v-show="upDown" @click="setIndex(false)">
+      <el-icon v-show="upDown" id="rightIcon" @click="setIndex(false)">
         <ArrowRightBold />
       </el-icon>
-      <el-icon class="upDownIcon" @click="setUpDown" v-if="upDown">
+      <el-icon v-if="upDown" class="upDownIcon" @click="setUpDown">
         <ArrowUpBold />
       </el-icon>
-      <el-icon class="upDownIcon" @click="setUpDown" v-else>
+      <el-icon v-else class="upDownIcon" @click="setUpDown">
         <ArrowDownBold />
       </el-icon>
     </div>
@@ -23,7 +23,7 @@
     <div class="footer">
       &copy; 2024 By ailu &nbsp
       <a href="https://github.com/mtzhongs1/tiny_universe" target="_blank">
-        <img src="../../assets/GitHub.svg" alt="GitHub" width="30" class="github">
+        <img alt="GitHub" class="github" src="../../assets/GitHub.svg" width="30">
       </a>
     </div>
   </div>
@@ -88,28 +88,29 @@ const updateBgImage = (index,url) => {
   images[index] = url;
 }
 
-//TODO:异步函数定义
-//async声明异步函数，await等待axios调用完后获取相应对象
-async function getUser() {
-  const resp = await doGet("/user");
+function getUser() {
+  doGet("/user").then((resp) => {
   if (resp.data.code === 1) {
     const tempUser = resp.data.data;
     Object.assign(user, tempUser);
     emailHide();
   }
+  })
 }
-const getImages = async () => {
-  const resp = await doGet("/setting/background");
-  if(resp.data.code === 1) {
-    var tempImages = resp.data.data;
-    tempImages = tempImages.split(",");
-    for(var i = 0 ; i < tempImages.length; i++) {
-      images.value[i] = tempImages[i];
+const getImages = () => {
+  doGet("/setting/background").then((resp) => {
+    if(resp.data.code === 1) {
+      var tempImages = resp.data.data;
+      tempImages = tempImages.split(",");
+      for(var i = 0 ; i < tempImages.length; i++) {
+        images.value[i] = tempImages[i];
+      }
+      // images.value = tempImages;
+    }else{
+      ElMessage.error("获取背景图失败，服务器繁忙");
     }
-    // images.value = tempImages;
-  }else{
-    ElMessage.error("获取背景图失败，服务器繁忙");
   }
+)
 }
 const switchTheme = () => {
   let theme = window.localStorage.getItem("theme");
@@ -163,7 +164,6 @@ provide("color", color);
   width: 100%;
   position: relative;
   background-color: var(--main-color);
-  overflow: auto;
 }
 
 .upDownIcon {
@@ -209,6 +209,7 @@ provide("color", color);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .footer {

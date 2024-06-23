@@ -16,4 +16,6 @@ import java.util.List;
 public interface TagMapper {
     @Select("select id,name,count from tag where name like concat(#{name},'%')")
     List<TagVO> getTags(String name);
+
+    void addTagCount(String[] tags);
 }

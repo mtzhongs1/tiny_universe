@@ -9,20 +9,23 @@
       router
   >
   <!--@select="handleSelect" -->
-    <el-menu-item>
+    <el-menu-item id="username">
       <h1>{{user.username}}</h1>
     </el-menu-item>
 
     <div class="flex-grow" />
-    <el-menu-item v-for="(menuItem,index) in menuItems" :index = "menuItem.path">
-      {{menuItem.name}}
-    </el-menu-item>
+    <el-row>
+      <el-col :span="4" v-for="(menuItem,index) in menuItems" :key="index">
+        <el-menu-item :index = "menuItem.path">
+          {{menuItem.name}}
+        </el-menu-item>
+      </el-col>
+    </el-row>
   </el-menu>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-import {inject, ref} from "vue";
+import {inject} from "vue";
 
 //TODO：监听事件
 //节流函数
@@ -63,8 +66,8 @@ const menuItems = [
   {name:'收藏',path:'/dashboard/collection'},
   {name:'其他',path:'/dashboard/other'},
 ]
-const activeIndex = menuItems[0].path;
-const router = useRouter();
+// const activeIndex = menuItems[0].path;
+// const router = useRouter();
 
 let user = inject('user');
 let color = inject('color');
@@ -86,4 +89,10 @@ let color = inject('color');
   top: 0;
   z-index: 100;
 }
+@media screen and (max-width: 460px){
+  #username{
+    display: none;
+  }
+}
+
 </style>

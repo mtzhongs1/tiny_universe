@@ -10,7 +10,8 @@ import java.util.List;
 
 @Data
 public class ArticleDTO {
-    private Long userId;
+    @NotBlank(message = "用户名不能为空")
+    private String username;
     @NotBlank(message = "内容不能为空")
     private String content;
     @NotBlank(message = "标题不能为空")

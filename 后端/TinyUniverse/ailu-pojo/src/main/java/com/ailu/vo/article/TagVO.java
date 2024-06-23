@@ -2,6 +2,8 @@ package com.ailu.vo.article;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Description:
  * @Author: ailu
@@ -9,7 +11,7 @@ import lombok.Data;
  */
 
 @Data
-public class TagVO {
+public class TagVO implements Serializable {
     private Long id;
     private String name;
     private Long count;

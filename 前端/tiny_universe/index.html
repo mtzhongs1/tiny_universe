@@ -55,6 +55,7 @@
     --message-text-color: var(--message-text-black-color);
     --shadow-color: var(--shadow-black-color);
     --common-color: #62b9ec;
+    --common-shallow-color: #5c7d94;
     --common-shadow-color: 1px 1px 1px 1px rgb(131, 133, 129),
     -1px -1px 1px 1px rgb(100, 100, 100);
 
@@ -109,9 +110,9 @@ html {
 
 /*滚动条颜色*/
 ::-webkit-scrollbar-thumb {
-    background:var(--main-beside-color);
+    background:var(--common-shallow-color);
     border-radius: 4px;
-
+    opacity: 0.2;
 }
 /*背景颜色*/
 ::-webkit-scrollbar-track {

@@ -9,6 +9,7 @@ import com.ailu.vo.user.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -47,7 +48,6 @@ public class UserController {
     @ApiOperation("修改用户信息")
     @PutMapping("/updateMsg")
     public Result updateMsg(@RequestBody UserUpdateDTO userUpdateDTO){
-
         userService.updateMsg(userUpdateDTO);
         return Result.success();
     }

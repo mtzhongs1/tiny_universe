@@ -207,6 +207,10 @@ public class RedisCache {
         return redisTemplate.opsForHash().multiGet(key, hKeys);
     }
 
+    public <T> List<T> getMultiCacheObjectValue(final Collection<String> keys){
+        return redisTemplate.opsForValue().multiGet(keys);
+    }
+
     /**
      * 获得缓存的基本对象列表
      *

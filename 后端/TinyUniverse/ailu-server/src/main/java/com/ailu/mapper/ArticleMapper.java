@@ -3,6 +3,8 @@ package com.ailu.mapper;
 import com.ailu.aop.AutoFill;
 import com.ailu.aop.InsertOrUpdate;
 import com.ailu.entity.Article;
+import com.ailu.vo.article.ArticleVO;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,7 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ArticleMapper {
     @AutoFill(InsertOrUpdate.INSERT)
-    @Insert("insert into article(user_id,content,title,description,cover,tag,type,create_time,update_time)" +
-            "values(#{userId},#{content},#{title},#{description},#{cover},#{tag},#{type},#{createTime},#{updateTime})")
     void saveArticle(Article article);
+
+    Page<ArticleVO> pageQueryArticle(Long userId);
 }

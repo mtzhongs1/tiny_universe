@@ -126,6 +126,7 @@ const toolbarConfig = {
 }
 
 let article = reactive({
+  id: '',
   title: '',
   content: '',
   description: '',
@@ -141,6 +142,9 @@ let tags = reactive([{
 let onTags = reactive([]);
 
 let name = ref('');
+
+let user = inject('user');
+
 onMounted(() => {
   getTags();
 })
@@ -190,12 +194,19 @@ const articleValidate = () => {
   validator.add(article.title,[{
     strategy: 'isNotEmpty',
     errorMsg: '标题不能为空'
+  },{
+    strategy: 'maxLength:25',
+    errorMsg: '标题长度不能超过25个字符'
+  }]);
+  validator.add(article.description,[{
+    strategy: 'maxLength:50',
+    errorMsg: '描述长度不能超过50个字符'
   }]);
   validator.add(editor.value.getText(),[{
     strategy: 'isNotEmpty',
     errorMsg: '内容不能为空'
   },{
-    strategy: 'minLength:20',
+    strategy: 'minLength:10',
     errorMsg: '文章内容长度不能少于10个字符'
   },{
     strategy: 'maxLength:2000',
@@ -235,6 +246,7 @@ const saveArticle = async (isArticle) => {
     ElMessage.error("上传文章内容失败，服务器繁忙")
     return;
   }
+  formData.append("author",user.username);
   formData.append("description",article.description);
   formData.append("cover",article.cover.join(','));
   formData.append("type",isArticle);
