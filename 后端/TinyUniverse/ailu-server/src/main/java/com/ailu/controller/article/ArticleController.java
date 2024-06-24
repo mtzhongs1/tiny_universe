@@ -47,5 +47,12 @@ public class ArticleController {
         return Result.success(pageResult);
     }
 
+    @GetMapping("/{articleId}")
+    public Result<Article> getArticle(@PathVariable Long articleId){
+        Article article = articleService.getArticle(articleId);
+        return Result.success(article);
+    }
+
+
 
 }

@@ -33,8 +33,8 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
         //点赞功能
         String hkey = "article_active:"+articleId;
         String skey = "article_active:love:"+articleId;
-        Long love = ((Number)(redisCache.getCacheMapValue(hkey, "love"))).longValue();
-        String userId = BaseContext.getCurrentId().toString();
+        Long love = redisCache.getCacheMapValue(hkey, "love");
+        Long userId = BaseContext.getCurrentId();
         boolean isAdd = setOperations.isMember(skey, userId);
         if(isAdd){
             //删除
@@ -63,8 +63,8 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
         //点赞功能
         String hkey = "article_active:"+articleId;
         String skey = "article_active:collection:"+articleId;
-        Long collectionCount = ((Number)(redisCache.getCacheMapValue(hkey, "collectionCount"))).longValue();
-        String userId = BaseContext.getCurrentId().toString();
+        Long collectionCount = redisCache.getCacheMapValue(hkey, "collectionCount");
+        Long userId = BaseContext.getCurrentId();
         boolean isAdd = setOperations.isMember(skey, userId);
         if(isAdd){
             //删除

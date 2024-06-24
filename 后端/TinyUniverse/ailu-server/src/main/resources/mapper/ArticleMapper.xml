@@ -6,10 +6,10 @@
         values(#{author},#{userId},#{content},#{title},#{description},#{cover},#{tag},#{type},#{createTime},#{updateTime})
     </insert>
     <select id="pageQueryArticle" resultType="com.ailu.vo.article.ArticleVO">
-        select a.id,u.username as author,a.content,a.title,a.description,a.cover,a.tag,a.type,a.create_time,a.update_time
+        select a.id,u.username as author,a.title,a.description,a.cover,a.create_time
         from article a,user u
-        where a.user_id = u.id and a.user_id = #{userId} and a.type = 1 and a.status = 1 and
-        order by create_time desc
+        where a.user_id = u.id and a.user_id = #{userId} and a.type = 1 and a.status = 1
+        order by a.create_time desc
     </select>
 
 </mapper>

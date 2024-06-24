@@ -237,8 +237,10 @@ const saveArticle = async (isArticle) => {
   formData.append("title",article.title);
   //存入html内容，得到html的url
   const htmlData = new FormData();
-  htmlData.append("html",getBlob(editor.value.getHtml(),"text/html;charset=utf-8"),article.title+".html");
-  console.log(htmlData.get("html"))
+  htmlData.append("html",getBlob(+editor.value.getHtml(),"text/html;charset=utf-8"),article.title+".html");
+  const url = URL.createObjectURL(htmlData.get("html"));
+  window.location.href=url;
+  // console.log(url);
   const res = await doPostFile("/file/uploadFile",htmlData);
   if(res.data.code===1){
     formData.append("content",res.data.data);

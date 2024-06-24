@@ -10,6 +10,7 @@ import Collection from '@/views/dashboard/collection/Collection.vue'
 import Other from '@/views/dashboard/other/Other.vue'
 import User from '@/views/dashboard/home/User.vue'
 import ArticleEditor from '@/views/dashboard/article/ArticleEditor.vue'
+import ArticleContent from "@/views/dashboard/article/ArticleContent.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,7 +32,8 @@ const router = createRouter({
         {path: 'collection',name: 'Collection',component:Collection},
         {path: 'other',name: 'Other',component:Other},
         {path: 'user',name:'User',component:User},
-        {path: 'article_editor',name:'ArticleEditor',component:ArticleEditor}
+        {path: 'article_editor',name:'ArticleEditor',component:ArticleEditor},
+        {path: 'article/content/:articleId',name:'ArticleContent',component:ArticleContent}
       ]
     },
   ]

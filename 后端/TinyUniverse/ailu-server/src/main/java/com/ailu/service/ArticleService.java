@@ -18,4 +18,7 @@ public interface ArticleService {
     void publishArticle(Article article);
 
     List<ArticleVO> pageQueryArticle(Long userId, int pageNum, int pageSize);
+
+    Article getArticle(Long articleId);
+
 }

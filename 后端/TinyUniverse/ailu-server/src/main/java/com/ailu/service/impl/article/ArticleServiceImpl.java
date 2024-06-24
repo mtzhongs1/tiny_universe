@@ -94,28 +94,27 @@ public class ArticleServiceImpl implements ArticleService {
         //     return redisCache.redisTemplate.opsForHash().entries(articleId);
         //}).collect(Collectors.toList());
         // 这样修改后collect方法里得到的是就是明确的数据类型
-        HashOperations<String,String,Object> hashOperations = redisCache.redisTemplate.opsForHash();
-        List<Map<String,Object>> articleActives = articleIds.stream().map(hashOperations::entries).collect(Collectors.toList());
+        HashOperations<String,String,Long> hashOperations = redisCache.redisTemplate.opsForHash();
+        List<Map<String,Long>> articleActives = articleIds.stream().map(hashOperations::entries).collect(Collectors.toList());
         // List<Map<String,Long>> articleActives = articleActiveJsons.stream().map(articleJson -> articleJson.toJavaObject(Map.class)).collect(Collectors.toList());
 
         // 转为Map
-        Map<Long,Map<String,Object>> articleActiveMaps = new HashMap<>();
-        for (Map<String, Object> articleActive : articleActives) {
-            Object objectId = articleActive.get("articleId");
-            Long articleId = ((Number)(objectId)).longValue();
+        Map<Long,Map<String,Long>> articleActiveMaps = new HashMap<>();
+        for (Map<String, Long> articleActive : articleActives) {
+            Long articleId = articleActive.get("articleId");
             articleActiveMaps.put(articleId,articleActive);
         }
         SetOperations setOperations = redisCache.redisTemplate.opsForSet();
         for (ArticleVO article : articles) {
             Long articleId = article.getId();
-            Map<String,Object> articleActiveMap = articleActiveMaps.get(articleId);
+            Map<String,Long> articleActiveMap = articleActiveMaps.get(articleId);
             if(articleActiveMap == null){
                 throw new BaseException("服务器繁忙");
             }
-            article.setCollectionCount(((Number)(articleActiveMap.get("collectionCount"))).longValue());
-            article.setWatch(((Number)(articleActiveMap.get("watch"))).longValue());
-            article.setCommentCount(((Number)(articleActiveMap.get("commentCount"))).longValue());
-            article.setLove(((Number)(articleActiveMap.get("love"))).longValue());
+            article.setCollectionCount(articleActiveMap.get("collectionCount"));
+            article.setWatch(articleActiveMap.get("watch"));
+            article.setCommentCount(articleActiveMap.get("commentCount"));
+            article.setLove(articleActiveMap.get("love"));
 
             if(Boolean.TRUE.equals(setOperations.isMember("article_active:love:" + article.getId(), userId.toString()))){
                 article.setIsLove(true);
@@ -130,6 +129,12 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         return articles;
+    }
+
+    @Override
+    public Article getArticle(Long articleId) {
+        Article article = articleMapper.getArticle(articleId);
+        return article;
     }
 
     private static @NotNull String getKey(Long userId, int pageNum, int pageSize) {

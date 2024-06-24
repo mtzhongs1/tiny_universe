@@ -49,8 +49,8 @@ onMounted(() => {
 
 //变量区
 // TODO:轮播图切换
-let upDown = ref(true);
-let isfooter = ref(true);
+let upDown = ref(false);
+let isfooter = ref(false);
 const images = ref([]);
 let user = reactive({
   id: '',

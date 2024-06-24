@@ -7,6 +7,7 @@ import com.ailu.vo.article.ArticleVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * @author: ailu
@@ -20,4 +21,8 @@ public interface ArticleMapper {
     void saveArticle(Article article);
 
     Page<ArticleVO> pageQueryArticle(Long userId);
+
+    @Select("select * from article where id = #{articleId}")
+    Article getArticle(Long articleId);
+
 }

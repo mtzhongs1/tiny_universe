@@ -17,15 +17,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ArticleVO {
     private Long id;
-    private String author;
     private String description;
     private String cover;
-    private String tag;
-    private String content;
-    private Boolean type;
     private String title;
+    private String author;
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
     // active属性
     private Long love;
     private Long commentCount;
