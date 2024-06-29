@@ -1,37 +1,32 @@
 package com.ailu.service.impl.article;
 
 import com.ailu.context.BaseContext;
-import com.ailu.dto.article.ArticleActiveDTO;
 import com.ailu.dto.article.ArticleDTO;
 import com.ailu.entity.Article;
-import com.ailu.entity.ArticleActive;
 import com.ailu.exception.BaseException;
 import com.ailu.mapper.ArticleActiveMapper;
 import com.ailu.mapper.ArticleMapper;
 import com.ailu.mapper.ArticleTagMapper;
 import com.ailu.mapper.TagMapper;
-import com.ailu.service.ArticleService;
+import com.ailu.result.PageResult;
+import com.ailu.service.article.ArticleService;
+import com.ailu.service.article.TagService;
+import com.ailu.service.common.MinioService;
 import com.ailu.util.RedisCache;
+import com.ailu.vo.article.ArticleAndActiveVO;
 import com.ailu.vo.article.ArticleVO;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -51,16 +46,19 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleTagMapper articleTagMapper;
     @Autowired
     private ArticleActiveMapper articleActiveMapper;
+
+    @Autowired
+    private MinioService minioService;
+
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private TagService tagService;
     @Override
     @Transactional
     public void publishArticle(Article article) {
         Long userId = BaseContext.getCurrentId();
-        //删除查询缓存
-        String key = "query_article_userId:" + userId;
-        redisCache.deleteObject(redisCache.redisTemplate.keys(key+"*"));
-
         article.setUserId(userId);
         // 添加文章
         articleMapper.saveArticle(article);
@@ -73,18 +71,20 @@ public class ArticleServiceImpl implements ArticleService {
 
         // ArticleActive articleActive = new ArticleActive(articleId, 0L, 0L, 0L,0L,0L);
         // redisCache.setCacheObject("article_active"+articleId, articleActive);
+        deleteArticlePageCache();
         setArticleActiveHash(articleId);
     }
 
     @Override
-    public List<ArticleVO> pageQueryArticle(Long userId,int pageNum, int pageSize) {
+    public PageResult pageQueryArticle(Long userId, int pageNum, int pageSize) {
         String key = getKey(userId, pageNum, pageSize);
-        List<ArticleVO> articles = redisCache.getCacheObject(key);
-
-        if(articles == null){
+        List<ArticleAndActiveVO> articles = redisCache.getCacheObject(key);
+        Long total = null;
+        if(ObjectUtils.isEmpty(articles)){
             PageHelper.startPage(pageNum, pageSize);
-            Page<ArticleVO> page = articleMapper.pageQueryArticle(userId);
+            Page<ArticleAndActiveVO> page = articleMapper.pageQueryArticle(userId);
             articles  = page.getResult();
+            total = page.getTotal();
             redisCache.setCacheObject(key,articles);
         }
         List<String> articleIds = articles.stream().map(article -> "article_active:" + article.getId()).collect(Collectors.toList());
@@ -105,7 +105,7 @@ public class ArticleServiceImpl implements ArticleService {
             articleActiveMaps.put(articleId,articleActive);
         }
         SetOperations setOperations = redisCache.redisTemplate.opsForSet();
-        for (ArticleVO article : articles) {
+        for (ArticleAndActiveVO article : articles) {
             Long articleId = article.getId();
             Map<String,Long> articleActiveMap = articleActiveMaps.get(articleId);
             if(articleActiveMap == null){
@@ -132,9 +132,26 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article getArticle(Long articleId) {
-        Article article = articleMapper.getArticle(articleId);
-        return article;
+    public ArticleVO getArticle(Long articleId) {
+        ArticleVO articleVO = articleMapper.getArticle(articleId);
+        List<String> tagNames = tagService.getTagNames(articleId);
+        articleVO.setTag(tagNames);
+        return articleVO;
+    }
+
+    @Override
+    public void deleteArticle(List<Long> ids) {
+        //删除文章缓存
+        deleteArticlePageCache();
+        //删除文章活动属性缓存
+        deleteArticleActiveCache(ids);
+        articleMapper.deleteArtOrDra(ids,1);
+    }
+
+    @Override
+    public void updateArticle(ArticleDTO articleDTO) {
+        deleteArticlePageCache();
+        articleMapper.updateArticle(articleDTO);
     }
 
     private static @NotNull String getKey(Long userId, int pageNum, int pageSize) {
@@ -142,7 +159,20 @@ public class ArticleServiceImpl implements ArticleService {
                 .append("pageNum:").append(pageNum).append("pageSize:").append(pageSize).toString();
         return key;
     }
+    private void deleteArticlePageCache() {
+        Long userId = BaseContext.getCurrentId();
+        //删除查询缓存
+        String key = "query_article_userId:" + userId;
+        redisCache.deleteObject(redisCache.redisTemplate.keys(key+"*"));
+    }
 
+
+    private void deleteArticleActiveCache(List<Long> ids) {
+        //删除查询缓存
+        String key = "article_active:";
+        List<String> actKeys = ids.stream().map(id -> key + id).collect(Collectors.toList());
+        redisCache.deleteObject(actKeys);
+    }
 
     private void setArticleActiveHash(Long articleId) {
         String key = "article_active:"+ articleId;
@@ -159,4 +189,5 @@ public class ArticleServiceImpl implements ArticleService {
         articleActiveMap.put("articleId",articleId);
         redisCache.setCacheMap(key,articleActiveMap);
     }
+
 }

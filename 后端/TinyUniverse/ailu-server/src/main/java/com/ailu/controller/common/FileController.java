@@ -1,26 +1,13 @@
 package com.ailu.controller.common;
 
 import com.ailu.result.Result;
-import com.ailu.service.FileService;
-import com.ailu.service.MinioService;
+import com.ailu.service.common.FileService;
 import com.ailu.vo.article.ImageVO;
-import com.sun.org.apache.xpath.internal.operations.Mult;
-import io.minio.GetObjectArgs;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @RequestMapping("/file")
 @RestController

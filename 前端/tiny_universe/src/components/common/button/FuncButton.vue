@@ -6,7 +6,7 @@
 </template>
 <script setup>
 // 父组件传递内容
-const props = defineProps(['message'])
+let props = defineProps(['message'])
 </script>
 <style scoped>
 button {

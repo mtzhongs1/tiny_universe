@@ -1,7 +1,7 @@
 package com.ailu.controller.common;
 
 import com.ailu.result.Result;
-import com.ailu.service.SettingService;
+import com.ailu.service.common.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

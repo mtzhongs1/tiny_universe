@@ -1,23 +1,25 @@
 <template>
-  <div>
+  <div class="outer-div">
     <div class="article-detail">
       <div class="header">
         <h1>{{ article.title }}</h1>
         <p class="meta">
-          <span>作者：{{ article.author }}</span>
-          <span>时间：{{ article.createTime }}</span>
+          <span>{{ article.author }}</span>
+          <span>{{ article.createTime }}</span>
+          <span><el-icon><View /></el-icon>{{article.watch}}</span>
         </p>
       </div>
-    <!--TODO:中文乱码，在嵌入的html页面加上<meta charset="UTF-8">     -->
-      <iframe :src="article.content" class="content"></iframe>
+<!--      <iframe :src="article.content" id="content" onload="load()"></iframe>-->
+      <article-content-view :content="article.content"></article-content-view>
     </div>
   </div>
 </template>
 <script setup>
-import {onBeforeMount, reactive} from "vue";
+import {onBeforeMount,reactive} from "vue";
 import {ElMessage} from "element-plus";
-import {doGet} from "@/http/httpRequest.js";
+import {doGet, doPostxwww} from "@/http/httpRequest.js";
 import {useRoute} from "vue-router";
+import ArticleContentView from "@/components/dashboard/article/ArticleContentView.vue";
 
 let article = reactive({
   id:'',
@@ -28,37 +30,46 @@ const query = route.query;
 onBeforeMount(() => {
   getArticle();
 })
-const getArticle = () => {
+const getArticle = async () => {
   article.id = params.articleId;
   console.log(article.id);
-  doGet("article/"+article.id).then((resp) => {
+  const resp = await doGet("article/"+article.id)
     if(resp.data.code === 1){
       const tempArticle = resp.data.data;
       Object.assign(article,tempArticle);
     }else{
       ElMessage.error("服务器繁忙");
     }
-  })
   article.love = query.love;
   article.collectionCount = query.collectionCount;
   article.isLove = query.isLove;
   article.commentCount = query.commentCount;
   article.isCollection = query.isCollection;
+  article.watch = query.watch;
+  // 浏览量加一
+  doPostxwww("article_active/watch",{articleId:article.id});
 }
 </script>
 <style scoped>
 .article-detail {
-  max-width: 800px;
+  max-width: 1000px;
+  padding: 20px 10px;
   margin: auto;
+  background: var(--main-beside-color);
 }
 
-.header h1 {
-  font-size: 2rem;
+.header h1{
+  text-align: center;
 }
 
 .meta {
   color: #666;
   font-size: 0.8rem;
+  text-align: center;
+}
+
+.meta span{
+  margin: 10px;
 }
 
 .cover-image {
@@ -66,8 +77,10 @@ const getArticle = () => {
   height: auto;
 }
 
-.content {
-  line-height: 1.6;
+#content {
+  width: 100%;
+  overflow: hidden;
+  height: 100vh;
+  border: none;
 }
-
 </style>

@@ -32,7 +32,7 @@ const router = createRouter({
         {path: 'collection',name: 'Collection',component:Collection},
         {path: 'other',name: 'Other',component:Other},
         {path: 'user',name:'User',component:User},
-        {path: 'article_editor',name:'ArticleEditor',component:ArticleEditor},
+        {path: 'article_editor/:articleId',name:'ArticleEditor',component:ArticleEditor},
         {path: 'article/content/:articleId',name:'ArticleContent',component:ArticleContent}
       ]
     },

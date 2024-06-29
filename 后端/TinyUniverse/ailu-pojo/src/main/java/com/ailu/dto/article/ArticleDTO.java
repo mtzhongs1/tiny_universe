@@ -10,19 +10,14 @@ import java.util.List;
 
 @Data
 public class ArticleDTO {
-    @NotBlank(message = "用户名不能为空")
-    private String username;
+    @NotNull(message = "文章id不能为空")
+    private Long id;
     @NotBlank(message = "内容不能为空")
     private String content;
     @NotBlank(message = "标题不能为空")
     private String title;
     private String description;
     private String cover;
-    @NotBlank(message = "请至少选择一个标签")
-    private String tag;
-    @NotNull(message = "类型不能为空")
-    private Boolean type;
-    private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
 }

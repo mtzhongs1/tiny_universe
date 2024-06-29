@@ -4,12 +4,11 @@ import com.ailu.dto.user.UserLoginDTO;
 import com.ailu.dto.user.UserRegisterDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.result.Result;
-import com.ailu.service.UserService;
+import com.ailu.service.user.UserService;
 import com.ailu.vo.user.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 /**

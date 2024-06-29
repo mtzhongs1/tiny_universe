@@ -32,7 +32,7 @@
       <el-row>
         <el-col :sm="16" :md="2">封面：</el-col>
         <el-col :span="18">
-          <ArticleCropper :func="getCover"></ArticleCropper>
+          <ArticleCropper :func="getCover" :images="article.cover"></ArticleCropper>
         </el-col>
       </el-row>
       <el-row>
@@ -64,6 +64,7 @@
         </el-col>
       </el-row>
       <el-row>
+      <!--选中的标签-->
         <el-tag
             v-for="(tag,index) in onTags"
             :key="index"
@@ -77,9 +78,13 @@
           {{ tag.name }}
         </el-tag>
       </el-row>
-      <div>
+      <div v-if="params.articleId < 0">
         <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
         <FuncButton @click="saveArticle(true)" :message="'发布文章'"></FuncButton>
+      </div>
+      <div v-else>
+        <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
+        <FuncButton @click="updateArticle(true)" :message="'修改文章'"></FuncButton>
       </div>
     </div>
   </div>
@@ -90,14 +95,36 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import {inject, onBeforeUnmount, onMounted, reactive, ref, shallowRef} from "vue";
 import FuncButton from "@/components/common/button/FuncButton.vue";
 import axios from "axios";
-import {getBlob, getToken} from "@/util/util.js";
+import { getToken} from "@/util/util.js";
 import ArticleCropper from "@/components/common/cropper/ArticleCropper.vue";
-import {doGet, doPost, doPostFile} from "@/http/httpRequest.js";
+import {doGet, doPost, doPut} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {Validator} from "@/util/validator.js";
+import {useRoute} from "vue-router";
 //Editor 组件用于创建编辑器实例，并通过 defaultConfig 选项配置默认设置
 const editor = shallowRef(null);
-const color = inject('color')
+//文章数据
+let article = reactive({
+  id: '',
+  title: '',
+  content: '',
+  description: '',
+  cover: [],
+  type:'',
+  tag:'',
+})
+let tags = reactive([{
+  name:'',
+  id:'',
+  status:false,
+}])
+let onTags = ref([]);
+let name = ref('');
+//父组件获得的数据
+let color = inject('color');
+let user = inject('user');
+const route = useRoute();
+const params = route.params;
 
 //编辑器配置（即文本框的内容）
 const editorConfig = {
@@ -114,81 +141,60 @@ const editorConfig = {
         token: getToken(),
       },
       fieldName: 'image',
-    }
+    },
   },
 }
 // 隐藏部分工具
 const toolbarConfig = {
   excludeKeys: [
       'group-video',
-      'fullScreen'
+      'fullScreen',
+      'color',
   ]
 }
 
-let article = reactive({
-  id: '',
-  title: '',
-  content: '',
-  description: '',
-  cover: [],
-  type:'',
-  tag:'',
-})
-let tags = reactive([{
-  name:'',
-  id:'',
-  status:false,
-}])
-let onTags = reactive([]);
-
-let name = ref('');
-
-let user = inject('user');
-
 onMounted(() => {
   getTags();
+  getArticle();
 })
-
 onBeforeUnmount(() => {
   //实例附加到 editor 引用。
   editor.value.destroy()
 })
 
+// 编辑器操作
 const handleClose = (index) => {
-  console.log(index);
-  onTags[index].status = false;
-  onTags.splice(index,1);
+  onTags.value[index].status = false;
+  onTags.value.splice(index,1);
 }
-
-const getCover = (url) => {
-  article.cover.push(url);
-}
-
-const setTagStatus = (index) => {
-  if(!tags[index].status){
-    tags[index].status = true;
-    onTags.push(tags[index]);
-  }
-}
-
-const getTags = () => {
-  doGet("/tag",{name:name.value}).then((resp) => {
-    if(resp.data.code === 1){
-      const tempTags = resp.data.data;
-      tags.splice(0,tags.length);
-      tempTags.forEach(tag => {tag.status=false; tags.push(tag);});
-    }else{
-      ElMessage.error("服务器繁忙");
-    }
-  })
-}
-
 const handleEditorCreated = (editorInstance) => {
   //实例附加到 editor 引用。
   editor.value = editorInstance
   console.log(editor.value.getConfig());
 };
 
+//文章属性操作
+const getCover = (url,index) => {
+  article.cover[index] = url;
+}
+const setTagStatus = (index) => {
+  if(!tags[index].status){
+    tags[index].status = true;
+    onTags.value.push(tags[index]);
+  }
+}
+const getTags = async () => {
+  let resp = await doGet("/tag",{name:name.value});
+  if(resp.data.code === 1){
+    const tempTags = resp.data.data;
+    tags.splice(0,tags.length);
+    tempTags.forEach(tag => {tag.status=false; tags.push(tag);});
+  }else{
+    ElMessage.error("服务器繁忙");
+  }
+}
+
+//文章相关操作
 const articleValidate = () => {
   var validator = new Validator();
   validator.add(article.title,[{
@@ -225,35 +231,8 @@ const articleValidate = () => {
   }])
   return validator.start();
 }
-
 const saveArticle = async (isArticle) => {
-  const errorMsg = articleValidate();
-  if(errorMsg){
-    ElMessage.error(errorMsg);
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("title",article.title);
-  //存入html内容，得到html的url
-  const htmlData = new FormData();
-  htmlData.append("html",getBlob(+editor.value.getHtml(),"text/html;charset=utf-8"),article.title+".html");
-  const url = URL.createObjectURL(htmlData.get("html"));
-  window.location.href=url;
-  // console.log(url);
-  const res = await doPostFile("/file/uploadFile",htmlData);
-  if(res.data.code===1){
-    formData.append("content",res.data.data);
-  }else{
-    ElMessage.error("上传文章内容失败，服务器繁忙")
-    return;
-  }
-  formData.append("author",user.username);
-  formData.append("description",article.description);
-  formData.append("cover",article.cover.join(','));
-  formData.append("type",isArticle);
-  const onTagIds = onTags.map(tag => tag.id);
-  formData.append("tag",onTagIds.join(','));
+  const formData = getArticleFd(isArticle)
   doPost("/article/publish",formData).then((resp) => {
     if(resp.data.code === 1){
       ElMessage.success("发布成功");
@@ -261,6 +240,64 @@ const saveArticle = async (isArticle) => {
       ElMessage.error(resp.data.msg);
     }
   })
+}
+const updateArticle = async (isArticle) => {
+  const formData = getArticleFd(isArticle)
+  doPut("/article",formData).then((resp) => {
+    if(resp.data.code === 1){
+      ElMessage.success("修改成功");
+    }else{
+      ElMessage.error(resp.data.msg);
+    }
+  })
+}
+const getArticle = () => {
+  if(params.articleId < 0){
+    return;
+  }
+  article.id = params.articleId;
+  doGet("article/"+article.id).then((resp) => {
+    if(resp.data.code === 1){
+      const tempArticle = resp.data.data;
+      Object.assign(article,tempArticle);
+      article.cover = tempArticle.cover ? tempArticle.cover.split(',') : [];
+      // 返回的是标签的名字数组
+      tempArticle.tag.forEach((onTag) => {
+        tags.forEach((tag) => {
+          if(onTag === tag.name){
+            onTags.value.push(tag);
+            tag.status = true;
+          }
+        })
+      })
+
+      editor.value.setHtml(article.content);
+    }else{
+      ElMessage.error("服务器繁忙");
+    }
+  })
+}
+
+//可重用方法
+const getArticleFd = (isArticle) => {
+  const errorMsg = articleValidate();
+  if(errorMsg){
+    ElMessage.error(errorMsg);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("id",article.id)
+  formData.append("title",article.title);
+  formData.append("content",editor.value.getHtml());
+  // editor.value.getHtml
+  formData.append("author",user.username);
+  formData.append("description",article.description);
+  formData.append("cover",article.cover.join(','));
+  formData.append("type",isArticle);
+  const onTagIds = onTags.value.map(tag => tag.id);
+  formData.append("tag",onTagIds.join(','));
+  return formData;
 }
 
 </script>

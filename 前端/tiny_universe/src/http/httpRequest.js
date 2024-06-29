@@ -62,15 +62,16 @@ export function doPostFile(url,data){
         }
     });
 }
-
-
-
-export function doDelete(url,params){
+export function doDelete(url,data){
     return axios({
         method: "delete",
         url: url,
-        params: params,
+        data: data,
         dataType: "json",
+        // TODO:后端参数有@RequestBody时，要用json的形式
+        headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+        }
     });
 }
 

@@ -6,26 +6,19 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @Description:
  * @Author: ailu
- * @Date: 2024/6/28 下午11:35
+ * @Date: 2024/6/26 上午1:10
  */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleVO implements Serializable{
-    private Long id;
-    private String author;
-    private String content;
+public class DraftVO implements Serializable {
     private String title;
-    private String description;
-    private String cover;
-    private List<String> tag;
-    private Boolean status;
-    private Boolean type;
+    private Long id;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

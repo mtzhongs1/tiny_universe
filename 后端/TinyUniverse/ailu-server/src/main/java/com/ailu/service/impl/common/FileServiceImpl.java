@@ -1,8 +1,8 @@
 package com.ailu.service.impl.common;
 
 import com.ailu.exception.BaseException;
-import com.ailu.service.FileService;
-import com.ailu.service.MinioService;
+import com.ailu.service.common.FileService;
+import com.ailu.service.common.MinioService;
 import com.ailu.util.UuidUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * @Description:

@@ -1,7 +1,7 @@
 package com.ailu.service.impl.user;
 import com.ailu.exception.BaseException;
 import com.ailu.properties.EmailProperties;
-import com.ailu.service.EmailService;
+import com.ailu.service.user.EmailService;
 import com.ailu.util.CodeUtil;
 import com.ailu.util.RedisCache;
 import org.apache.commons.lang3.StringUtils;

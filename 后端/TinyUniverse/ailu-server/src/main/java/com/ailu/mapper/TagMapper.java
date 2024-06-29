@@ -18,4 +18,8 @@ public interface TagMapper {
     List<TagVO> getTags(String name);
 
     void addTagCount(String[] tags);
+
+    @Select("select name from tag t,article_tag at where t.id = at.tag_id and at.article_id = #{articleId} ")
+    List<String> getTagNames(Long articleId);
+
 }

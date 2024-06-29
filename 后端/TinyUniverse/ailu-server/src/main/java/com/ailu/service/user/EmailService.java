@@ -1,6 +1,4 @@
-package com.ailu.service;
-
-import com.ailu.entity.Email;
+package com.ailu.service.user;
 
 /**
  * @author: ailu

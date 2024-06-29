@@ -1,20 +1,11 @@
-package com.ailu.service.impl;
+package com.ailu.service.impl.article;
 
 import com.ailu.context.BaseContext;
-import com.ailu.service.ArticleActiveService;
+import com.ailu.service.article.ArticleActiveService;
 import com.ailu.util.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @Description:
@@ -54,7 +45,12 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
 
     @Override
     public void watch(Long articleId) {
-
+        // 下面错误： 原因，配置的序列化器将redis在序列化时转为String，因此存入的是String类型，自然没办法加一
+        // redisCache.redisTemplate.opsForHash().increment("article_active:"+articleId,"watch",1L);
+        String key = "article_active:" + articleId;
+        Long watch = redisCache.getCacheMapValue(key, "watch");
+        watch++;
+        redisCache.setCacheMapValue(key,"watch",watch);
     }
 
     @Override

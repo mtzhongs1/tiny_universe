@@ -1,4 +1,4 @@
-package com.ailu.service;
+package com.ailu.service.user;
 
 import com.ailu.dto.user.UserLoginDTO;
 import com.ailu.dto.user.UserRegisterDTO;

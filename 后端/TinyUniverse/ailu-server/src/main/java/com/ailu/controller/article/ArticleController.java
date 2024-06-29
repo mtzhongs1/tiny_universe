@@ -4,15 +4,20 @@ import com.ailu.dto.article.ArticleDTO;
 import com.ailu.entity.Article;
 import com.ailu.result.PageResult;
 import com.ailu.result.Result;
-import com.ailu.service.ArticleService;
+import com.ailu.service.article.ArticleService;
+import com.ailu.service.article.TagService;
+import com.ailu.vo.article.ArticleAndActiveVO;
 import com.ailu.vo.article.ArticleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Description:
@@ -27,10 +32,12 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private RedisCacheManager cacheManager;
+
 
     @PostMapping("/publish")
     @ApiOperation(value = "发布文章")
-
     public Result publishArticle(@RequestBody Article article) {
         articleService.publishArticle(article);
         return Result.success();
@@ -40,7 +47,7 @@ public class ArticleController {
     @ApiOperation(value = "分页获取文章信息")
     public Result<PageResult> pageQueryArticle(@PathVariable Long userId, @PathVariable int pageNum,
                                    @PathVariable int pageSize){
-        List<ArticleVO> articles = articleService.pageQueryArticle(userId,pageNum, pageSize);
+        List<ArticleAndActiveVO> articles = articleService.pageQueryArticle(userId,pageNum, pageSize);
         PageResult pageResult = new PageResult();
         pageResult.setRecords(articles);
         pageResult.setTotal(articles.size());
@@ -48,11 +55,29 @@ public class ArticleController {
     }
 
     @GetMapping("/{articleId}")
-    public Result<Article> getArticle(@PathVariable Long articleId){
-        Article article = articleService.getArticle(articleId);
-        return Result.success(article);
+    @Cacheable(value= "article",key = "#articleId")
+    public Result<ArticleVO> getArticle(@PathVariable Long articleId){
+        ArticleVO articleVO = articleService.getArticle(articleId);
+        return Result.success(articleVO);
     }
 
+    @DeleteMapping
+    @ApiOperation("删除文章")
+    public Result deleteArticle(@RequestBody List<Long> ids){
+        // TODO:删除集合中的缓存
+        for(Long id : ids){
+            Objects.requireNonNull(cacheManager.getCache("article")).evictIfPresent(id);
+        }
+        articleService.deleteArticle(ids);
+        return Result.success();
+    }
 
+    @PutMapping
+    @ApiOperation("修改文章")
+    @CacheEvict(value = "article",key = "#articleDTO.id")
+    public Result updateArticle(@RequestBody ArticleDTO articleDTO){
+        articleService.updateArticle(articleDTO);
+        return Result.success();
+    }
 
 }

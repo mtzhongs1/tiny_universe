@@ -1,4 +1,4 @@
-package com.ailu.service;
+package com.ailu.service.article;
 
 import com.ailu.vo.article.TagVO;
 
@@ -12,5 +12,6 @@ import java.util.List;
 
 public interface TagService {
     List<TagVO> getTags(String name);
+    List<String> getTagNames(Long ArticleId);
 
 }

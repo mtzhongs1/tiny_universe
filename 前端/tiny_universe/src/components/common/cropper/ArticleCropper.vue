@@ -3,7 +3,7 @@
   <div class="cover">
       <img @click="goFile(index)" v-for="(image,index) in images"
            :src="image" class="avatar" alt="" style="cursor: pointer"/>
-    <el-icon style="cursor: pointer" v-if="index < 3" class="avatar-icon" @click="goFile">
+    <el-icon style="cursor: pointer" v-if="images.length < 3" class="avatar-icon" @click="goFile">
       <Plus/>
     </el-icon>
     <input style="display:none" ref="uploadInput" type="file"
@@ -47,24 +47,49 @@
 </template>
 
 <script setup>
-import {reactive, ref} from 'vue'
+import {onMounted, reactive, ref, watch} from 'vue'
 import VuePictureCropper, { cropper } from 'vue-picture-cropper'
 import {doPostFile} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 
-const props = defineProps({
+let props = defineProps({
   func: {
     type: Function,
+  },
+  images: {
+    type: Array,
+    default: () => {
+      return []
+    }
   }
 })
 const func = props.func;
 
 const dialogVisible = ref(false)
-let images = reactive([]);
-let index = 0;
+let images = reactive(props.images);
 let tempImage = ref();
 let curr;
 let uploadInput = ref(null);
+
+watch(() => props.images, (newValue) => {
+  images = reactive(newValue);
+})
+
+const goFile = (tempCurr) => {
+  // 如果选择的图片的索引小于images的长度,说明是修改图片
+  if(tempCurr >= 0 && tempCurr < images.length){
+    curr = tempCurr;
+  }else{
+    if(images.length >= 3){
+      ElMessage.error('封面最多三张');
+      return;
+    }
+    curr = images.length;
+  }
+
+  uploadInput.value.click();
+}
+
 const selectFile = (event) => {
   const file = event.target.files[0];
   if (!file.type.includes('image')) {
@@ -74,19 +99,6 @@ const selectFile = (event) => {
   dialogVisible.value = true;
 }
 
-const goFile = (tempCurr) => {
-  if(tempCurr >= 0 && tempCurr < images.length){
-    curr = tempCurr;
-  }else{
-    if(index >= 3){
-      ElMessage.error('封面最多三张');
-      return;
-    }
-    curr = index;
-  }
-
-  uploadInput.value.click();
-}
 async function confirmImg(){
   if (!cropper) return
   // const file = await cropper.getFile();
@@ -95,11 +107,15 @@ async function confirmImg(){
   formData.append("image",tempImage.value);
   doPostFile("/file/uploadImg",formData).then((resp) => {
     if(resp.data.code === 1){
-      if(curr === index){
-        images[index++] = resp.data.data;
-        func(resp.data.data);
-      }else{
+      //为添加的情况
+      if(curr === images.length){
+        images.push(resp.data.data);
+        func(resp.data.data,images.length-1);
+      }
+      //为修改的情况
+      else{
         images[curr] = resp.data.data;
+        func(images[curr],curr);
       }
       dialogVisible.value = false;
     }else{

@@ -10,7 +10,7 @@
 <script setup>
 import { ref } from 'vue'
 import {useRouter} from "vue-router";
-const props = defineProps(['user']);
+let props = defineProps(['user']);
 let user = ref(props.user);
 const router = useRouter();
 function toUser(){

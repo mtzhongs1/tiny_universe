@@ -1,4 +1,4 @@
-package com.ailu.service;
+package com.ailu.service.common;
 
 import java.io.InputStream;
 

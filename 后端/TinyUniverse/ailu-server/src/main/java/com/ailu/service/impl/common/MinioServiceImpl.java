@@ -1,22 +1,17 @@
 package com.ailu.service.impl.common;
 
 import com.ailu.properties.MinioProperties;
-import com.ailu.service.MinioService;
+import com.ailu.service.common.MinioService;
 
 import com.ailu.util.MinioUtils;
 import io.minio.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Slf4j
 @Service
@@ -72,7 +67,8 @@ public class MinioServiceImpl implements MinioService {
         try {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .object(filePath)
-                    .contentType("text/html")
+                    // TODO:绝对要指定编码格式！！！
+                    .contentType("text/html;charset=utf-8")
                     .bucket(minioProperties.getBucket()).stream(inputStream,inputStream.available(),-1)
                     .build();
             minioClient.putObject(putObjectArgs);

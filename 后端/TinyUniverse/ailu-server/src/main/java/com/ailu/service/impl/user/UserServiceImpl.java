@@ -9,7 +9,7 @@ import com.ailu.entity.User;
 import com.ailu.exception.BaseException;
 import com.ailu.mapper.UserMapper;
 import com.ailu.properties.JwtProperties;
-import com.ailu.service.UserService;
+import com.ailu.service.user.UserService;
 import com.ailu.util.JwtUtil;
 import com.ailu.util.RedisCache;
 import com.ailu.vo.user.UserVO;

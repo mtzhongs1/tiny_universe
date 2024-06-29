@@ -1,7 +1,7 @@
 package com.ailu.controller.article;
 
 import com.ailu.result.Result;
-import com.ailu.service.ArticleActiveService;
+import com.ailu.service.article.ArticleActiveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,8 @@ public class ArticleActiveController {
         return Result.success();
     }
     @PostMapping("/watch")
-    public Result watch(){
+    public Result watch(@RequestParam("articleId") Long articleId){
+        articleActiveService.watch(articleId);
         return Result.success();
     }
     @PostMapping("/collection")
