@@ -2,7 +2,7 @@
   <!--TODO:替换input样式  -->
   <div class="cover">
       <img @click="goFile(index)" v-for="(image,index) in images"
-           :src="image" class="avatar" alt="" style="cursor: pointer"/>
+           :src="image" :key="index" class="avatar" alt="" style="cursor: pointer"/>
     <el-icon style="cursor: pointer" v-if="images.length < 3" class="avatar-icon" @click="goFile">
       <Plus/>
     </el-icon>
@@ -30,13 +30,13 @@
           :options="{
       viewMode: 1,
       //防止修改剪切框大小
-      dragMode: 'move',
+      // dragMode: 'move',
       aspectRatio: 1,
       cropBoxResizable: false
 
     }"
       />
-      <div class="dialog-footer">
+      <div class="dialog-footer">`
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="confirmImg">
           确认

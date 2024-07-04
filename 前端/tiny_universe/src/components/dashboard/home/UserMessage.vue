@@ -1,23 +1,26 @@
 <template>
   <!-- 个人基本信息 -->
   <div class="own-aside">
-      <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="120" :src="user.avatar" />
-      <span class="name">{{user.username}}</span>
-      <span class="description" style="font-size: 10px">{{user.description}}</span>
+    <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="120" :src="user.avatar" />
+    <span class="name">{{user.username}}</span>
+    <span class="description" style="font-size: 10px">{{user.description}}</span>
+    <div style="font-size: 15px">
+      <span style="margin-right: 10px" class="UserActiveDiv">粉丝：{{userActive.fans}}</span>
+      <span class="UserActiveDiv">关注：{{userActive.follows}}</span>
+    </div>
   </div>
 
 </template>
 <script setup>
-import { ref } from 'vue'
+import {inject, ref} from 'vue'
 import {useRouter} from "vue-router";
+import {newRoute} from "@/util/router.js";
 let props = defineProps(['user']);
 let user = ref(props.user);
 const router = useRouter();
+let userActive = inject('userActive')
 function toUser(){
-  const routerUrl = router.resolve({
-    path: '/dashboard/user',
-  })
-  window.open(routerUrl.href,'_blank');
+  newRoute("/dashboard/user_detail/"+user.value.id,router);
 }
 </script>
 <style scoped>
@@ -43,6 +46,11 @@ function toUser(){
   padding: 30px 20px;
 
   color: var(--text-color);
+}
+
+.UserActiveDiv:hover{
+  cursor:pointer;
+  color:var(--common-color)
 }
 
 @keyframes spin {

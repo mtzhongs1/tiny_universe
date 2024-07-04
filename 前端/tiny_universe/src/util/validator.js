@@ -12,7 +12,7 @@ const strategies = {
             errorMsg : void 0
     },
     isEmail(errorMsg){
-        return !/^\w+([+-.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(this.value) ?
+        return !/^\w+([+-.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(this) ?
             errorMsg : void 0
     },
     arrayIsNotEmpty(errorMsg){

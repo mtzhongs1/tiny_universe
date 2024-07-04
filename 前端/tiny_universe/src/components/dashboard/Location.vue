@@ -9,7 +9,7 @@
       router
   >
   <!--@select="handleSelect" -->
-    <el-menu-item id="username">
+    <el-menu-item @click="toUserDetail(user.id)" id="username">
       <h1>{{user.username}}</h1>
     </el-menu-item>
 
@@ -26,6 +26,10 @@
 
 <script setup>
 import {inject} from "vue";
+import {newRoute} from "@/util/router.js";
+import {useRouter} from "vue-router";
+
+let router = useRouter();
 
 //TODO：监听事件
 //节流函数
@@ -68,6 +72,10 @@ const menuItems = [
 ]
 // const activeIndex = menuItems[0].path;
 // const router = useRouter();
+
+const toUserDetail = (id) => {
+  newRoute('/dashboard/user_detaily/'+id,router);
+}
 
 let user = inject('user');
 let color = inject('color');

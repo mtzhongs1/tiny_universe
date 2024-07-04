@@ -78,13 +78,17 @@
           {{ tag.name }}
         </el-tag>
       </el-row>
-      <div v-if="params.articleId < 0">
-        <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
-        <FuncButton @click="saveArticle(true)" :message="'发布文章'"></FuncButton>
-      </div>
-      <div v-else>
-        <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
-        <FuncButton @click="updateArticle(true)" :message="'修改文章'"></FuncButton>
+      <div>
+        <div class="buttonDiv" v-if="params.articleId < 0">
+          <Draft></Draft>
+          <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
+          <FuncButton @click="saveArticle(true)" :message="'发布文章'"></FuncButton>
+        </div>
+        <div class="buttonDiv" v-else>
+          <Draft></Draft>
+          <FuncButton @click="saveArticle(false)" :message="'保存草稿'"></FuncButton>
+          <FuncButton @click="updateArticle(true)" :message="'修改文章'"></FuncButton>
+        </div>
       </div>
     </div>
   </div>
@@ -101,6 +105,7 @@ import {doGet, doPost, doPut} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {Validator} from "@/util/validator.js";
 import {useRoute} from "vue-router";
+import Draft from "@/components/dashboard/article/Draft.vue";
 //Editor 组件用于创建编辑器实例，并通过 defaultConfig 选项配置默认设置
 const editor = shallowRef(null);
 //文章数据
@@ -196,7 +201,7 @@ const getTags = async () => {
 
 //文章相关操作
 const articleValidate = () => {
-  var validator = new Validator();
+  const validator = new Validator();
   validator.add(article.title,[{
     strategy: 'isNotEmpty',
     errorMsg: '标题不能为空'
@@ -218,7 +223,7 @@ const articleValidate = () => {
     strategy: 'maxLength:2000',
     errorMsg: '文章内容长度不能超过2000个字符'
   }]);
-  validator.add(onTags,[{
+  validator.add(onTags.value,[{
     strategy: 'arrayIsNotEmpty',
     errorMsg: '标签不能为空'
   },{
@@ -233,13 +238,25 @@ const articleValidate = () => {
 }
 const saveArticle = async (isArticle) => {
   const formData = getArticleFd(isArticle)
-  doPost("/article/publish",formData).then((resp) => {
-    if(resp.data.code === 1){
-      ElMessage.success("发布成功");
-    }else{
-      ElMessage.error(resp.data.msg);
-    }
-  })
+  if(isArticle === true){
+    //发布文章
+    doPost("/article/publish",formData).then((resp) => {
+      if(resp.data.code === 1){
+        ElMessage.success("发布成功");
+      }else{
+        ElMessage.error(resp.data.msg);
+      }
+    })
+  }else{
+    //保存草稿
+    doPost("/draft/",formData).then((resp) => {
+      if(resp.data.code === 1){
+        ElMessage.success("保存成功");
+      }else{
+        ElMessage.error(resp.data.msg);
+      }
+    })
+  }
 }
 const updateArticle = async (isArticle) => {
   const formData = getArticleFd(isArticle)
@@ -278,6 +295,8 @@ const getArticle = () => {
   })
 }
 
+
+
 //可重用方法
 const getArticleFd = (isArticle) => {
   const errorMsg = articleValidate();
@@ -308,6 +327,11 @@ const getArticleFd = (isArticle) => {
 /*  display: flex;*/
 
 /*}*/
+
+.buttonDiv{
+  display: flex;
+  gap: 20px;
+}
 
 :deep(.w-e-modal button){
   padding: 4px;

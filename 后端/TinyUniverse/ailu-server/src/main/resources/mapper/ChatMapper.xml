@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ailu.mapper.ChatMapper">
+
+
+    <insert id="saveHistory">
+        insert into chat(user_id,username,avatar,text,date) values
+        <foreach collection="messageDTOs" item="messageDTO" separator="),(" open="(" close=")">
+            #{messageDTO.userId},#{messageDTO.username},#{messageDTO.avatar},#{messageDTO.text},#{messageDTO.date}
+        </foreach>
+    </insert>
+</mapper>

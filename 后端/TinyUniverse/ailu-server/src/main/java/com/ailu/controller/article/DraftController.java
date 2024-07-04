@@ -1,6 +1,8 @@
 package com.ailu.controller.article;
 
 import com.ailu.dto.article.DraftDTO;
+import com.ailu.entity.Article;
+import com.ailu.result.PageResult;
 import com.ailu.result.Result;
 import com.ailu.service.article.ArticleService;
 import com.ailu.service.article.DraftService;
@@ -29,17 +31,25 @@ public class DraftController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询草稿")
-    @Cacheable(value = "draft", key = "'draft:' + #draftDTO.userId + ':' + #draftDTO.pageNum + ':' + #draftDTO.pageSize")
-    public Result<List<DraftVO>> pageQueryDraft(DraftDTO draftDTO){
-        List<DraftVO> drafts = draftService.pageQueryDraft(draftDTO);
-        return Result.success(drafts);
+    @Cacheable(value = "draft", key = "'draft:' + #draftDTO.userId  + ':' + #draftDTO.name + ':' + #draftDTO.pageNum + ':' + #draftDTO.pageSize")
+    public Result<PageResult> pageQueryDraft(DraftDTO draftDTO){
+        PageResult pageResult = draftService.pageQueryDraft(draftDTO);
+        return Result.success(pageResult);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     @ApiOperation("删除草稿")
     @CacheEvict(value = "draft", allEntries = true)
     public Result deleteDraft(@RequestBody List<Long> ids){
         draftService.deleteDraft(ids);
+        return Result.success();
+    }
+
+    @PostMapping
+    @ApiOperation("保存草稿")
+    @CacheEvict(value = "draft", allEntries = true)
+    public Result saveDraft(@RequestBody Article article){
+        draftService.saveDraft(article);
         return Result.success();
     }
 

@@ -1,6 +1,7 @@
 package com.ailu.controller.user;
 
 import com.ailu.dto.user.FolFanDTO;
+import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserActiveDTO;
 import com.ailu.entity.UserActive;
 import com.ailu.result.PageResult;
@@ -28,30 +29,30 @@ public class UserActiveController {
 
     @GetMapping("/{userId}")
     @ApiOperation("获取用户活动属性")
-    public Result getUserActive(@PathVariable Long userId){
+    public Result<UserActive> getUserActive(@PathVariable Long userId){
         UserActive userActive = userActiveService.getUserActive(userId);
         return Result.success(userActive);
     }
 
-    @PostMapping("/follow/{to}")
+    @PostMapping("/follow")
     @ApiOperation("关注")
     public Result follow(@RequestBody UserActiveDTO userActiveDTO){
         userActiveService.follow(userActiveDTO);
         return Result.success();
     }
 
-    @GetMapping("/follow/{pageSize}/{pageNum}")
+    @GetMapping("/follow/page")
     @ApiOperation("分页查询关注数")
-    public Result<PageResult> pageQueryFollow(@PathVariable int pageSize,@PathVariable int pageNum){
-        List<FolFanDTO> follows = userActiveService.pageQueryFolOrFan(1,pageSize,pageNum);
-        return Result.success();
+    public Result<PageResult> pageQueryFollow(FolFanPageDTO folFanPageDTO){
+        PageResult page = userActiveService.pageQueryFolOrFan(1,folFanPageDTO);
+        return Result.success(page);
     }
 
-    @GetMapping("/fan")
-    @ApiOperation("分页查询粉丝数")
-    public Result<PageResult> pageQueryFans(@PathVariable int pageSize,@PathVariable int pageNum){
-        List<FolFanDTO> fans = userActiveService.pageQueryFolOrFan(0,pageSize,pageNum);
-        return Result.success();
+    @GetMapping("/fan/page")
+    @ApiOperation("分页查询粉丝")
+    public Result<PageResult> pageQueryFans(FolFanPageDTO folFanPageDTO){
+        PageResult page= userActiveService.pageQueryFolOrFan(0,folFanPageDTO);
+        return Result.success(page);
     }
 
 }

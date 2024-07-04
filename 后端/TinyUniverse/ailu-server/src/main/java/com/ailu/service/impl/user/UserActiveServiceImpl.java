@@ -2,9 +2,11 @@ package com.ailu.service.impl.user;
 
 import com.ailu.context.BaseContext;
 import com.ailu.dto.user.FolFanDTO;
+import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserActiveDTO;
 import com.ailu.entity.UserActive;
 import com.ailu.mapper.UserActiveMapper;
+import com.ailu.result.PageResult;
 import com.ailu.service.user.UserActiveService;
 import com.ailu.util.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,14 +63,19 @@ public class UserActiveServiceImpl implements UserActiveService {
     }
 
     @Override
-    public List<FolFanDTO> pageQueryFolOrFan(int folOrFan,int pageSize,int pageNum) {
+    public PageResult pageQueryFolOrFan(int folOrFan, FolFanPageDTO folFanPageDTO) {
         // 起始位置和末尾位置
+        int pageNum = folFanPageDTO.getPageNum();
+        int pageSize = folFanPageDTO.getPageSize();
+        Long userId = folFanPageDTO.getUserId();
         int start = (pageNum-1) * pageSize;
         int end = start + pageSize;
+
         ListOperations listOperations = redisCache.redisTemplate.opsForList();
         // 关注列表或者粉丝列表
-        String key = folOrFan == 0 ? "user:"+BaseContext.getCurrentId()+"follow" : "user:"+BaseContext.getCurrentId()+"fan";
+        String key = folOrFan == 0 ? "user:"+userId+"follow" : "user:"+userId+"fan";
         List<FolFanDTO> folFanDTOS = listOperations.range(key, start, end);
-        return folFanDTOS;
+        Long total = listOperations.size(key);
+        return new PageResult(total,folFanDTOS);
     }
 }

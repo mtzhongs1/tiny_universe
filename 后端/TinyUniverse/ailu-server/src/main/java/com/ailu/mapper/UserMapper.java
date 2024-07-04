@@ -4,10 +4,13 @@ import com.ailu.aop.AutoFill;
 import com.ailu.aop.InsertOrUpdate;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
+import com.ailu.vo.user.UserSocketVO;
 import com.ailu.vo.user.UserVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author: ailu
@@ -21,8 +24,6 @@ public interface UserMapper {
     User getUserByUsername(String username);
 
     @AutoFill(InsertOrUpdate.INSERT)
-    @Insert("insert into user(username,password,email,update_time,create_time) " +
-            "values(#{username},#{password},#{email},#{updateTime},#{createTime})")
     void saveUser(User user);
 
     @Select("select id,username,sex,email,avatar,description,birthday from user where id = #{userId}")
@@ -31,4 +32,5 @@ public interface UserMapper {
     @AutoFill(InsertOrUpdate.UPDATE)
     void updateMsg(UserUpdateDTO userUpdateDTO);
 
+    List<UserSocketVO> getUsersById(List<Long> ids);
 }

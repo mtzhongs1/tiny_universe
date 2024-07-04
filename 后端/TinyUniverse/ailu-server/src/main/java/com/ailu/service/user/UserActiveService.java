@@ -1,8 +1,10 @@
 package com.ailu.service.user;
 
 import com.ailu.dto.user.FolFanDTO;
+import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserActiveDTO;
 import com.ailu.entity.UserActive;
+import com.ailu.result.PageResult;
 
 import java.util.List;
 
@@ -18,5 +20,5 @@ public interface UserActiveService {
     void follow(UserActiveDTO followDTO);
 
 
-    List<FolFanDTO> pageQueryFolOrFan(int folOrFan,int pageSize,int pageNum);
+    PageResult pageQueryFolOrFan(int folOrFan, FolFanPageDTO folFanPageDTO);
 }

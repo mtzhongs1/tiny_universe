@@ -18,7 +18,7 @@
     <insert id="saveArticleTag">
         insert into article_tag(article_id,tag_id)
         values
-        <foreach collection="tags" item="tagId" separator="),(" open="(" close=")">
+        <foreach collection="tagIds" item="tagId" separator="),(" open="(" close=")">
             #{articleId},#{tagId}
         </foreach>
     </insert>

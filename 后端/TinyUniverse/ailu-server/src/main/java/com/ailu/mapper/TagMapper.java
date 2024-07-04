@@ -17,7 +17,7 @@ public interface TagMapper {
     @Select("select id,name,count from tag where name like concat(#{name},'%')")
     List<TagVO> getTags(String name);
 
-    void addTagCount(String[] tags);
+    void addTagCount(List<Integer> tagIds);
 
     @Select("select name from tag t,article_tag at where t.id = at.tag_id and at.article_id = #{articleId} ")
     List<String> getTagNames(Long articleId);

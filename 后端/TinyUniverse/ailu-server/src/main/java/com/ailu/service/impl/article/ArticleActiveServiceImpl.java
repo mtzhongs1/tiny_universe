@@ -28,7 +28,7 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
         Long userId = BaseContext.getCurrentId();
         boolean isAdd = setOperations.isMember(skey, userId);
         if(isAdd){
-            //删除
+            //减少
             redisCache.setCacheMapValue(hkey, "love", --love);
             setOperations.remove(skey,userId);
         }else{

@@ -9,6 +9,8 @@ import com.ailu.vo.user.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -39,13 +41,15 @@ public class UserController {
 
     @ApiOperation("获取用户信息")
     @GetMapping
-    public Result<UserVO> getUser(){
-        UserVO userVO = userService.getUser();
+    @Cacheable(value = "user", key = "#userId", condition = "#userId != null")
+    public Result<UserVO> getUser(Long userId){
+        UserVO userVO = userService.getUser(userId);
         return Result.success(userVO);
     }
 
     @ApiOperation("修改用户信息")
     @PutMapping("/updateMsg")
+    @CacheEvict(value = "user",key = "#userUpdateDTO.id")
     public Result updateMsg(@RequestBody UserUpdateDTO userUpdateDTO){
         userService.updateMsg(userUpdateDTO);
         return Result.success();
@@ -57,8 +61,4 @@ public class UserController {
     //     userService.updatePwd(userUpdateDTO);
     //     return Result.success();
     // }
-
-
-
-
 }

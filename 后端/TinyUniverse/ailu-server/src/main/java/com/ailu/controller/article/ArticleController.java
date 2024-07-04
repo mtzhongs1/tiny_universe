@@ -47,10 +47,15 @@ public class ArticleController {
     @ApiOperation(value = "分页获取文章信息")
     public Result<PageResult> pageQueryArticle(@PathVariable Long userId, @PathVariable int pageNum,
                                    @PathVariable int pageSize){
-        List<ArticleAndActiveVO> articles = articleService.pageQueryArticle(userId,pageNum, pageSize);
-        PageResult pageResult = new PageResult();
-        pageResult.setRecords(articles);
-        pageResult.setTotal(articles.size());
+        PageResult pageResult = articleService.pageQueryArticle(userId,pageNum, pageSize);
+        return Result.success(pageResult);
+    }
+
+    @GetMapping("/page/{pageNum}/{pageSize}")
+    @ApiOperation(value = "分页获取文章信息")
+    public Result<PageResult> pageQueryAllArticle(@PathVariable int pageNum,
+                                               @PathVariable int pageSize){
+        PageResult pageResult = articleService.pageQueryAllArticle(pageNum, pageSize);
         return Result.success(pageResult);
     }
 
@@ -78,6 +83,13 @@ public class ArticleController {
     public Result updateArticle(@RequestBody ArticleDTO articleDTO){
         articleService.updateArticle(articleDTO);
         return Result.success();
+    }
+
+    @PostMapping("/search")
+    @ApiOperation("分词搜索")
+    public Result<PageResult> search(String name){
+        PageResult page = articleService.search(name);
+        return Result.success(page);
     }
 
 }

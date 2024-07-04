@@ -7,6 +7,7 @@ import com.ailu.dto.user.UserRegisterDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
 import com.ailu.exception.BaseException;
+import com.ailu.mapper.SettingMapper;
 import com.ailu.mapper.UserMapper;
 import com.ailu.properties.JwtProperties;
 import com.ailu.service.user.UserService;
@@ -19,6 +20,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +41,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtProperties jwtProperties;
+
+    @Autowired
+    private SettingMapper settingMapper;
     @Override
     public String login(UserLoginDTO userLoginDTO) {
         String username = userLoginDTO.getUsername();
@@ -63,6 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void register(UserRegisterDTO userRegisterDTO) {
         String code = userRegisterDTO.getCode();
         String key = checkCode(userRegisterDTO.getEmail(), code);
@@ -76,20 +82,23 @@ public class UserServiceImpl implements UserService {
         user.setPassword(BCrypt.hashpw(user.getPassword(), BcryptConstant.salt));
 
         userMapper.saveUser(user);
+
+        //保存用户设置
+        settingMapper.saveSetting(user.getId());
+
         redisCache.deleteObject(key);
     }
 
 
     @Override
-    public UserVO getUser() {
-        Long userId = BaseContext.getCurrentId();
+    public UserVO getUser(Long userId) {
+        userId = userId == null ? BaseContext.getCurrentId() : userId;
         UserVO userVO = userMapper.getUser(userId);
         return userVO;
     }
 
     @Override
     public void updateMsg(UserUpdateDTO userUpdateDTO) {
-        userUpdateDTO.setId(BaseContext.getCurrentId());
         userMapper.updateMsg(userUpdateDTO);
     }
 

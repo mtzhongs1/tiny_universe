@@ -2,6 +2,7 @@ package com.ailu.service.impl.article;
 
 import com.ailu.context.BaseContext;
 import com.ailu.dto.article.ArticleDTO;
+import com.ailu.dto.article.SimplePageDTO;
 import com.ailu.entity.Article;
 import com.ailu.exception.BaseException;
 import com.ailu.mapper.ArticleActiveMapper;
@@ -64,9 +65,10 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.saveArticle(article);
         Long articleId = article.getId();
         String[] tags = article.getTag().split(",");
-        tagMapper.addTagCount(tags);
+        List<Integer> tagIds = Arrays.stream(tags).map(Integer::parseInt).collect(Collectors.toList());
+        tagMapper.addTagCount(tagIds);
         // 修改article_tag
-        articleTagMapper.saveArticleTag(articleId,tags);
+        articleTagMapper.saveArticleTag(articleId,tagIds);
         //将article的社交属性存到Redis中
 
         // ArticleActive articleActive = new ArticleActive(articleId, 0L, 0L, 0L,0L,0L);
@@ -78,21 +80,30 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public PageResult pageQueryArticle(Long userId, int pageNum, int pageSize) {
         String key = getKey(userId, pageNum, pageSize);
-        List<ArticleAndActiveVO> articles = redisCache.getCacheObject(key);
+        //采用Hash结果来缓存分页得到的结果
+        Map<String, Object> map = redisCache.getCacheMap(key);
+        //分页查询需要的数据
+        List<ArticleAndActiveVO> articles = null;
         Long total = null;
-        if(ObjectUtils.isEmpty(articles)){
+        if(ObjectUtils.isEmpty(map)){
             PageHelper.startPage(pageNum, pageSize);
+            // 分页结果
             Page<ArticleAndActiveVO> page = articleMapper.pageQueryArticle(userId);
-            articles  = page.getResult();
-            total = page.getTotal();
-            redisCache.setCacheObject(key,articles);
+            map.put("total",page.getTotal());
+            map.put("records",page.getResult());
+            redisCache.setCacheMap(key,map);
         }
+        articles =(List<ArticleAndActiveVO>) map.get("records");
+        total = (Long) map.get("total");
+        //活动属性的key
         List<String> articleIds = articles.stream().map(article -> "article_active:" + article.getId()).collect(Collectors.toList());
         // Redis批量查询
         //TODO：错误做法，redisCache.redisTemplate.opsForHash().entries(articleId)得到的是Map<R,T>,而collect得到的是不明确的类型，则类型推断失败
         //List<Map<String,Long>> articleActives = articleIds.stream().map(articleId -> {
         //     return redisCache.redisTemplate.opsForHash().entries(articleId);
         //}).collect(Collectors.toList());
+
+        //活动属性数据
         // 这样修改后collect方法里得到的是就是明确的数据类型
         HashOperations<String,String,Long> hashOperations = redisCache.redisTemplate.opsForHash();
         List<Map<String,Long>> articleActives = articleIds.stream().map(hashOperations::entries).collect(Collectors.toList());
@@ -105,10 +116,12 @@ public class ArticleServiceImpl implements ArticleService {
             articleActiveMaps.put(articleId,articleActive);
         }
         SetOperations setOperations = redisCache.redisTemplate.opsForSet();
+        //将活动属性设置到文章中
         for (ArticleAndActiveVO article : articles) {
             Long articleId = article.getId();
             Map<String,Long> articleActiveMap = articleActiveMaps.get(articleId);
             if(articleActiveMap == null){
+                deleteArticlePageCache();
                 throw new BaseException("服务器繁忙");
             }
             article.setCollectionCount(articleActiveMap.get("collectionCount"));
@@ -116,19 +129,19 @@ public class ArticleServiceImpl implements ArticleService {
             article.setCommentCount(articleActiveMap.get("commentCount"));
             article.setLove(articleActiveMap.get("love"));
 
-            if(Boolean.TRUE.equals(setOperations.isMember("article_active:love:" + article.getId(), userId.toString()))){
+            if(Boolean.TRUE.equals(setOperations.isMember("article_active:love:" + article.getId(), userId))){
                 article.setIsLove(true);
             }else{
                 article.setIsLove(false);
             }
-            if(Boolean.TRUE.equals(setOperations.isMember("article_active:collection:" + article.getId(), userId.toString()))){
+            if(Boolean.TRUE.equals(setOperations.isMember("article_active:collection:" + article.getId(), userId))){
                 article.setIsCollection(true);
             }else{
                 article.setIsCollection(false);
             }
         }
 
-        return articles;
+        return new PageResult(total,articles);
     }
 
     @Override
@@ -152,6 +165,18 @@ public class ArticleServiceImpl implements ArticleService {
     public void updateArticle(ArticleDTO articleDTO) {
         deleteArticlePageCache();
         articleMapper.updateArticle(articleDTO);
+    }
+
+    @Override
+    public PageResult search(String name) {
+
+        return new PageResult();
+    }
+
+    @Override
+    public PageResult pageQueryAllArticle(int pageNum, int pageSize) {
+
+        return null;
     }
 
     private static @NotNull String getKey(Long userId, int pageNum, int pageSize) {

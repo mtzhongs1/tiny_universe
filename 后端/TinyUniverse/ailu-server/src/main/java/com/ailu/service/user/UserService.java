@@ -19,6 +19,6 @@ public interface UserService {
     void updateMsg(UserUpdateDTO userUpdateMsgDTO);
 
 
-    UserVO getUser();
+    UserVO getUser(Long userId);
 
 }

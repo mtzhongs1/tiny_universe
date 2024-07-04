@@ -26,4 +26,5 @@ public class SettingController {
         settingService.updateImages(url, index);
         return Result.success();
     }
+
 }

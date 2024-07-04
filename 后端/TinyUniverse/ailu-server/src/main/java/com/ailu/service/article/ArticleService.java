@@ -25,4 +25,9 @@ public interface ArticleService {
     void deleteArticle(List<Long> ids);
 
     void updateArticle(ArticleDTO articleDTO);
+
+    PageResult search(String name);
+
+    PageResult pageQueryAllArticle(int pageNum, int pageSize);
+
 }

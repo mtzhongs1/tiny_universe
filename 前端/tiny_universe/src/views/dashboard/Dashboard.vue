@@ -50,7 +50,7 @@ onMounted(() => {
 //变量区
 // TODO:轮播图切换
 let upDown = ref(false);
-let isfooter = ref(false);
+// let isfooter = ref(false);
 const images = ref([]);
 let user = reactive({
   id: '',
@@ -60,6 +60,11 @@ let user = reactive({
   email: '',
   birthday: '',
   description: '',
+});
+let userActive = reactive({
+  userId: '',
+  fans: '',
+  follows: ''
 });
 let index = ref(0);
 let bgImagePath = computed(() => {return images.value[index.value]}); // 初始图片路径
@@ -74,9 +79,9 @@ const setUpDown = () => {
     setProperty('--header-height','100vh');
   }
   upDown.value = !upDown.value
-  setTimeout(() => {
-    isfooter.value = !isfooter.value;
-  },500);
+  // setTimeout(() => {
+  //   isfooter.value = !isfooter.value;
+  // },500);
 }
 function setIndex(isLeft) {
   index.value = isLeft
@@ -88,13 +93,21 @@ const updateBgImage = (index,url) => {
   images[index] = url;
 }
 
-function getUser() {
-  doGet("/user").then((resp) => {
+const getUser = async () => {
+  const resp = await doGet("/user");
   if (resp.data.code === 1) {
     const tempUser = resp.data.data;
     Object.assign(user, tempUser);
     emailHide();
   }
+  // 获取用户活动属性
+  doGet("/user_active/" + user.id).then((resp) =>{
+    if(resp.data.code === 1){
+      const tempUserActive = resp.data.data;
+      Object.assign(userActive,tempUserActive);
+    }else{
+      ElMessage.error("服务器繁忙");
+    }
   })
 }
 const getImages = () => {
@@ -146,6 +159,7 @@ let color = reactive({
 //其他区
 provide("user", user);
 provide("color", color);
+provide("userActive",userActive);
 
 </script>
 
@@ -164,6 +178,7 @@ provide("color", color);
   width: 100%;
   position: relative;
   background-color: var(--main-color);
+  margin-bottom: 40px;
 }
 
 .upDownIcon {
@@ -217,9 +232,11 @@ provide("color", color);
   background: #42ace8;
   color: white;
   text-align: center;
-  margin-top: 400px;
+  margin-top: auto;
   padding: 40px 0 40px 0;
   font-size: 18px;
+  z-index: 10
 }
+
 
 </style>

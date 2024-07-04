@@ -34,7 +34,7 @@
         </el-space>
         <p>背景图：</p>
         <div class="bgImageDiv">
-          <div v-for="(image,index) in images" style="width:100px">
+          <div :key="index" v-for="(image,index) in images">
             <el-upload
                 class="avatar-uploader"
                 :show-file-list="false"
@@ -111,6 +111,7 @@ function switchStyle() {
   position: fixed;
   bottom: 50px;
   right: 20px;
+  z-index: 11;
 }
 
 .icon {
@@ -119,12 +120,15 @@ function switchStyle() {
 
 .bgImage {
   cursor: pointer;
+  width: 100px;
+  height: 100px;
 }
 
 /*旋转动画效果*/
 .setting_icon {
   animation: spin 2s linear infinite;
   cursor: pointer;
+  z-index: 20;
 }
 
 @keyframes spin {

@@ -33,4 +33,6 @@ public class SettingServiceImpl implements SettingService {
         images = StringUtils.join(imageArray, ",");
         settingMapper.updateSetting(BaseContext.getCurrentId(), images);
     }
+
+
 }

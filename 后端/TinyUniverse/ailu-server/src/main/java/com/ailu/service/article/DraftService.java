@@ -1,6 +1,8 @@
 package com.ailu.service.article;
 
 import com.ailu.dto.article.DraftDTO;
+import com.ailu.entity.Article;
+import com.ailu.result.PageResult;
 import com.ailu.vo.article.DraftVO;
 
 import java.util.List;
@@ -12,7 +14,10 @@ import java.util.List;
  */
 
 public interface DraftService {
-    List<DraftVO> pageQueryDraft(DraftDTO draftDTO);
+    PageResult pageQueryDraft(DraftDTO draftDTO);
 
     void deleteDraft(List<Long> ids);
+
+    void saveDraft(Article article);
+
 }

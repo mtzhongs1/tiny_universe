@@ -2,46 +2,51 @@
 	<div class="center">
 		<div class="logon">
 			<div :class="overlaylong">
-				<form :ref="LoginFormRef" class="overlaylong-Signin" v-if="disfiex === 0">
+				<form :ref="LoginFormRef" style="text-align: center" v-if="disfiex === 0">
 					<h2 class="overlaylongH2">Sign in</h2>
-          <label v-show="false" for="username"></label>
-					<input name="username" id=“username” v-model = "user.username" type="text" placeholder="username">
-          <label v-show="false" for="password"></label>
-					<input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
-					<h3>Forgot your password?</h3>
-					<!-- TODO:自定义按钮组件 -->
-					<WowButton message="Sign in" @click = "login"></WowButton>
-					<!-- <button @click="login" class="btn">Sign in</button> -->
+          <div class="overlaylong-Signin">
+            <label v-show="false" for="username"></label>
+            <input name="username" id=“username” v-model = "user.username" type="text" placeholder="username">
+            <label v-show="false" for="password"></label>
+            <input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
+            <h3>Forgot your password?</h3>
+            <!-- <button @click="login" class="btn">Sign in</button> -->
+          </div>
+            <!-- TODO:自定义按钮组件 -->
+            <WowButton message="Sign in" @click = "login"></WowButton>
 				</form>
-				<form :ref="RegisterFormRef" class="overlaylong-Signup" v-if="disfiex === 1">
+				<form :ref="RegisterFormRef" style="text-align: center" v-if="disfiex === 1">
 					<h2 class="overlaylongH2">Sign up</h2>
-          <label v-show="false" for="username"></label>
-					<input name="username" id="username" v-model = "user.username" type="text" placeholder="username">
-          <label v-show="false" for="password"></label>
-					<input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
-          <label v-show="false" for="email"></label>
-					<input name="email" id="email" v-model = "user.email" type="text" placeholder="email">
-					<span>
+          <div class="overlaylong-Signup">
+            <label v-show="false" for="username"></label>
+            <input name="username" id="username" v-model = "user.username" type="text" placeholder="username">
+            <label v-show="false" for="password"></label>
+            <input name="password" id="password" v-model = "user.password" type="text" placeholder="password">
+            <label v-show="false" for="email"></label>
+            <input name="email" id="email" v-model = "user.email" type="text" placeholder="email">
+            <span>
             <label v-show="false" for="code"></label>
 						<input name="code" id="code" v-model = "user.code" style="width: 55px;" type="text" placeholder="code">
 						<button :disabled="codeProp.isTimerActive" @click="sendCode" class="sendBtn">
 							<span class="button_top"> {{ codeProp.msg }} </span>
 						</button>
 					</span>
-					<WowButton message="Sign up" @click = "register"></WowButton>
-					<!-- <button @click = "register" class="btn">Sign up</button> -->
+          </div>
+            <WowButton message="Sign up" @click = "register"></WowButton>
+            <!-- <button @click = "register" class="btn">Sign up</button> -->
+
 				</form>
 
 			</div>
 			<div :class="overlaytitle">
-				<div class="overlaytitle-Signin" v-if="disfiex == 0">
+				<div class="overlaytitle-Signin" v-show="disfiex === 0">
 					<h2 class="overlaytitleH2">欢迎回来，朋友!</h2>
 					<p class="overlaytitleP">
 						在这里，拥有独属于自己的自由天地！
 					</p>
 					<div class="buttongohs" @click="Signin">Sign up</div>
 				</div>
-				<div class="overlaytitle-Signup" v-if="disfiex == 1">
+				<div class="overlaytitle-Signup" v-show="disfiex === 1">
 					<h2 class="overlaytitleH2">你好，陌生人!</h2>
 					<p class="overlaytitleP">点击注册，开始旅途。</p>
 					<div class="buttongohs" @click="Signup">Sign in</div>
@@ -341,6 +346,11 @@ h1 {
 	flex-direction: column;
 }
 
+.overlaylong-Signup > *{
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
 .buttongohs {
 	width: 180px;
 	height: 40px;
@@ -366,16 +376,18 @@ h1 {
 }
 
 .overlaylong-Signin {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
 }
 
 .overlaylong-Signup {
 	display: flex;
+  flex-wrap: nowrap;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-start;
 	flex-direction: column;
 }
 

@@ -64,6 +64,7 @@ function saveUser() {
     return;
   }
   const formData = new FormData();
+  formData.append("id",user.id);
   formData.append("username", user.username);
   formData.append("sex", user.sex);
   formData.append("birthday", user.birthday);

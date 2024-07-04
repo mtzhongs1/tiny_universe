@@ -2,6 +2,8 @@ package com.ailu.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author: ailu
  * @description: TODO
@@ -11,5 +13,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ArticleTagMapper {
 
-    void saveArticleTag(Long articleId, String[] tags);
+    void saveArticleTag(Long articleId, List<Integer> tagIds);
 }
