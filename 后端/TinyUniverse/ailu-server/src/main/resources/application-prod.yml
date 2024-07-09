@@ -1,0 +1,35 @@
+ailu:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: 10.23.108.34
+    port: 3306
+    database: tiny_universe
+    username: root
+    password: dfDF51d5
+
+    minio:
+      endpoint: https://springboot-gfp3-114328-5-1322483620.sh.run.tcloudbase.com:9000
+      accessKey: ailu
+      secretKey: 12345678
+      bucket: public
+
+  redis:
+    database: 1
+    host: https://springboot-gfp3-114328-5-1322483620.sh.run.tcloudbase.com
+    port: 6379
+    password: 123456
+
+xxl:
+  job:
+    accessToken: default_token
+    admin:
+      addresses: https://springboot-gfp3-114328-5-1322483620.sh.run.tcloudbase.com/xxl-job-admin
+    executor:
+      address: ''
+      appname: tiny-universe
+      ip: ''
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30
+      port: 9999
+
+

@@ -1,10 +1,15 @@
 server:
   port: 8082
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
 
 
 spring:
   profiles:
-    active: dev
+    active: prod
   main:
     allow-circular-references: true
     allow-bean-definition-overriding: true

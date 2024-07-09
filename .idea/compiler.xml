@@ -20,7 +20,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ScheduledTask" options="-parameters" />
-      <module name="TinyUniverse" options="-parameters" />
+      <module name="TinyUniverse" options="" />
       <module name="ailu-common" options="-parameters" />
       <module name="ailu-manage" options="-parameters" />
       <module name="ailu-pojo" options="-parameters" />
