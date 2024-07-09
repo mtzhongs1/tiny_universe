@@ -43,7 +43,7 @@ function toUser(){
   flex-direction: column;
   place-items: center;
   gap: 20px;
-  padding: 30px 20px;
+  padding: 30px 10px;
 
   color: var(--text-color);
 }

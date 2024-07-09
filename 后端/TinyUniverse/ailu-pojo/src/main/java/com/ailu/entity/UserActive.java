@@ -19,5 +19,4 @@ public class UserActive {
     private Long userId;
     private Long fans;
     private Long follows;
-
 }

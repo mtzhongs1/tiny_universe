@@ -8,16 +8,24 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ailu-common" />
         <module name="ailu-pojo" />
+        <module name="ailu-manage" />
         <module name="ailu-server" />
+        <module name="xxl-job-admin" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ScheduledTask" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ScheduledTask" options="-parameters" />
       <module name="TinyUniverse" options="-parameters" />
       <module name="ailu-common" options="-parameters" />
+      <module name="ailu-manage" options="-parameters" />
       <module name="ailu-pojo" options="-parameters" />
       <module name="ailu-server" options="-parameters" />
+      <module name="xxl-job-admin" options="-parameters" />
     </option>
   </component>
 </project>

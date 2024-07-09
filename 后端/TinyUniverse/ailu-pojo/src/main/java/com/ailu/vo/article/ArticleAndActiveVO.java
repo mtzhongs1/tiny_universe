@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ArticleAndActiveVO {
     private Long id;
+    private String content;
     private String description;
     private String cover;
     private String title;

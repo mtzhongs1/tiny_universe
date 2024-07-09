@@ -14,10 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserActiveDTO {
     Long userId;
-    String username;
-    String avatar;
-
     Long toUserId;
-    String toUserName;
-    String toAvatar;
+
+    Boolean isFollow;
 }

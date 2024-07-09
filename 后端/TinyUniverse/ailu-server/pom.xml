@@ -46,6 +46,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
@@ -61,7 +66,16 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.huaban</groupId>
+            <artifactId>jieba-analysis</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.0.1-jre</version>
+        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -87,6 +101,7 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+
     </dependencies>
 
     <build>

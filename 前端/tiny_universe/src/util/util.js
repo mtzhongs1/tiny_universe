@@ -1,4 +1,5 @@
 import {ElMessageBox} from "element-plus";
+import {nextTick} from "vue";
 
 export function getTokenName(){
     return "token";
@@ -81,3 +82,10 @@ export function setCssVariable(theme,color){
     setProperty('--message-text-color',color.message_text_color);
     setProperty('--shadow-color',color.shadow_color);
 }
+
+export const reloadUtil = (isRouterAlive) => {
+    isRouterAlive.value = false;
+    nextTick(() => {
+        isRouterAlive.value = true;
+    });
+};

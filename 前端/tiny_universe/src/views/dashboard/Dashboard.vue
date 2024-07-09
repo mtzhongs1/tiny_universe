@@ -17,7 +17,7 @@
       </el-icon>
     </div>
     <div class="mainDiv">
-      <router-view style="margin: 50px auto auto;"></router-view>
+      <router-view style="margin: 50px auto auto auto;"></router-view>
       <Setting :images = "images" :updateBgImage="updateBgImage"></Setting>
     </div>
     <div class="footer">
@@ -172,13 +172,13 @@ provide("userActive",userActive);
   background-position: center center;
   background-repeat: no-repeat;
   transition: all 1s;
+  z-index:2;
 }
 
 .mainDiv {
   width: 100%;
   position: relative;
   background-color: var(--main-color);
-  margin-bottom: 40px;
 }
 
 .upDownIcon {
@@ -186,7 +186,7 @@ provide("userActive",userActive);
   left:50%;
   bottom: 10px;
   cursor: pointer;
-  z-index:1;
+  z-index:100;
 }
 
 .el-icon {
@@ -208,7 +208,7 @@ provide("userActive",userActive);
 }
 
 .location{
-  z-index:0;
+  z-index:5;
 }
 
 .el-icon:hover{
@@ -232,10 +232,10 @@ provide("userActive",userActive);
   background: #42ace8;
   color: white;
   text-align: center;
-  margin-top: auto;
   padding: 40px 0 40px 0;
   font-size: 18px;
-  z-index: 10
+  margin-top: auto;
+  z-index:10;
 }
 
 

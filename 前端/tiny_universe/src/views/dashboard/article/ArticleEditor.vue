@@ -155,6 +155,7 @@ const toolbarConfig = {
       'group-video',
       'fullScreen',
       'color',
+      'bgColor'
   ]
 }
 
@@ -220,8 +221,8 @@ const articleValidate = () => {
     strategy: 'minLength:10',
     errorMsg: '文章内容长度不能少于10个字符'
   },{
-    strategy: 'maxLength:2000',
-    errorMsg: '文章内容长度不能超过2000个字符'
+    strategy: 'maxLength:5000',
+    errorMsg: '文章内容长度不能超过5000个字符'
   }]);
   validator.add(onTags.value,[{
     strategy: 'arrayIsNotEmpty',

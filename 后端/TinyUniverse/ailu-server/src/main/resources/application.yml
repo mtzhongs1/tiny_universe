@@ -90,4 +90,15 @@ logging:
         service: info
         controller: info
 
-
+xxl:
+  job:
+    accessToken: ${xxl.job.accessToken}
+    admin:
+      addresses: ${xxl.job.admin.addresses}
+    executor:
+      address: ${xxl.job.executor.address}
+      appname: ${xxl.job.executor.appname}
+      ip: ${xxl.job.executor.ip}
+      logpath: ${xxl.job.executor.logpath}
+      logretentiondays: ${xxl.job.executor.logretentiondays}
+      port: ${xxl.job.executor.port}

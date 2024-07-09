@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ailu.mapper.TagMapper">
+<mapper namespace="com.ailu.server.mapper.TagMapper">
 
     <update id="addTagCount" parameterType="com.ailu.entity.Tag">
         update tag set count = count + 1 where id in

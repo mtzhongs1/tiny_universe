@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ailu.mapper.ArticleMapper">
+<mapper namespace="com.ailu.server.mapper.ArticleMapper">
     <insert id="saveArticle" useGeneratedKeys="true" keyProperty="id" parameterType="com.ailu.entity.Article">
         insert into article(author,user_id,content,title,description,cover,tag,type,create_time,update_time)
         values(#{author},#{userId},#{content},#{title},#{description},#{cover},#{tag},#{type},#{createTime},#{updateTime})
     </insert>
+    <select id="pageQueryArticle" resultType="com.ailu.vo.article.ArticleAndActiveVO">
+        select a.id,u.username as author,a.title,a.description,a.cover,a.create_time,LEFT(a.content,40) as content
+        from article a,user u
+        where
+        a.user_id = u.id and
+        <if test="userId != null">
+            a.user_id = #{userId} and
+        </if>
+        a.type = 1 and
+        a.status = 1
+        <if test="type == 1">
+            order by a.create_time desc
+        </if>
+    </select>
     <delete id="deleteArtOrDra">
         delete from article where id in
         <foreach collection="ids" close=")" open="(" separator="," item="id">
@@ -12,12 +26,6 @@
         </foreach>
         and type = #{type}
     </delete>
-    <select id="pageQueryArticle" resultType="com.ailu.vo.article.ArticleAndActiveVO">
-        select a.id,u.username as author,a.title,a.description,a.cover,a.create_time
-        from article a,user u
-        where a.user_id = u.id and a.user_id = #{userId} and a.type = 1 and a.status = 1
-        order by a.create_time desc
-    </select>
     <select id="pageQueryDraft" resultType="com.ailu.vo.article.DraftVO">
         select a.id,a.title,a.create_time,a.update_time
         from article a,user u
@@ -26,9 +34,23 @@
     </select>
 
     <select id="getArticle" resultType="com.ailu.vo.article.ArticleVO">
-        select a.id,a.author,a.content,a.description,a.cover,a.create_time,a.update_time,a.title,a.type,a.status
+        select a.id,a.user_id,a.author,a.content,a.description,a.cover,a.create_time,a.update_time,a.title,a.type,a.status
         from article a
         where a.id = #{articleId} and a.status = 1
+    </select>
+    <select id="getArticlesByIds" resultType="com.ailu.vo.article.ArticleAndActiveVO">
+        select a.id,a.content,a.author,a.title,a.description,a.cover,a.create_time
+        from article a
+        where
+        a.type = 1 and
+        a.status = 1 and
+        a.id in
+        <foreach collection="articleIds" close=")" open="(" separator="," item="id">
+            #{id}
+        </foreach>
+        <if test="type == 1">
+            order by a.create_time desc
+        </if>
     </select>
 
 </mapper>

@@ -16,7 +16,7 @@ public class Comment {
     private Long id;
     private Long userId;
     private Long ArticleId;
-    private Long toId;
+    private Long parentId;
     private String content;
     private Long createTime;
     private Long updateTime;

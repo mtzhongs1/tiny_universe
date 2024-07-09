@@ -1,9 +1,13 @@
 <template>
-  <div class="editor-content-view line-numbers" id="editor-content-view" v-html="props.content">
+  <div>
+    <div class="editor-content-view line-numbers" id="editor-content-view" ref="contentRef" v-html="props.content">
+    </div>
+
+
   </div>
 </template>
 <script setup>
-import {onMounted} from "vue";
+import {nextTick, onMounted, ref, watch} from "vue";
 
 import Prism from "prismjs"//导入代码高亮插件
 import "prismjs/themes/prism-tomorrow.min.css"
@@ -12,10 +16,18 @@ import "prismjs/plugins/line-numbers/prism-line-numbers.min.css"
 onMounted(() => {
   setTimeout(() => {
     Prism.highlightAll()// 全局代码高亮
-  }, 100)
+  }, 1000);
 })
 
-let props = defineProps(['content'])
+let props = defineProps(['content','makeDirectory'])
+let contentRef = ref(null);
+
+// TODO：根据html生成导航目录
+watch(() => props.content, async () => {
+  await nextTick();
+  props.makeDirectory(contentRef);
+});
+
 </script>
 <style scoped>
 .editor-content-view {
@@ -72,4 +84,5 @@ let props = defineProps(['content'])
 .editor-content-view ::v-deep(input[type="checkbox"]) {
   margin-right: 5px;
 }
+
 </style>

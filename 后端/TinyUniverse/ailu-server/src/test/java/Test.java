@@ -1,10 +1,10 @@
-import com.ailu.util.JwtUtil;
-import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
-import io.jsonwebtoken.Claims;
-import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import com.mysql.cj.x.protobuf.MysqlxCrud;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.*;
 
 /**
  * @Description:
@@ -12,42 +12,35 @@ import java.util.Arrays;
  * @Date: 7/6/2024 下午3:58
  */
 
+@Slf4j
 public class Test{
 
-    interface Child{
-        // private String name;
-        default void printName(){
-            System.out.println("我被打印了");
-        }
-    }
 
-    class ChildImpl implements Child{
-        // @Override
-        // public void printName() {
-        //     System.out.println("我被打印了");
-        // }
-    }
+    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/tiny_universe?characterEncoding=utf8&useSSL=false";
+    static final String USER = "root";
+    static final String PASS = "123456";
 
     @org.junit.jupiter.api.Test
     public void test(){
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        Long number = 2L;
-        byte[] serialize = jackson2JsonRedisSerializer.serialize(number);
-        Object deserialize = jackson2JsonRedisSerializer.deserialize(serialize);
-        System.out.println(deserialize.getClass());
-        System.out.println(deserialize);
-        System.out.println(number.getClass());
-
-        GenericFastJsonRedisSerializer genericFastJsonRedisSerializer = new GenericFastJsonRedisSerializer();
-        byte[] serialize1 = genericFastJsonRedisSerializer.serialize(number);
-        Object deserialize1 = genericFastJsonRedisSerializer.deserialize(serialize1);
-        System.out.println(deserialize1.getClass());
-        System.out.println(deserialize1);
-        System.out.println(number.getClass());
-
-        System.out.println(genericFastJsonRedisSerializer.deserialize(serialize).getClass());
-
-        // jackson2JsonRedisSerializer
-
+        //TODO:在linux服务器要重新修改路径
+        String path = "'D:/mysql/user.csv '";
+        Path filePath = Paths.get("D:/mysql/user.csv");
+        String SQL = String.format("SELECT * FROM article " +
+                " INTO OUTFILE%sFIELDS TERMINATED BY ',' LINES TERMINATED BY '\\r\\n' ", path);
+        try (Connection conn = DriverManager.getConnection(DB_URL,USER,PASS);
+             PreparedStatement ps = conn.prepareStatement(SQL);) {
+            //装载驱动
+            Class.forName(JDBC_DRIVER);
+            //删除原有文件
+            File file = new File(String.valueOf(filePath));
+            if(file.exists()){
+                file.delete();
+            }
+            ps.executeQuery();
+            //关闭连接
+        }catch(Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }
