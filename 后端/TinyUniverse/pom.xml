@@ -55,6 +55,31 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.ailu</groupId>
+                <artifactId>ailu-pojo</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ailu</groupId>
+                <artifactId>ailu-common</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ailu</groupId>
+                <artifactId>ailu-server</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ailu</groupId>
+                <artifactId>ailu-manage</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ailu</groupId>
+                <artifactId>xxl-job-admin</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-redis</artifactId>
                 <version>${spring.redis}</version>
