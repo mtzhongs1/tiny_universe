@@ -1,3 +1,5 @@
+import com.baidubce.qianfan.Qianfan;
+import com.baidubce.qianfan.model.chat.ChatResponse;
 import com.mysql.cj.x.protobuf.MysqlxCrud;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,5 +44,10 @@ public class Test{
         }catch(Exception e) {
             log.error(e.getMessage());
         }
+    }
+
+    @org.junit.jupiter.api.Test
+    public void test1(){
+
     }
 }

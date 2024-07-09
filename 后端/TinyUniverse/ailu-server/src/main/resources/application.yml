@@ -102,3 +102,10 @@ xxl:
       logpath: ${xxl.job.executor.logpath}
       logretentiondays: ${xxl.job.executor.logretentiondays}
       port: ${xxl.job.executor.port}
+
+qianfan:
+  appID: 92565648
+  APIKey: 449k1dEkappNvotvX1Hmb6j3
+  SecretKey: mZcN7L8m0Qd8A7RKDtN9CNXncAAzrkaD
+
+

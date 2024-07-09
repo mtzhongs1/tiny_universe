@@ -6,11 +6,16 @@
     <div>
       <CommentEditor></CommentEditor>
     </div>
+
+    <div>
+    </div>
   </div>
 </template>
 <script setup>
 
 import CommentEditor from "@/components/common/editor/CommentEditor.vue";
+import {doPost} from "@/http/httpRequest.js";
+
 </script>
 <style scoped>
 .commentDiv{
