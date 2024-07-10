@@ -5,6 +5,7 @@
 		<artifactId>TinyUniverse</artifactId>
 		<groupId>com.ailu</groupId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath></relativePath>
 	</parent>
 	<artifactId>xxl-job-admin</artifactId>
 	<packaging>jar</packaging>
