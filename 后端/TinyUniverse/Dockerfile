@@ -10,4 +10,4 @@ COPY ./ailu-server/src ./src
 RUN mvn package -DskipTests
 
 # Run the web service on container startup.
-CMD ["java","-jar","/ailu-server/target/ailu-server-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
+CMD ["java","-jar","/TinyUniverse/ailu-server/target/ailu-server-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
