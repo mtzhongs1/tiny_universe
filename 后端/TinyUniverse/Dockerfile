@@ -8,7 +8,7 @@ COPY ailu-common .
 COPY ailu-server .
 COPY ailu-manage .
 COPY ailu-pojo .
-COPY xxl-job-admin .
+#COPY xxl-job-admin .
 
 # Build a release artifact.
 RUN mvn package -DskipTests
