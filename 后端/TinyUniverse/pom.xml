@@ -9,7 +9,6 @@
     <modules>
         <module>ailu-server</module>
         <module>ailu-common</module>
-        <module>xxl-job-admin</module>
         <module>ailu-pojo</module>
         <module>ailu-manage</module>
     </modules>
@@ -40,7 +39,7 @@
         <poi>3.16</poi>
         <xxl>2.4.1</xxl>
         <spring.redis>2.7.11</spring.redis>
-        <hutool>5.6.1</hutool>
+        <hutool>5.8.0</hutool>
         <zxing>3.3.3</zxing>
         <httpclient>0.4.8</httpclient>
         <fastjson>2.0.25</fastjson>

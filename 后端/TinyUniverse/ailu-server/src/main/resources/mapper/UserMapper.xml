@@ -47,5 +47,10 @@
             #{id}
         </foreach>
     </select>
-
+    <select id="getUsersByFid" resultType="com.ailu.dto.user.FolFanDTO">
+        select id,username,avatar from user where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

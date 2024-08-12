@@ -10,7 +10,7 @@
         </el-tab-pane>
         <el-tab-pane label="在线聊天室">
 <!--          <chat-room></chat-room>-->
-          <AsyncChatRoom></AsyncChatRoom>
+          <AsyncChatRoom v-if="isChatRoomAlive" :reloadChatRoom="reloadChatRoom"></AsyncChatRoom>
         </el-tab-pane>
         <el-tab-pane label="广告">
         </el-tab-pane>
@@ -24,9 +24,15 @@
 // import Card from "@/components/dashboard/entertainment/Card.vue";
 // import ChatRoom from "@/components/dashboard/entertainment/ChatRoom.vue";
 //TODO:定义异步组件，只在需要显示时才进行渲染
-import {defineAsyncComponent} from "vue";
+import {defineAsyncComponent, ref} from "vue";
+import {useRouter} from "vue-router";
+import {reloadUtil} from "@/util/util.js";
 const AsyncCard = defineAsyncComponent(() => import("@/components/dashboard/entertainment/Card.vue"));
 const AsyncChatRoom = defineAsyncComponent(() => import("@/components/dashboard/entertainment/ChatRoom.vue"));
+let isChatRoomAlive = ref(true);
+const reloadChatRoom = () => {
+  reloadUtil(isChatRoomAlive)
+}
 </script>
 
 <style>

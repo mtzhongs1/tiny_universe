@@ -1,7 +1,9 @@
 package com.ailu.server.service.comment;
 
 import com.ailu.dto.comment.CommentDTO;
+import com.ailu.dto.comment.CommentUpdateDTO;
 import com.ailu.dto.comment.CommentVO;
+import com.ailu.result.PageResult;
 
 import java.util.List;
 
@@ -12,11 +14,15 @@ import java.util.List;
  */
 
 public interface CommentService {
-    List<CommentVO> getComments(Long articleId,int type);
+    PageResult getComments(Long articleId, int type);
 
     void saveComment(CommentDTO commentDTO);
 
-    void deleteComment(Long id);
+    void deleteComment(Long articleId,Long id);
 
     void deleteCommentByArticleId(List<Long> articleIds);
+
+    void updateComment(CommentUpdateDTO commentDTO);
+
+    Boolean doLove(Long id);
 }

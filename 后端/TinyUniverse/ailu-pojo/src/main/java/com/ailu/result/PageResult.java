@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,6 +17,6 @@ public class PageResult implements Serializable {
 
     private long total; //总记录数
 
-    private Collection records; //当前页数据集合
+    private Object records; //当前页数据集合
 
 }

@@ -12,7 +12,16 @@
         <option value="$PROJECT_DIR$/后端/TinyUniverse/pom.xml" />
         <option value="$PROJECT_DIR$/后端/TinyUniverse/ScheduledTask/pom.xml" />
         <option value="$PROJECT_DIR$/后端/TinyUniverse/xxl-job-admin/pom.xml" />
+        <option value="$PROJECT_DIR$/单模块/TinyUniverse/pom.xml" />
+        <option value="$PROJECT_DIR$/单模块/Tiny-Universe/pom.xml" />
+        <option value="$PROJECT_DIR$/xxl-job/xxl-job-admin/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/单模块/Tiny-Universe/pom.xml" />
+        <option value="$PROJECT_DIR$/单模块/TinyUniverse/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK" />

@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FolFanDTO {
-    Long userId;
+    Long id;
     String username;
     String avatar;
+    Boolean isFollow;
 }

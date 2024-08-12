@@ -4,6 +4,7 @@ import { ElMessageBox } from "element-plus";
 
 //TODO:配置后端接口路径前缀
 axios.defaults.baseURL = "http://localhost:8082/";
+// axios.defaults.baseURL = "/api";
 
 //TODO:封装axios的http异步请求
 export function doGet(url,params){
@@ -72,6 +73,15 @@ export function doDelete(url,data){
         headers: {
             "Content-Type": "application/json;charset=UTF-8"
         }
+    });
+}
+
+//TODO：处理@RequestParam的数据
+export function doDeletexwww(url,data){
+    return axios({
+        method: "delete",
+        url: url,
+        params : data,
     });
 }
 

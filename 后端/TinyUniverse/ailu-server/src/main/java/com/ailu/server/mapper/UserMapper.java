@@ -1,5 +1,7 @@
 package com.ailu.server.mapper;
 
+import com.ailu.dto.user.FolFanDTO;
+import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
 import com.ailu.server.aop.AutoFill;
@@ -10,7 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author: ailu
@@ -32,7 +36,9 @@ public interface UserMapper {
     @AutoFill(InsertOrUpdate.UPDATE)
     void updateMsg(UserUpdateDTO userUpdateDTO);
 
-    List<UserSocketVO> getUsersById(List<Long> ids);
+    List<UserSocketVO> getUsersById(Collection<Long> ids);
+
+    List<FolFanDTO> getUsersByFid(Collection<Long> ids);
 
     @Select("select id from user where email = #{email}")
     Long getUserByEmail(String email);

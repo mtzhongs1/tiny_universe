@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/ailu-manage.iml" filepath="$PROJECT_DIR$/ailu-manage.iml" />
       <module fileurl="file://$PROJECT_DIR$/后端/TinyUniverse/ailu-pojo/ailu-pojo.iml" filepath="$PROJECT_DIR$/后端/TinyUniverse/ailu-pojo/ailu-pojo.iml" />
       <module fileurl="file://$PROJECT_DIR$/后端/TinyUniverse/ailu-server/ailu-server.iml" filepath="$PROJECT_DIR$/后端/TinyUniverse/ailu-server/ailu-server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/后端/TinyUniverse/xxl-job-admin/xxl-job-admin.iml" filepath="$PROJECT_DIR$/后端/TinyUniverse/xxl-job-admin/xxl-job-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/小小世界.iml" filepath="$PROJECT_DIR$/.idea/小小世界.iml" />
     </modules>
   </component>

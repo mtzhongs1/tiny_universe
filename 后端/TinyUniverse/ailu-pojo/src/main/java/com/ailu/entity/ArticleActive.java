@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleActive {
-
+public class ArticleActive implements Serializable {
+  private static final long serialVersionUID = 187799455564L;
   private Long id;
   private Long articleId;
   private Long love;

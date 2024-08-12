@@ -2,12 +2,15 @@ package com.ailu.server.service.impl.article;
 
 import com.ailu.context.BaseContext;
 import com.ailu.dto.article.ArticleDTO;
+import com.ailu.dto.article.ArticlePageDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
+import com.ailu.entity.ArticleActive;
 import com.ailu.entity.UserActive;
 import com.ailu.exception.BaseException;
 import com.ailu.result.PageResult;
 import com.ailu.server.config.RedisCache;
+import com.ailu.server.controller.article.TagController;
 import com.ailu.server.mapper.ArticleActiveMapper;
 import com.ailu.server.mapper.ArticleMapper;
 import com.ailu.server.mapper.ArticleTagMapper;
@@ -22,6 +25,7 @@ import com.ailu.vo.article.ArticleAndActiveVO;
 import com.ailu.vo.article.ArticleVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.xxl.job.core.executor.XxlJobExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -69,6 +70,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private TagController tagController;
 
     @Override
     @Transactional
@@ -85,39 +88,31 @@ public class ArticleServiceImpl implements ArticleService {
         articleTagMapper.saveArticleTag(articleId,tagIds);
         //将article的社交属性存到Redis中
 
-        // ArticleActive articleActive = new ArticleActive(articleId, 0L, 0L, 0L,0L,0L);
-        // redisCache.setCacheObject("article_active"+articleId, articleActive);
-        deleteArticlePageCache();
+        // ArticleActive articleActive = new ArticleActive(articleId, 0L, 0L, 0L,0L);
+        // redisCache.setCacheObject("article_active:"+articleId, articleActive);
+        // deleteArticlePageCache();
         setArticleActiveHash(articleId);
     }
 
     @Override
-    public PageResult pageQueryArticle(Long userId, int pageNum, int pageSize,int type) {
+    public PageResult pageQueryArticle(ArticlePageDTO articlePageDTO) {
+        PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
+        // 分页结果
+        Page<ArticleAndActiveVO> page = articleMapper.pageQueryArticle(articlePageDTO);
+        List<ArticleAndActiveVO> articles = page.getResult();
+        Long total = page.getTotal();
 
-        String key = getKey(userId, pageNum, pageSize,type);
-        //采用Hash结果来缓存分页得到的结果
-        Map<String, Object> map = redisCache.getCacheMap(key);
-        //分页查询需要的数据
-        List<ArticleAndActiveVO> articles = null;
-        Long total = null;
-        if(ObjectUtils.isEmpty(map)){
-            PageHelper.startPage(pageNum, pageSize);
-            // 分页结果
-            Page<ArticleAndActiveVO> page = articleMapper.pageQueryArticle(userId,type);
-            map.put("total",page.getTotal());
-            map.put("records",page.getResult());
-            redisCache.setCacheMap(key,map);
-        }
-        articles =(List<ArticleAndActiveVO>) map.get("records");
-        total = (Long) map.get("total");
+        filterArticleByTag(articles,articlePageDTO.getTag());
         setArticleActive(articles);
 
         return new PageResult(total,articles);
     }
 
-    @Override
-    public PageResult pageQueryAllArticle(int pageNum, int pageSize,int type) {
-        return pageQueryArticle(null,pageNum,pageSize,type);
+    private void filterArticleByTag(List<ArticleAndActiveVO> articles, Integer tag) {
+        if(tag != null && tag != -1){
+            Set<Long> articleIdById = tagService.getArticleIdById(tag);
+            articles.removeIf(article -> !articleIdById.contains(article.getId()));
+        }
     }
 
     @Override
@@ -141,7 +136,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public void deleteArticle(List<Long> ids) {
         //删除文章缓存
-        deleteArticlePageCache();
+        // deleteArticlePageCache();
         //删除文章活动属性缓存
         deleteArticleActiveCache(ids);
         articleMapper.deleteArtOrDra(ids,1);
@@ -152,7 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void updateArticle(ArticleDTO articleDTO) {
-        deleteArticlePageCache();
+        // deleteArticlePageCache();
         articleMapper.updateArticle(articleDTO);
     }
 
@@ -192,6 +187,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private void setArticleActive(List<ArticleAndActiveVO> articles) {
+        Long userId = BaseContext.getCurrentId();
         //活动属性的key
         List<String> articleIds = articles.stream().map(article -> "article_active:" + article.getId()).collect(Collectors.toList());
         // Redis批量查询
@@ -215,11 +211,11 @@ public class ArticleServiceImpl implements ArticleService {
         SetOperations setOperations = redisCache.redisTemplate.opsForSet();
         //将活动属性设置到文章中
         for (ArticleAndActiveVO article : articles) {
+
             Long articleId = article.getId();
             Map<String,Long> articleActiveMap = articleActiveMaps.get(articleId);
             if(articleActiveMap == null){
-                deleteArticlePageCache();
-                throw new BaseException("服务器繁忙");
+                articleActiveMap = setArticleActiveHash(articleId);
             }
             article.setContent(DocUtils.getText(article.getContent()));
             article.setCollectionCount(articleActiveMap.get("collectionCount"));
@@ -228,29 +224,19 @@ public class ArticleServiceImpl implements ArticleService {
             article.setLove(articleActiveMap.get("love"));
 
             //这里不能直接拿userId,因为userId可能是别人的也可能是当前用户的，而现在是要为了确认当前用户有没有点赞，所以要用BaseContext.getCurrentId();
-            if(Boolean.TRUE.equals(setOperations.isMember("article_active:love:" + article.getId(), BaseContext.getCurrentId()))){
-                article.setIsLove(true);
-            }else{
-                article.setIsLove(false);
-            }
-            if(Boolean.TRUE.equals(setOperations.isMember("article_active:collection:" + article.getId(), BaseContext.getCurrentId()))){
-                article.setIsCollection(true);
-            }else{
-                article.setIsCollection(false);
-            }
+            article.setIsLove(setOperations.isMember("article_active:love:" + article.getId(),userId));
+            article.setIsCollection(setOperations.isMember("article_active:collection:" + article.getId(),userId));
         }
     }
 
 
-    private static String getKey(Long userId, int pageNum, int pageSize,int type) {
-        String key;
-        if (userId == null) {
-            //TODO：对于不需要修改的字符串，使用String.format来代替用StringBuilder拼接
-            key = String.format("query_article_userId:all:pageNum:%d:pageSize:%d:type:%d", pageNum, pageSize, type);
-        } else {
-            key = String.format("query_article_userId:%d:pageNum:%d:pageSize:%d:type:%d", userId, pageNum, pageSize, type);
-        }
-        return key;
+    private static String getKey(ArticlePageDTO articlePageDTO) {
+        Long userId = articlePageDTO.getUserId();
+        Integer tag = articlePageDTO.getTag();
+        return String.format("query_article_userId:%d:pageNum:%d:pageSize:%d:type:%d:tag:%d",
+                userId == null ? -1 : userId, articlePageDTO.getPageNum(),
+                articlePageDTO.getPageSize(), articlePageDTO.getType(),
+                tag == null ? -1 : tag);
     }
     private void deleteArticlePageCache() {
         Long userId = BaseContext.getCurrentId();
@@ -269,7 +255,7 @@ public class ArticleServiceImpl implements ArticleService {
         redisCache.deleteObject(actKeys);
     }
 
-    private void setArticleActiveHash(Long articleId) {
+    private Map<String, Long> setArticleActiveHash(Long articleId) {
         String key = "article_active:"+ articleId;
         // redisCache.setCacheMapValue(key,"love",0L);
         // redisCache.setCacheMapValue(key,"forward",0L);
@@ -283,6 +269,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleActiveMap.put("collectionCount", 0L);
         articleActiveMap.put("articleId",articleId);
         redisCache.setCacheMap(key,articleActiveMap);
+        return articleActiveMap;
     }
 
 }

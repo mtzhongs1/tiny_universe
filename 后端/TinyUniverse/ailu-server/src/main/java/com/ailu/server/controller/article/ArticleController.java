@@ -1,6 +1,7 @@
 package com.ailu.server.controller.article;
 
 import com.ailu.dto.article.ArticleDTO;
+import com.ailu.dto.article.ArticlePageDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
 import com.ailu.result.PageResult;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,27 +36,23 @@ public class ArticleController {
     @Autowired
     private RedisCacheManager cacheManager;
 
-
     @PostMapping("/publish")
     @ApiOperation(value = "发布文章")
+    // @CacheEvict(value = "article_all",allEntries = true)
     public Result publishArticle(@RequestBody Article article) {
         articleService.publishArticle(article);
         return Result.success();
     }
 
-    @GetMapping("/page/{userId}/{pageNum}/{pageSize}/{type}")
-    @ApiOperation(value = "分页获取当前用户文章信息")
-    public Result<PageResult> pageQueryArticle(@PathVariable Long userId, @PathVariable int pageNum,
-                                   @PathVariable int pageSize,@PathVariable int type){
-        PageResult pageResult = articleService.pageQueryArticle(userId,pageNum, pageSize,type);
-        return Result.success(pageResult);
-    }
-
-    @GetMapping("/pageAll/{pageNum}/{pageSize}/{type}")
-    @ApiOperation(value = "分页获取所有文章信息")
-    public Result<PageResult> pageQueryAllArticle(@PathVariable int pageNum,
-                                               @PathVariable int pageSize, @PathVariable int type){
-        PageResult pageResult = articleService.pageQueryAllArticle(pageNum, pageSize,type);
+    @GetMapping("/page")
+    @ApiOperation(value = "分页获取用户文章信息")
+    // @Cacheable(value = "article_all",key = "'userId:'+#articlePageDTO.userId+':' "+
+    //         "+'pageNum:'+#articlePageDTO.pageNum+':'"+
+    //         "+'pageSize:'+#articlePageDTO.pageSize+':'"+
+    //         "+'type:'+#articlePageDTO.type+':'"+
+    //         "+'tag:'+#articlePageDTO.tag")
+    public Result<PageResult> pageQueryArticle(ArticlePageDTO articlePageDTO){
+        PageResult pageResult = articleService.pageQueryArticle(articlePageDTO);
         return Result.success(pageResult);
     }
 
@@ -67,6 +65,9 @@ public class ArticleController {
 
     @DeleteMapping
     @ApiOperation("删除文章")
+    // @Caching(evict = {
+    //         @CacheEvict(value = "article_all",allEntries = true),
+    // })
     public Result deleteArticle(@RequestBody List<Long> ids){
         // TODO:删除集合中的缓存
         for(Long id : ids){

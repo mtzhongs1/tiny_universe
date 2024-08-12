@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @Description:
@@ -29,5 +30,10 @@ public class TagServiceImpl implements TagService {
     public List<String> getTagNames(Long articleId){
         List<String> tagNames = tagMapper.getTagNames(articleId);
         return tagNames;
+    }
+
+    @Override
+    public Set<Long> getArticleIdById(Integer tagId) {
+        return tagMapper.getArticleIdById(tagId);
     }
 }

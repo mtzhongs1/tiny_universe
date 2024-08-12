@@ -1,6 +1,7 @@
 package com.ailu.server.service.article;
 
 import com.ailu.dto.article.ArticleDTO;
+import com.ailu.dto.article.ArticlePageDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
 import com.ailu.result.PageResult;
@@ -18,7 +19,7 @@ import java.util.List;
 public interface ArticleService {
     void publishArticle(Article article);
 
-    PageResult pageQueryArticle(Long userId, int pageNum, int pageSize,int type);
+    PageResult pageQueryArticle(ArticlePageDTO articlePageDTO);
 
     ArticleVO getArticle(Long articleId);
 
@@ -27,8 +28,6 @@ public interface ArticleService {
     void updateArticle(ArticleDTO articleDTO);
 
     PageResult search(String name,int pageNum,int pageSize,int type);
-
-    PageResult pageQueryAllArticle(int pageNum, int pageSize,int type);
 
     UserActiveVO getUser(Long articleId);
 

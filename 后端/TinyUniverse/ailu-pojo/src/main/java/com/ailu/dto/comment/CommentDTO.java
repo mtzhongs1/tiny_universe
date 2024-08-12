@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 /**
  * @Description:
@@ -16,14 +18,15 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentDTO {
-    private Long id;
+    @NotNull(message = "用户id不能为空")
     private Long userId;
+    @NotNull(message = "文章id不能为空")
     private Long ArticleId;
     private Long parentId;
     @NotBlank(message = "评论内容不能为空")
-    @Size(min = 1,max = 500,message = "评论内容长度在1-200之间")
+    @Size(min = 1,max = 500,message = "评论内容长度在1-500之间")
     private String content;
-    private Long createTime;
-    private Long updateTime;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
     private Long love;
 }

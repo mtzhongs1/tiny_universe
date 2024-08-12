@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ailu.server.mapper.CollectionMapper">
+
+
+    <insert id="saveMultCollection">
+        insert into collection(name,user_id,article_id,type,parent_id,create_time,update_time) values
+        <foreach collection="parentIds" item="parentId0" separator="),(" open="(" close=")">
+            #{name},#{userId},#{articleId},#{type},#{parentId0},#{createTime},#{updateTime}
+        </foreach>
+    </insert>
+</mapper>

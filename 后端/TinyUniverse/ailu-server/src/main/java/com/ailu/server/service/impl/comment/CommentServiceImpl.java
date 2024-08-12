@@ -1,17 +1,20 @@
 package com.ailu.server.service.impl.comment;
 
 import com.ailu.constant.SortConstant;
+import com.ailu.context.BaseContext;
 import com.ailu.dto.comment.CommentDTO;
+import com.ailu.dto.comment.CommentUpdateDTO;
 import com.ailu.dto.comment.CommentVO;
+import com.ailu.result.PageResult;
+import com.ailu.server.config.RedisCache;
 import com.ailu.server.mapper.CommentMapper;
 import com.ailu.server.service.comment.CommentService;
+import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description:
@@ -24,9 +27,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private CommentMapper commentMapper;
+    @Autowired
+    private RedisCache redisCache;
 
     @Override
-    public List<CommentVO> getComments(Long articleId,int type) {
+    public PageResult getComments(Long articleId, int type) {
         List<CommentVO> commentVOs = commentMapper.getComments(articleId);
         List<CommentVO> commentTrees = buildTree(commentVOs);
         //根据评论时间进行降序排序
@@ -37,16 +42,21 @@ public class CommentServiceImpl implements CommentService {
         else{
             commentTrees.sort((o1, o2) -> o2.getLove().compareTo(o1.getLove()));
         }
-        return commentTrees;
+        return new PageResult(commentVOs.size(),commentTrees);
     }
 
     @Override
     public void saveComment(CommentDTO commentDTO) {
+        // commentDTO.setLove(0L);
+        updateCommentCount(commentDTO.getArticleId(), 1L);
         commentMapper.saveComment(commentDTO);
     }
 
+
+
     @Override
-    public void deleteComment(Long id) {
+    public void deleteComment(Long articleId,Long id) {
+        updateCommentCount(articleId, -1L);
         commentMapper.deleteComment(id);
     }
 
@@ -55,19 +65,49 @@ public class CommentServiceImpl implements CommentService {
         commentMapper.deleteCommentByArticleId(articleIds);
     }
 
+    @Override
+    public void updateComment(CommentUpdateDTO commentDTO) {
+        commentMapper.updateComment(commentDTO);
+    }
+
+    @Override
+    public Boolean doLove(Long id) {
+        Long userId = BaseContext.getCurrentId();
+        SetOperations setOperations = redisCache.redisTemplate.opsForSet();
+        String skey = "comment:love:"+id;
+        Boolean isMember = setOperations.isMember(skey, userId);
+        if(Boolean.TRUE.equals(isMember)){
+            setOperations.remove(skey,userId);
+        }
+        else{
+            setOperations.add(skey,userId);
+        }
+        return !isMember;
+    }
+    private void updateCommentCount(Long articleId,long value) {
+        String key = "article_active:"+ articleId;
+        // redisCache.redisTemplate.opsForHash().increment(key,"commentCount",1);
+        Long commentCount = redisCache.getCacheMapValue(key, "commentCount");
+        commentCount+=value;
+        redisCache.setCacheMapValue(key,"commentCount",commentCount);
+    }
 
     //TODO:构建二层树结构
     private List<CommentVO> buildTree(List<CommentVO> commentVOs) {
         //map分组，key为parentId,value为CommentVO
         Map<Long, List<CommentVO>> map = new HashMap<>();
+        SetOperations setOperations = redisCache.redisTemplate.opsForSet();
+        Long userId = BaseContext.getCurrentId();
         for (CommentVO commentVO : commentVOs) {
-            map.merge(commentVO.getParentId(),new ArrayList<>(),(old,newList)->{
+            commentVO.setIsLove(setOperations.isMember("comment:love:"+commentVO.getId(),userId));
+            commentVO.setLove(setOperations.size("comment:love:"+commentVO.getId()));
+            map.merge(commentVO.getParentId(),new ArrayList<>(Collections.singletonList(commentVO)),(old, newList)->{
                 old.add(commentVO);
                 return old;
             });
         }
         //顶级节点
-        List<CommentVO> parents = map.get(null);
+        List<CommentVO> parents = map.getOrDefault(null,new ArrayList<>());
         for (CommentVO parent : parents) {
             parent.setChildren(new ArrayList<>());
             recursion(parent.getChildren(),parent.getId(),map);
@@ -78,10 +118,12 @@ public class CommentServiceImpl implements CommentService {
     //递归,commentVOs找出父id==parentId的节点，然后添加到parent集合中
     private void recursion(List<CommentVO> parent, Long parentId, Map<Long,List<CommentVO>> map){
         List<CommentVO> childs = map.get(parentId);
-        for (CommentVO child : childs) {
-            parent.add(child);
-            //TODO:这里用parent是因为是二级结构，如果是多级结构则是child.getChildren()
-            recursion(parent,child.getId(),map);
+        if(childs != null){
+            for (CommentVO child : childs) {
+                parent.add(child);
+                //TODO:这里用parent是因为是二级结构，如果是多级结构则是child.getChildren()
+                recursion(parent,child.getId(),map);
+            }
         }
     }
 

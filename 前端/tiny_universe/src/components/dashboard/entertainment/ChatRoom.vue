@@ -65,7 +65,6 @@ let users = ref([]);
 //username:搜索框文字
 let username = ref();
 let count = ref(0);
-let enterOrExit = reactive({})
 const reconnectInterval = 3000;
 
 onMounted( () => {
@@ -175,6 +174,7 @@ const getUsers = (username) => {
   overflow-y: auto;
   height: 400px;
   margin-bottom: 20px;
+  background-color: #6494cc;
 }
 
 .message {

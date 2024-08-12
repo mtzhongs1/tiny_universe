@@ -9,7 +9,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: dev
   main:
     allow-circular-references: true
     allow-bean-definition-overriding: true
@@ -28,7 +28,7 @@ spring:
   mail:
     host: smtp.qq.com  #SMTP服务器地址
     username: 2568315961@qq.com #登陆账号
-    password: jqefjzyibkbkecfb #登陆密码（或授权码）
+    password: mwvwtpgypxjvdhic #登陆密码（或授权码）
     port: 587
     properties:
       from: 2568315961@qq.com #邮件发信人（即真实邮箱）
@@ -87,6 +87,7 @@ mybatis:
   configuration:
     #开启驼峰命名
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
     com:

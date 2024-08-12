@@ -1,5 +1,6 @@
 package com.ailu.server.service.article;
 
+import com.ailu.dto.collection.ColDTO;
 import com.ailu.entity.ArticleActive;
 
 /**
@@ -15,7 +16,9 @@ public interface ArticleActiveService {
 
     void watch(Long articleId);
 
-    boolean collection(Long articleId);
+    void collection(ColDTO colDTO);
 
     ArticleActive getArticleActive(Long articleId);
+
+    void delCollection(Long articleId);
 }

@@ -176,7 +176,6 @@ const handleClose = (index) => {
 const handleEditorCreated = (editorInstance) => {
   //实例附加到 editor 引用。
   editor.value = editorInstance
-  console.log(editor.value.getConfig());
 };
 
 //文章属性操作
@@ -270,7 +269,7 @@ const updateArticle = async (isArticle) => {
   })
 }
 const getArticle = () => {
-  if(params.articleId < 0){
+  if(!params.articleId || params.articleId < 0){
     return;
   }
   article.id = params.articleId;
@@ -328,6 +327,7 @@ const getArticleFd = (isArticle) => {
 /*  display: flex;*/
 
 /*}*/
+
 
 .buttonDiv{
   display: flex;

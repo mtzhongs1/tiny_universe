@@ -2,6 +2,8 @@ package com.ailu.vo.user;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Description:
  * @Author: ailu
@@ -9,7 +11,7 @@ import lombok.Data;
  */
 
 @Data
-public class UserSocketVO {
+public class UserSocketVO implements Serializable {
     private Long id;
     private String username;
     private String avatar;

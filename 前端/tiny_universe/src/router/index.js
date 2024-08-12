@@ -13,6 +13,8 @@ import ArticleEditor from '@/views/dashboard/article/ArticleEditor.vue'
 import ArticleContent from "@/views/dashboard/article/ArticleContent.vue";
 import UserDetail from "@/views/dashboard/module/user/UserDetail.vue";
 import Search from "@/views/dashboard/article/Search.vue";
+import Fols from "@/components/dashboard/user/Fols.vue";
+import Fans from "@/components/dashboard/user/Fans.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,10 +36,19 @@ const router = createRouter({
         {path: 'collection',name: 'Collection',component:Collection},
         {path: 'other',name: 'Other',component:Other},
         {path: 'user',name:'User',component:User},
-        {path: 'user_detail/:id',name:'UserDetail',component:UserDetail},
+        {
+          path: 'user_detail/:id',
+          name:'UserDetail',
+          component:UserDetail,
+          children:[
+            {path: 'fols',name:'Fols',component:Fols},
+            {path: 'fans',name:'Fans',component:Fans}
+          ]
+        },
         {path: 'article_editor/:articleId',name:'ArticleEditor',component:ArticleEditor},
         {path: 'article/content/:articleId',name:'ArticleContent',component:ArticleContent},
-        {path: 'search/:name',name:'Search',component:Search}
+        {path: 'search/:name',name:'Search',component:Search},
+        {path: 'collection',name: 'Collection',component:Collection}
       ]
     },
   ]

@@ -2,6 +2,7 @@ package com.ailu.vo.user;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -11,7 +12,8 @@ import java.time.LocalDate;
  */
 
 @Data
-public class UserVO {
+public class UserVO implements Serializable {
+    private static final long serialVersionUID = 15454521138L;
     private Long id;
     private String username;
     private String email;

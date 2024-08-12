@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author: ailu
@@ -21,4 +22,6 @@ public interface TagMapper {
     @Select("select name from tag t,article_tag at where t.id = at.tag_id and at.article_id = #{articleId} ")
     List<String> getTagNames(Long articleId);
 
+    @Select("select at.article_id from article_tag at,tag t where at.tag_id = t.id and t.id = #{tagId}")
+    Set<Long> getArticleIdById(Integer tagId);
 }

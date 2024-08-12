@@ -60,6 +60,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true)
+                .allowedOrigins("https://www.ailu.fun/")
                 .maxAge(3600);
     }
 

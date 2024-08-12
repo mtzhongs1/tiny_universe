@@ -3,11 +3,11 @@
     <div>
       <div class="activeStyle">
         <div>
-          <el-icon class="active-icon" :size="27" :color="articleActive.loveColor" @click="doLove(article)"><Sugar /></el-icon>
+          <el-icon class="active-icon" :size="27" :color="articleActive.isLove?'#62b9ec':''" @click="doLove(article)"><Sugar /></el-icon>
           <span class="active-num">{{articleActive.love}}</span>
         </div>
         <div>
-          <el-icon class="active-icon" :size="27" :color="articleActive.collectionColor" @click="doCollection(article)"><Star /></el-icon>
+          <el-icon class="active-icon" :size="27" :color="articleActive.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>
           <span class="active-num">{{articleActive.collectionCount}}</span>
         </div>
       </div>
@@ -25,8 +25,8 @@
         <article-content-view :makeDirectory="makeDirectory" :content="article.content"></article-content-view>
       </div>
       <!--评论区域-->
-      <div>
-        <Comment></Comment>
+      <div class="comment-detail">
+        <Comment v-if="isCommentAlive"></Comment>
       </div>
     </div>
     <div>
@@ -41,7 +41,7 @@
             <span>关注：{{userActive.follows}}</span>
             <span>粉丝：{{userActive.fans}}</span>
           </div>
-          <div v-if="user.id === article.userId">
+          <div v-if="user.id !== article.userId">
             <div @click="follow" >
               <el-button style="color:white" v-if="isFollow" class="follow-btn"> 关注 </el-button>
               <el-button v-else class="follow-btn" style="background: #a19999 ;color:black"> 取关 </el-button>
@@ -65,7 +65,7 @@
   </div>
 </template>
 <script setup>
-import {inject, onBeforeMount, reactive, ref} from "vue";
+import {inject, onBeforeMount, provide, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 import {doGet, doPostxwww} from "@/http/httpRequest.js";
 import {useRoute, useRouter} from "vue-router";
@@ -73,6 +73,7 @@ import {useRoute, useRouter} from "vue-router";
 import ArticleContentView from "@/components/dashboard/article/ArticleContentView.vue";
 import Comment from "@/components/dashboard/article/Comment.vue";
 import {newRoute} from "@/util/router.js";
+import {reloadUtil} from "@/util/util.js";
 
 let user = inject("user");
 let article = reactive({
@@ -87,6 +88,8 @@ let userActive = reactive({
   userId:'',fans:'',follows:''
 });
 let catalog = ref([]);
+
+let isCommentAlive = ref(true);
 onBeforeMount(() => {
   getArticle();
   getUser();
@@ -95,7 +98,6 @@ onBeforeMount(() => {
 const getUser = () => {
   doGet("article/getUser/"+article.id).then((resp) => {
     if(resp.data.code === 1){
-      console.log(resp.data.data);
       Object.assign(userActive,resp.data.data);
     }else{
       ElMessage.error("服务器繁忙");
@@ -121,12 +123,6 @@ const getArticleActive = () => {
     if(resp.data.code === 1){
       const tempArticleActive = resp.data.data;
       Object.assign(articleActive,tempArticleActive);
-      if(articleActive.isLove){
-        articleActive.loveColor = "#62b9ec";
-      }
-      if(articleActive.isCollection){
-        articleActive.collectionColor = "#62b9ec";
-      }
     }
     else{
       ElMessage.error("服务端繁忙");
@@ -157,12 +153,12 @@ const doLove = (article) => {
       const isAdd = resp.data.data;
       // 点赞
       if(isAdd){
-        articleActive.loveColor = "#62b9ec";
+        articleActive.isLove = true;
         articleActive.love++;
       }
       // 取消点赞
       else{
-        articleActive.loveColor = "";
+        articleActive.isLove = false;
         articleActive.love--;
       }
     }else{
@@ -176,12 +172,12 @@ const doCollection = (article) => {
       const isAdd = resp.data.data;
       // 收藏
       if(isAdd){
-        articleActive.collectionColor = "#62b9ec";
+        articleActive.isCollection = true;
         articleActive.collectionCount++;
       }
       // 取消收藏
       else{
-        articleActive.collectionColor = "";
+        articleActive.isCollection = false;
         articleActive.collectionCount--;
       }
     }else{
@@ -198,11 +194,13 @@ const getIsFollow = () => {
     }
   })
 }
-
+const reloadComment = () => {
+  reloadUtil(isCommentAlive);
+}
 const follow = () => {
   doPostxwww("/user_active/follow",{
     toUserId:article.userId,
-    isFollow:!isFollow.value,
+    isFollow:isFollow.value,
   }).then((resp) => {
     if(resp.data.code === 1){
       isFollow.value = !isFollow.value;
@@ -222,6 +220,14 @@ const follow = () => {
 const toUserDetail = (id) => {
   newRoute('/dashboard/user_detail/'+id,router);
 }
+
+let articleId = ref(null);
+watch(() => article.id,(newValue) => {
+  articleId.value = newValue;
+})
+
+provide("articleId",articleId);
+provide("reloadComment",reloadComment);
 </script>
 <style scoped>
 .outer-div{
@@ -232,11 +238,12 @@ const toUserDetail = (id) => {
   gap:60px;
 }
 
-.article-detail {
-  width: 60vw;
+.article-detail,.comment-detail {
+  width: 100%;
   padding: 20px 10px;
   background: var(--main-beside-color);
 }
+
 
 .activeStyle{
   display: flex;
@@ -331,6 +338,7 @@ const toUserDetail = (id) => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 60vw;
 }
 
 .follow-btn{
@@ -343,7 +351,7 @@ const toUserDetail = (id) => {
   .UserAndDir{
     display: none;
   }
-  .article-detail{
+  .article-detail,.comment-detail{
     width: 85vw;
   }
 }
@@ -354,6 +362,11 @@ const toUserDetail = (id) => {
   }
   .outer-div{
     justify-content: center;
+  }
+  .article-detail,.comment-detail{
+    width: 100vw;
+    position: relative;
+    left: -160px;
   }
 }
 </style>

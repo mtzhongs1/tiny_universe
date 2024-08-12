@@ -1,6 +1,7 @@
 package com.ailu.server.mapper;
 
 import com.ailu.dto.article.ArticleDTO;
+import com.ailu.dto.article.ArticlePageDTO;
 import com.ailu.dto.article.ArticleTextDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
@@ -27,7 +28,7 @@ public interface ArticleMapper {
     @AutoFill(InsertOrUpdate.INSERT)
     void saveArticle(Article article);
 
-    Page<ArticleAndActiveVO> pageQueryArticle(Long userId,int type);
+    Page<ArticleAndActiveVO> pageQueryArticle(ArticlePageDTO articlePageDTO);
 
     ArticleVO getArticle(Long articleId);
 

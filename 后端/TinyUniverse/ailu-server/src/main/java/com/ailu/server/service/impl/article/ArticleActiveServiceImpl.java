@@ -1,13 +1,20 @@
 package com.ailu.server.service.impl.article;
 
 import com.ailu.context.BaseContext;
+import com.ailu.dto.collection.ColDTO;
+import com.ailu.dto.collection.CollectionDTO;
 import com.ailu.entity.ArticleActive;
 import com.ailu.server.config.RedisCache;
+import com.ailu.server.mapper.CollectionMapper;
 import com.ailu.server.service.article.ArticleActiveService;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +27,9 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private CollectionMapper collectionMapper;
 
     @Override
     public boolean love(Long articleId) {
@@ -57,24 +67,32 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
     }
 
     @Override
-    public boolean collection(Long articleId){
+    public void collection(ColDTO colDTO){
         SetOperations setOperations = redisCache.redisTemplate.opsForSet();
         //收藏功能
-        String hkey = "article_active:"+articleId;
+        String hkey = "article_active:"+colDTO.getArticleId();
+        String skey = "article_active:collection:"+colDTO.getArticleId();
+        Long collectionCount = redisCache.getCacheMapValue(hkey, "collectionCount");
+        Long userId = BaseContext.getCurrentId();
+        //添加
+        redisCache.setCacheMapValue(hkey, "collectionCount", ++collectionCount);
+        setOperations.add(skey,userId);
+        List<Long> praentIds = (List<Long>) JSON.parse(colDTO.getParentIds());
+        CollectionDTO collectionDTO = new CollectionDTO(colDTO.getName(),0,null,userId,
+                colDTO.getArticleId(),praentIds);
+        collectionMapper.saveMultCollection(collectionDTO);
+    }
+    @Override
+    public void delCollection(Long articleId) {
+        SetOperations setOperations = redisCache.redisTemplate.opsForSet();
+        //收藏功能
+        String hkey = "article_active:"+ articleId;
         String skey = "article_active:collection:"+articleId;
         Long collectionCount = redisCache.getCacheMapValue(hkey, "collectionCount");
         Long userId = BaseContext.getCurrentId();
-        boolean isAdd = setOperations.isMember(skey, userId);
-        if(isAdd){
-            //删除
-            redisCache.setCacheMapValue(hkey, "collectionCount", --collectionCount);
-            setOperations.remove(skey,userId);
-        }else{
-            //添加
-            redisCache.setCacheMapValue(hkey, "collectionCount", ++collectionCount);
-            setOperations.add(skey,userId);
-        }
-        return !isAdd;
+        redisCache.setCacheMapValue(hkey, "collectionCount", collectionCount-1);
+        setOperations.remove(skey,userId);
+        collectionMapper.deleteCollectionByArticleId(articleId,userId);
     }
 
     @Override
@@ -97,4 +115,6 @@ public class ArticleActiveServiceImpl implements ArticleActiveService {
         }
         return articleActive;
     }
+
+
 }

@@ -32,8 +32,8 @@ export function getBlob(file,type,fileName){
 }
 
 export function confirm(){
-    ElMessageBox.confirm(
-        '确定要退出吗？',
+    return ElMessageBox.confirm(
+        '你决定好了吗？',
         '提示',
         {
             confirmButtonText: '确定',
@@ -64,6 +64,7 @@ export function setCssVariable(theme,color){
         color.message_color = getCssVariable('--message-white-color');
         color.message_text_color = getCssVariable('--message-text-white-color');
         color.shadow_color = getCssVariable('--shadow-white-color');
+        color.comment_color = getCssVariable('--comment-white-color');
     }else{
         //夜晚
         color.header_color = getCssVariable('--header-black-color');
@@ -73,6 +74,7 @@ export function setCssVariable(theme,color){
         color.message_color = getCssVariable('--message-black-color');
         color.message_text_color = getCssVariable('--message-text-black-color');
         color.shadow_color = getCssVariable('--shadow-black-color');
+        color.comment_color = getCssVariable('--comment-black-color');
     }
     setProperty('--header-color',color.header_color);
     setProperty('--main-color',color.main_color);
@@ -81,6 +83,7 @@ export function setCssVariable(theme,color){
     setProperty('--message-color',color.message_color);
     setProperty('--message-text-color',color.message_text_color);
     setProperty('--shadow-color',color.shadow_color);
+    setProperty('--comment-color',color.comment_color);
 }
 
 export const reloadUtil = (isRouterAlive) => {

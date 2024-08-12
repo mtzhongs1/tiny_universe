@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ailu.server.mapper.ArticleMapper">
     <insert id="saveArticle" useGeneratedKeys="true" keyProperty="id" parameterType="com.ailu.entity.Article">
-        insert into article(author,user_id,content,title,description,cover,tag,type,create_time,update_time)
-        values(#{author},#{userId},#{content},#{title},#{description},#{cover},#{tag},#{type},#{createTime},#{updateTime})
+        insert into article(author,user_id,content,title,description,cover,type,create_time,update_time)
+        values(#{author},#{userId},#{content},#{title},#{description},#{cover},#{type},#{createTime},#{updateTime})
     </insert>
     <select id="pageQueryArticle" resultType="com.ailu.vo.article.ArticleAndActiveVO">
         select a.id,u.username as author,a.title,a.description,a.cover,a.create_time,LEFT(a.content,40) as content
@@ -17,6 +17,9 @@
         a.status = 1
         <if test="type == 1">
             order by a.create_time desc
+        </if>
+        <if test="type == 0">
+            order by a.create_time asc
         </if>
     </select>
     <delete id="deleteArtOrDra">

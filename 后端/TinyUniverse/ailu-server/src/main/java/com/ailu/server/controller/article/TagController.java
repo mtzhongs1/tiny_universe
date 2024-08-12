@@ -4,6 +4,8 @@ import com.ailu.result.Result;
 import com.ailu.server.service.article.TagService;
 import com.ailu.vo.article.TagVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +28,7 @@ public class TagController {
 
     @GetMapping
     @Cacheable(value = "tags", key = "#name")
-    public Result<List<TagVO>> getTags(String name){
+    public Result<List<TagVO>> getTags(@Value("") String name){
         List<TagVO> tags = tagService.getTags(name);
         return Result.success(tags);
     }

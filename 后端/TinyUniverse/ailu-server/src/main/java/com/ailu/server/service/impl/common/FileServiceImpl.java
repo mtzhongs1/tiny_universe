@@ -29,6 +29,10 @@ public class FileServiceImpl implements FileService {
         if (image.isEmpty()) {
             throw new BaseException("没有传来图片");
         }
+        if (image.getSize() > 4 * 1024 * 1024) {
+            throw new BaseException("文件不能大于4M");
+        }
+
         String fileName = getFileName(image,".png");
         String url = null;
         try {
