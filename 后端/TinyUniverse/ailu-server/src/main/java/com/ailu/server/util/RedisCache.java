@@ -1,10 +1,7 @@
-package com.ailu.server.config;
+package com.ailu.server.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -220,4 +217,58 @@ public class RedisCache {
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
     }
+
+    public Set<String> getKeys(String match) {
+        ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions();
+        ScanOptions scanOptions = scanOptionsBuilder
+                .match(match)
+                .count(10000)
+                .build();
+        // Cursor<Map.Entry<String, Long>> searchkey = redisTemplate.opsForHash().scan(scanOptions);
+        // while (searchkey.hasNext()){
+        //     Map.Entry<String, Long> next = searchkey.next();
+        // }
+
+        Set<String> keys = (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keysTmp = new HashSet<>();
+            Cursor<byte[]> cursor = connection.scan(scanOptions);
+            while (cursor.hasNext()) {
+                keysTmp.add(new String(cursor.next()));
+            }
+            cursor.close();
+            return keysTmp;
+        });
+        return keys;
+    }
+
+    /** * 以count为步长查找符合pattern条件的keys * * @param redisTemplate 指定redis * @param pattern 匹配条件 * @param count 一次在count条记录中match符合pattern条件的记录。若count<=0,使用1000 * @return Set<String> 若limit<= 0,返回所有;否则返回查找结果 */
+    public Set<String> scanKeys(RedisTemplate redisTemplate, String pattern, int count) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> tmpKeys = new HashSet<>();
+            ScanOptions options;
+            if (count <= 0) {
+                options = ScanOptions.scanOptions().match(pattern).count(1000).build();
+            } else {
+                options = ScanOptions.scanOptions().match(pattern).count(count).build();
+            }
+            // 迭代一直查找，直到找到redis中所有满足条件的key为止(cursor变为0为止)
+            Cursor<byte[]> cursor = connection.scan(options);
+            while (cursor.hasNext()) {
+                tmpKeys.add(new String(cursor.next()));
+            }
+            return tmpKeys;
+        });
+    }
+
+
+    public ScanOptions getScanOptions(String match) {
+        ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions();
+        ScanOptions scanOptions = scanOptionsBuilder
+                .match(match)
+                // 最大获取的数据条数（大约）
+                .count(10000)
+                .build();
+        return scanOptions;
+    }
+
 }

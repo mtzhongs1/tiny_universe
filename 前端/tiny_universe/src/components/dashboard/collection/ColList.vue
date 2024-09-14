@@ -29,15 +29,6 @@
         </el-collapse-item>
       </el-collapse>
       <el-space :size="50">
-        <el-pagination
-            v-model:current-page="page.pageNum"
-            :page-size="page.pageSize"
-            :size="collections.length"
-            :total = "total"
-            layout="total, prev, pager, next"
-            @current-change="getCollectionos"
-            style="margin:50px 0"
-        />
         <el-button v-if="article" @click="doCollection">确定</el-button>
       </el-space>
     </div>
@@ -68,42 +59,39 @@
   </div>
 </template>
 <script setup>
-import {inject, onMounted, reactive, ref} from "vue";
-import {doDelete, doGet, doPost, doPostxwww, doPut} from "@/http/httpRequest.js";
+import {inject, onMounted, reactive, ref, watch} from "vue";
+import {doDelete, doGet, doPost, doPut} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
-import {confirm} from "@/util/util.js";
-import axios from "axios";
+import {confirm, isEmpty} from "@/util/util.js";
 import {useRouter} from "vue-router";
 import {newRoute} from "@/util/router.js";
-let collections = ref();
-let total = ref(0);
+let collections = ref([]);
 let dialogVisible = ref(false);
 let closeColDialog = inject("closeColDialog");
 let reload = inject("reload");
 let collection = reactive({id:'',name:'',isPublic:''});
 let article = inject("article");
-let page = reactive({
-  pageSize:5,
-  pageNum:1
-})
+let userId = inject("userId");
+let user = inject("user");
 let router = useRouter();
 onMounted(() => {
   getCollectionos();
 })
 const getCollectionos = () => {
-  doGet("/collection/collections/"+page.pageSize+"/"+page.pageNum).then((resp) => {
+  let temp = isEmpty(userId)?user.id:userId;
+  doGet("/collection/collections/"+temp).then((resp) => {
     if(resp.data.code === 1){
-      collections.value = resp.data.data.records;
-      total.value = resp.data.data.total;
+      collections.value = resp.data.data;
     }else{
       ElMessage.error("服务器繁忙");
     }
   })
 }
 const getChild = (collection) => {
-  doGet("/collection/collection/"+page.pageSize+"/"+page.pageNum+"/"+collection.id).then((resp) => {
+  let temp = isEmpty(userId)?user.id:userId;
+  doGet("/collection/collection/"+temp+"/"+collection.id).then((resp) => {
     if(resp.data.code === 1){
-      collection.childs = resp.data.data.records;
+      collection.childs = resp.data.data;
     }else{
       ElMessage.error("服务器繁忙");
     }
@@ -172,7 +160,11 @@ const doCollection = () => {
     }
   })
 }
-
+watch(() => user.id,(userId) => {
+  if(!isEmpty(userId)){
+    getCollectionos();
+  }
+})
 
 </script>
 <style scoped>

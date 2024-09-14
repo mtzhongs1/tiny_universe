@@ -23,7 +23,6 @@ public class ArticlePageDTO implements Serializable {
     Integer pageNum;
     @NotNull(message = "pageSize不能为空")
     Integer pageSize;
-    @NotNull(message = "type不能为空")
     Integer type;
     Integer tag;
 }

@@ -6,19 +6,16 @@ import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
 import com.ailu.result.PageResult;
 import com.ailu.result.Result;
+import com.ailu.server.dataSource.searchType.DataSourceFactory;
 import com.ailu.server.service.article.ArticleService;
 import com.ailu.vo.article.ArticleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Description:
@@ -34,7 +31,9 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
     @Autowired
-    private RedisCacheManager cacheManager;
+    private DataSourceFactory dataSourceFactory;
+    // @Autowired
+    // private RedisCacheManager cacheManager;
 
     @PostMapping("/publish")
     @ApiOperation(value = "发布文章")
@@ -51,13 +50,13 @@ public class ArticleController {
     //         "+'pageSize:'+#articlePageDTO.pageSize+':'"+
     //         "+'type:'+#articlePageDTO.type+':'"+
     //         "+'tag:'+#articlePageDTO.tag")
-    public Result<PageResult> pageQueryArticle(ArticlePageDTO articlePageDTO){
+    //type=0：热度排名 type=1，最新 type=2，推荐
+    public Result<PageResult> pageQueryArticle(ArticlePageDTO articlePageDTO) throws TasteException {
         PageResult pageResult = articleService.pageQueryArticle(articlePageDTO);
         return Result.success(pageResult);
     }
 
     @GetMapping("/{articleId}")
-    @Cacheable(value= "article",key = "#articleId")
     public Result<ArticleVO> getArticle(@PathVariable Long articleId){
         ArticleVO articleVO = articleService.getArticle(articleId);
         return Result.success(articleVO);
@@ -65,31 +64,27 @@ public class ArticleController {
 
     @DeleteMapping
     @ApiOperation("删除文章")
-    // @Caching(evict = {
-    //         @CacheEvict(value = "article_all",allEntries = true),
-    // })
     public Result deleteArticle(@RequestBody List<Long> ids){
         // TODO:删除集合中的缓存
-        for(Long id : ids){
-            Objects.requireNonNull(cacheManager.getCache("article")).evictIfPresent(id);
-        }
+        // for(Long id : ids){
+        //     Objects.requireNonNull(cacheManager.getCache("article")).evictIfPresent(id);
+        // }
         articleService.deleteArticle(ids);
         return Result.success();
     }
 
     @PutMapping
     @ApiOperation("修改文章")
-    @CacheEvict(value = "article",key = "#articleDTO.id")
     public Result updateArticle(@RequestBody ArticleDTO articleDTO){
         articleService.updateArticle(articleDTO);
         return Result.success();
     }
 
-    @GetMapping("/search/{pageNum}/{pageSize}/{type}/{name}")
+    @GetMapping("/search/{pageNum}/{pageSize}/{type}/{content}")
     @ApiOperation("分词搜索")
-    public Result<PageResult> search(@PathVariable String name,@PathVariable int pageNum,
-                                     @PathVariable int pageSize,@PathVariable int type){
-        PageResult page = articleService.search(name,pageNum,pageSize,type);
+    public Result<PageResult> search(@PathVariable String content,@PathVariable Integer pageNum,
+                                     @PathVariable Integer pageSize,@PathVariable Integer type){
+        PageResult page = dataSourceFactory.getDataSource("article").search(content,pageNum,pageSize,type);
         return Result.success(page);
     }
 

@@ -1,7 +1,7 @@
 package com.ailu.server.schedule;
 
 import com.ailu.dto.article.ArticleTextDTO;
-import com.ailu.server.config.RedisCache;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.ArticleMapper;
 import com.ailu.util.DocUtils;
 import com.huaban.analysis.jieba.JiebaSegmenter;

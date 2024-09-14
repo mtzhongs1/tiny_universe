@@ -1,13 +1,13 @@
 <template>
   <div v-if="fols.length > 0">
     <div class="followers" v-for="(fol,index) in fols" :key="index" >
-        <el-space style="margin: 20px">
-          <el-avatar @click="toUser(fol.id)" fit="cover" :size="80" :src="fol.avatar" />
-          <p>{{fol.username}}</p>
-        </el-space>
+      <el-space style="margin: 20px">
+        <el-avatar @click="toUser(fol.id)" fit="cover" :size="80" :src="fol.avatar" />
+        <p>{{fol.username}}</p>
+      </el-space>
 
       <div @click="follow(fol)" class="guan">
-        <el-button v-if="!fol.isFollow" class="follow-btn" type="primary">关注</el-button>
+        <el-button v-if="fol.isFollow" class="follow-btn" type="primary">关注</el-button>
         <el-button v-else class="qu-guan" type="success">已关注</el-button>
       </div>
     </div>
@@ -17,8 +17,8 @@
                    :size="fols.length"
                    :total = "page.total"
                    layout="total, prev, pager, next"
-                   @current-change="getFols"
-                   v-show="fols.length > 0"
+                   @current-change="handleCurrentChange"
+                   v-show="!isEmpty(fols)"
     />
   </div>
   <div v-else style="height: 400px;display:flex;justify-content: center;align-items: center">
@@ -27,11 +27,12 @@
 </template>
 
 <script setup>
-import {inject, onMounted, reactive, ref, watch} from "vue";
+import {inject, onMounted, reactive, ref} from "vue";
 import {doGet, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {newRoute} from "@/util/router.js";
 import {useRouter} from "vue-router";
+import {isEmpty} from "@/util/util.js";
 let userId = inject("userId");
 let fols = ref([]);
 let page = reactive(
@@ -45,15 +46,18 @@ let router = useRouter();
 onMounted(() => {
   getFols();
 })
+const handleCurrentChange = (val) => {
+  page.pageNum = val;
+  getFols();
+}
 const toUser = (id) => {
-  console.log(id);
-  newRoute("/dashboard/user_detail/"+id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
 const getFols = () => {
-  if(userId === undefined || userId === null){
+  if(isEmpty(userId)){
     return;
   }
-  doGet("/user_active/follow/page",{
+  doGet("/user_active/fan/page",{
     pageNum: page.pageNum,
     pageSize: page.pageSize,
     userId: userId
@@ -86,6 +90,7 @@ const follow = (fol) => {
     }
   })
 }
+
 </script>
 
 <style scoped>
@@ -106,5 +111,6 @@ const follow = (fol) => {
 .follow-btn:hover{
   color: #ffffff;
   background: var(--common-color);
+
 }
 </style>

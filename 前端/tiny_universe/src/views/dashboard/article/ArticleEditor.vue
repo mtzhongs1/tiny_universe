@@ -6,14 +6,24 @@
       <!--TODO: 响应式布局-->
         <el-col :sm="16" :md="2">标题：</el-col>
         <el-col :span="22">
-          <input type="text" v-model="article.title" placeholder="请输入文章标题" class="custom-input">
+          <el-input style="width: 70%;" size="large" type="text" v-model="article.title" placeholder="请输入文章标题" maxlength="20" show-word-limit></el-input>
         </el-col>
         <!--Toolbar 组件提供了编辑器的工具栏，包含各种编辑功能按钮。-->
       </el-row>
       <el-row class="description">
         <el-col :sm="16" :md="2">描述：</el-col>
         <el-col :span="22">
-          <textarea type="text" v-model="article.description" placeholder="请输入描述" class="custom-input"/>
+          <el-input style="width: 70%;" size="large" type="textarea" v-model="article.description" placeholder="请输入描述" maxlength="100" show-word-limit/>
+          <el-popover
+              placement="top-start"
+              :width="168"
+              trigger="hover"
+              content="根据文章内容生成描述"
+          >
+            <template #reference>
+              <el-button @click="produceDescription" style="margin: 0 0 10px 10px">AI生成</el-button>
+            </template>
+          </el-popover>
         </el-col>
       </el-row>
       <el-row class="editor-content">
@@ -210,8 +220,8 @@ const articleValidate = () => {
     errorMsg: '标题长度不能超过25个字符'
   }]);
   validator.add(article.description,[{
-    strategy: 'maxLength:50',
-    errorMsg: '描述长度不能超过50个字符'
+    strategy: 'maxLength:100',
+    errorMsg: '描述长度不能超过100个字符'
   }]);
   validator.add(editor.value.getText(),[{
     strategy: 'isNotEmpty',
@@ -293,6 +303,20 @@ const getArticle = () => {
       ElMessage.error("服务器繁忙");
     }
   })
+}
+const produceDescription = () => {
+  // const fd = new FormData();
+  // fd.append("content",editor.value.getText())
+  doGet("/gpt/description",{
+    id:user.id,
+    content:editor.value.getText()
+  }).then((resp) => {
+    if(resp.data.code === 1){
+      article.description = resp.data.data;
+    }else{
+      ElMessage.error(resp.data.msg);
+    }
+  });
 }
 
 

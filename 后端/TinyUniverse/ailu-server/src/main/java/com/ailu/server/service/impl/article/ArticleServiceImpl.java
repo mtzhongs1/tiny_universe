@@ -1,16 +1,15 @@
 package com.ailu.server.service.impl.article;
 
+import com.ailu.constant.ArticleScoreConstant;
 import com.ailu.context.BaseContext;
 import com.ailu.dto.article.ArticleDTO;
 import com.ailu.dto.article.ArticlePageDTO;
+import com.ailu.dto.article.ArticleScoreDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
-import com.ailu.entity.ArticleActive;
 import com.ailu.entity.UserActive;
-import com.ailu.exception.BaseException;
 import com.ailu.result.PageResult;
-import com.ailu.server.config.RedisCache;
-import com.ailu.server.controller.article.TagController;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.ArticleActiveMapper;
 import com.ailu.server.mapper.ArticleMapper;
 import com.ailu.server.mapper.ArticleTagMapper;
@@ -25,15 +24,29 @@ import com.ailu.vo.article.ArticleAndActiveVO;
 import com.ailu.vo.article.ArticleVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.xxl.job.core.executor.XxlJobExecutor;
+import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
+import org.apache.mahout.cf.taste.impl.model.GenericDataModel;
+import org.apache.mahout.cf.taste.impl.model.GenericPreference;
+import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
+import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
+import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
+import org.apache.mahout.cf.taste.impl.similarity.UncenteredCosineSimilarity;
+import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.model.PreferenceArray;
+import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
+import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.SetOperations;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,14 +83,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private CommentService commentService;
-    @Autowired
-    private TagController tagController;
 
     @Override
     @Transactional
     public void publishArticle(Article article) {
         Long userId = BaseContext.getCurrentId();
         article.setUserId(userId);
+
         // 添加文章
         articleMapper.saveArticle(article);
         Long articleId = article.getId();
@@ -95,23 +107,138 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public PageResult pageQueryArticle(ArticlePageDTO articlePageDTO) {
-        PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
-        // 分页结果
-        Page<ArticleAndActiveVO> page = articleMapper.pageQueryArticle(articlePageDTO);
-        List<ArticleAndActiveVO> articles = page.getResult();
-        Long total = page.getTotal();
+    public PageResult pageQueryArticle(ArticlePageDTO articlePageDTO) throws TasteException {
+        Page<ArticleAndActiveVO> page = null;
+        //推荐
+        if(articlePageDTO.getType() == 2){
+            page = recommendArticle(articlePageDTO);
+            // filterArticleByTag(page.getResult(),articlePageDTO.getTag(),page);
+        }else if(articlePageDTO.getType() == 1){
+            //最新
+            //TODO:PageHelper和order by一起出现会导致的问题：因为一开始没有选择连接article_tag表进行查询，
+            // 而是选择在后面过滤不包含该tag的文章，会导致tag标签中的文章因为分页的关系没有查询到
+            PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
+            page = articleMapper.pageQueryArticle(articlePageDTO);
 
-        filterArticleByTag(articles,articlePageDTO.getTag());
-        setArticleActive(articles);
-
-        return new PageResult(total,articles);
+        }else{
+            //热门
+            List<ArticleScoreDTO> articleScoreDTO = getArticleIds();
+            // PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
+            // page = articleMapper.pageQueryArticle(articlePageDTO);
+            // int total = articleScoreDTO.size();
+            PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
+            page = articleMapper.pageQueryArticleByIds(articleScoreDTO,articlePageDTO.getTag());
+        }
+        setArticleActive(page.getResult());
+        return new PageResult(page.getTotal(),page.getResult());
     }
 
-    private void filterArticleByTag(List<ArticleAndActiveVO> articles, Integer tag) {
+    private List<ArticleScoreDTO> getArticleIds() {
+        Set<String> keys = redisCache.getKeys("article_active:[0-9]*");
+        HashOperations<String,String,Long> hashOperations = redisCache.redisTemplate.opsForHash();
+        //java键值对
+        List<Pair<Long,Map<String,Long>>> articleActives = keys.stream().map((key) -> {
+            Map<String, Long> map = hashOperations.entries(key);
+            return new Pair<>(Long.parseLong(key.substring(key.lastIndexOf(":")+1)),map);
+        }).collect(Collectors.toList());
+        List<ArticleScoreDTO> articleScores = new ArrayList<>();
+        for (Pair<Long,Map<String, Long>> articleActive : articleActives) {
+            ArticleScoreDTO articleScore = new ArticleScoreDTO();
+            articleScore.setId(articleActive.getKey());
+            articleActive.getValue().forEach(articleScore::setField);
+            articleScore.calculateScore();
+            articleScores.add(articleScore);
+        }
+        Collections.sort(articleScores);
+        return articleScores;
+    }
+
+    /*TODO：推荐文章功能，基于用户相似性的协同过滤，即找出与该用户相似的用户，将其他用户喜欢的推荐给改用户
+       如果是基于物品相似性的协同过滤，则是找出用户喜欢的物品，找出与该物品相似的其他物品推荐给用户*/
+    private Page<ArticleAndActiveVO> recommendArticle(ArticlePageDTO articlePageDTO) throws TasteException {
+        //获取用户行为(点赞，收藏)
+        //获取所有文章的点赞情况
+        // String sLoveKey = "article_active:love:*";
+        // String sCollectionKey = "article_active:collection:*";
+        //拿到所有的文章id
+        List<Long> ids = articleMapper.getArticleIdsByTag(articlePageDTO.getTag());
+        //拼接所有的key
+        List<String> sLoveKeys = ids.stream().map(id -> "article_active:love:" + id).collect(Collectors.toList());
+        List<String> sCollectionKeys = ids.stream().map(id -> "article_active:collection:" + id).collect(Collectors.toList());
+        //拿到所有的value
+        Map<Long,Map<Long,Integer>> map = new HashMap<>();
+
+        SetOperations setOperations =  redisCache.redisTemplate.opsForSet();
+        for(int i = 0 ; i < ids.size() ; i++){
+            Long articleId = ids.get(i);
+            Set<Long> love = setOperations.members(sLoveKeys.get(i));
+            Set<Long> collection = setOperations.members(sCollectionKeys.get(i));
+            for (Long userId : love) {
+                setUserPreferences(map,userId, articleId,ArticleScoreConstant.love);
+            }
+            for (Long userId : collection) {
+                setUserPreferences(map,userId, articleId,ArticleScoreConstant.collection);
+            }
+        }
+        //获取数据集
+        DataModel dataModel = createDataModel(map);
+        //获取推荐的文章Id
+        List<Long> recommedIds = getArticleByDataModel(dataModel,articlePageDTO.getPageSize());
+        PageHelper.startPage(articlePageDTO.getPageNum(),articlePageDTO.getPageSize());
+        if(ObjectUtils.isEmpty(recommedIds)){
+            return new Page<>();
+        }
+        return articleMapper.getArticlesByIds(recommedIds,articlePageDTO.getType());
+    }
+
+    //根据数据集推荐文章id
+    private List<Long> getArticleByDataModel(DataModel dataModel,Integer pageSize) throws TasteException {
+        //获取用户相似程度
+        UserSimilarity similarity = new UncenteredCosineSimilarity(dataModel);
+        //获取用户邻居
+        UserNeighborhood userNeighborhood = new NearestNUserNeighborhood(pageSize, similarity, dataModel);
+        //构建推荐器
+        Recommender recommender = new GenericUserBasedRecommender(dataModel, userNeighborhood, similarity);
+        //推荐pageSize个
+        List<RecommendedItem> recommendedItems = recommender.recommend(BaseContext.getCurrentId(),pageSize);
+        List<Long> itemIds = recommendedItems.stream().map(RecommendedItem::getItemID).collect(Collectors.toList());
+        return itemIds;
+    }
+
+    private DataModel createDataModel(Map<Long, Map<Long, Integer>> map) {
+        FastByIDMap<PreferenceArray> fastByIdMap = new FastByIDMap<>();
+        for (Map.Entry<Long, Map<Long, Integer>> entry : map.entrySet()) {
+            Map<Long, Integer> userPreferences = entry.getValue();
+            List<GenericPreference> array = new ArrayList<>();
+            Long userId = entry.getKey();
+            userPreferences.forEach((articleId, value) -> {
+                array.add(new GenericPreference(userId,articleId,value));
+            });
+            fastByIdMap.put(userId,new GenericUserPreferenceArray(array));
+        }
+        return new GenericDataModel(fastByIdMap);
+    }
+
+    private static void setUserPreferences(Map<Long,Map<Long,Integer>> map,Long userId, Long articleId,Integer value) {
+        Map<Long, Integer> userPreferences = map.get(userId);
+        if(ObjectUtils.isNotEmpty(userPreferences)){
+            //不为null,修改喜好值
+            userPreferences.put(articleId, userPreferences.getOrDefault(articleId,0)+value);
+        }else{
+            //为null,放入初始喜好
+            userPreferences = new HashMap<>();
+            userPreferences.put(articleId, value);
+            map.put(userId,userPreferences);
+        }
+    }
+
+    private void filterArticleByTag(List<ArticleAndActiveVO> articles, Integer tag,Page<ArticleAndActiveVO> page) {
         if(tag != null && tag != -1){
+            //当前tag下的所有文章id
             Set<Long> articleIdById = tagService.getArticleIdById(tag);
             articles.removeIf(article -> !articleIdById.contains(article.getId()));
+            //因为要求的是分页条件下的当前的文章id,所以总数就是当前tag下的所有文章id
+            page.setTotal(articleIdById.size());
         }
     }
 
@@ -142,6 +269,8 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.deleteArtOrDra(ids,1);
         //删除文章评论
         commentService.deleteCommentByArticleId(ids);
+        //删除tag的文章
+        tagService.removeArticle(ids);
 
     }
 
@@ -155,8 +284,8 @@ public class ArticleServiceImpl implements ArticleService {
     public PageResult search(String name, int pageNum, int pageSize,int type) {
         List<Long> articleIds = redisCache.getCacheMapValue("article_word", name);
         PageHelper.startPage(pageNum, pageSize);
-        if(articleIds.isEmpty()){
-            return new PageResult(0L,null);
+        if(ObjectUtils.isEmpty(articleIds)){
+            return new PageResult(0L,new ArrayList<>());
         }
         Page<ArticleAndActiveVO> page = articleMapper.getArticlesByIds(articleIds,type);
         List<ArticleAndActiveVO> articles = page.getResult();
@@ -190,7 +319,6 @@ public class ArticleServiceImpl implements ArticleService {
         Long userId = BaseContext.getCurrentId();
         //活动属性的key
         List<String> articleIds = articles.stream().map(article -> "article_active:" + article.getId()).collect(Collectors.toList());
-        // Redis批量查询
         //TODO：错误做法，redisCache.redisTemplate.opsForHash().entries(articleId)得到的是Map<R,T>,而collect得到的是不明确的类型，则类型推断失败
         //List<Map<String,Long>> articleActives = articleIds.stream().map(articleId -> {
         //     return redisCache.redisTemplate.opsForHash().entries(articleId);

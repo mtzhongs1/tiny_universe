@@ -16,4 +16,5 @@ public interface TagService {
     List<String> getTagNames(Long ArticleId);
     Set<Long> getArticleIdById(Integer tagId);
 
+    void removeArticle(List<Long> ids);
 }

@@ -1,11 +1,14 @@
 package com.ailu.server.controller.collection;
 
 import com.ailu.dto.collection.CollectionDTO;
+import com.ailu.entity.Collections;
 import com.ailu.result.PageResult;
 import com.ailu.result.Result;
 import com.ailu.server.service.collection.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description:
@@ -18,14 +21,14 @@ import org.springframework.web.bind.annotation.*;
 public class CollectionController {
     @Autowired
     private CollectionService collectionService;
-    @GetMapping("/collections/{pageSize}/{pageNum}")
-    public Result<PageResult> collections(@PathVariable int pageSize, @PathVariable int pageNum) {
-        PageResult collections =  collectionService.collections(pageSize, pageNum);
+    @GetMapping("/collections/{userId}")
+    public Result<List<Collections>> collections(@PathVariable Long userId) {
+        List<Collections> collections =  collectionService.collections(userId);
         return Result.success(collections);
     }
-    @GetMapping("/collection/{pageSize}/{pageNum}/{parentId}")
-    public Result<PageResult> collection(@PathVariable int pageSize, @PathVariable int pageNum, @PathVariable Long parentId) {
-        PageResult collection =  collectionService.collection(pageSize, pageNum,parentId);
+    @GetMapping("/collection/{userId}/{parentId}")
+    public Result<List<Collections>> collection(@PathVariable Long userId,@PathVariable Long parentId) {
+        List<Collections> collection =  collectionService.collection(userId,parentId);
         return Result.success(collection);
     }
     @PostMapping("/collections")

@@ -13,8 +13,8 @@
             </div>
           </div>
           <el-space :size="20">
-            <span>关注: {{userActive.follows}}</span>
             <span>粉丝： {{userActive.fans}}</span>
+            <span>关注: {{userActive.follows}}</span>
             <div v-if="user.id === self.id">
               <el-button
                   :key="'plain'"
@@ -37,28 +37,15 @@
             :ellipsis="false"
             active-text-color="#409eff"
             router
-            :default-active="'/dashboard/user_detail/'+params.id"
         >
           <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
           <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->
-          <el-menu-item :index="'/dashboard/user_detail/'+params.id" @click="isFollow=true">动态</el-menu-item>
-          <el-menu-item :index="'/dashboard/user_detail/'+params.id" @click="isFollow=false">文章</el-menu-item>
-          <el-menu-item :index="'/dashboard/user_detail/'+params.id" @click="isFollow=false">收藏</el-menu-item>
-          <el-menu-item :index="'/dashboard/user_detail/'+params.id" @click="isFollow=false">社交</el-menu-item>
-
+          <el-menu-item :index="'/dashboard/user_detail/shuo_shuo/'+params.id">动态</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/article_view/'+params.id">文章</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/collection_view/'+params.id">收藏</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+params.id">社交</el-menu-item>
         </el-menu>
-
-        <el-tabs type="border-card">
-          <el-tab-pane label="收藏">
-            <div class="collection">
-              <CreateCol></CreateCol>
-              <ColList v-if="listIsAlive"></ColList>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="社交">
-            <Follow></Follow>
-          </el-tab-pane>
-        </el-tabs>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </div>
@@ -71,11 +58,7 @@ import {doGet, doPost, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {useRoute, useRouter} from "vue-router";
 import {newRoute} from "@/util/router.js";
-import ArtilceList from "@/components/dashboard/home/ArticleList.vue";
 import {reloadUtil} from "@/util/util.js";
-import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
-import ColList from "@/components/dashboard/collection/ColList.vue";
-import Follow from "@/components/dashboard/user/Follow.vue"
 const router = useRouter();
 const self = inject("user");
 const route = useRoute();
@@ -122,9 +105,10 @@ const getUser = async () => {
     })
   }
 }
-
+provide("userId",params.id);
 const toUserMessage = () => {
-  newRoute('/dashboard/user',router);
+  router.push("/dashboard/user")
+  // newRoute('/dashboard/user_detail/shuo_shuo/'+params.id,router);
 }
 
 const follow = () => {

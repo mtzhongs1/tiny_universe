@@ -15,6 +15,7 @@ import FuncButton from "@/components/common/button/FuncButton.vue";
 import {Editor, Toolbar} from "@wangeditor/editor-for-vue";
 import {ElMessage} from "element-plus";
 import {doPost} from "@/http/httpRequest.js";
+import {isEmpty} from "@/util/util.js";
 const editor = shallowRef(null);
 let comment = ref('');
 const articleId = inject("articleId");
@@ -46,7 +47,7 @@ const handleEditorCreated = (editorInstance) => {
 
 const sendComment = (parentId) => {
   const fd = new FormData();
-  if(parentId !== undefined){
+  if(!isEmpty(parentId)){
     fd.append("parentId",parentId)
   }
   fd.append("articleId",articleId.value);

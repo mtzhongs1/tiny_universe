@@ -2,12 +2,14 @@ package com.ailu.server.service.impl.user;
 
 import com.ailu.constant.BcryptConstant;
 import com.ailu.context.BaseContext;
+import com.ailu.dto.user.FolFanDTO;
 import com.ailu.dto.user.UserLoginDTO;
 import com.ailu.dto.user.UserRegisterDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
 import com.ailu.exception.BaseException;
-import com.ailu.server.config.RedisCache;
+import com.ailu.result.PageResult;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.SettingMapper;
 import com.ailu.server.mapper.UserMapper;
 import com.ailu.server.properties.JwtProperties;
@@ -15,16 +17,19 @@ import com.ailu.server.service.user.EmailService;
 import com.ailu.server.service.user.UserService;
 import com.ailu.util.JwtUtil;
 import com.ailu.vo.user.UserVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description:
@@ -107,6 +112,19 @@ public class UserServiceImpl implements UserService {
         Long id = userMapper.getUserByEmail(email);
         BCrypt.hashpw(password, BcryptConstant.salt);
         userMapper.updatePwd(id,password);
+    }
+
+    @Override
+    public PageResult search(String content, Integer pageNum, Integer pageSize, Integer type) {
+        PageHelper.startPage(pageNum,pageSize);
+        Page<FolFanDTO> users = userMapper.search(content);
+        String folkey = "user:" + BaseContext.getCurrentId() + "follow";
+        ZSetOperations setOperations = redisCache.redisTemplate.opsForZSet();
+        Set<Long> set = setOperations.rangeWithScores(folkey, 0, -1);
+        users.getResult().forEach(user -> {
+            user.setIsFollow(set.contains(user.getId()));
+        });
+        return new PageResult(users.getTotal(),users.getResult());
     }
 
     @Override

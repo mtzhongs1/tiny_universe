@@ -4,15 +4,13 @@
 <!--        <el-tab-pane label="音乐">-->
 <!--          <Music></Music>-->
 <!--        </el-tab-pane>-->
-        <el-tab-pane label="卡片">
+<!--        <el-tab-pane label="卡片">-->
 <!--          <card></card>-->
-          <AsyncCard></AsyncCard>
-        </el-tab-pane>
+<!--&lt;!&ndash;          <AsyncCard></AsyncCard>&ndash;&gt;-->
+<!--        </el-tab-pane>-->
         <el-tab-pane label="在线聊天室">
 <!--          <chat-room></chat-room>-->
-          <AsyncChatRoom v-if="isChatRoomAlive" :reloadChatRoom="reloadChatRoom"></AsyncChatRoom>
-        </el-tab-pane>
-        <el-tab-pane label="广告">
+          <ChatRoom v-if="isChatRoomAlive" :reloadChatRoom="reloadChatRoom"></ChatRoom>
         </el-tab-pane>
       </el-tabs>
 
@@ -24,11 +22,10 @@
 // import Card from "@/components/dashboard/entertainment/Card.vue";
 // import ChatRoom from "@/components/dashboard/entertainment/ChatRoom.vue";
 //TODO:定义异步组件，只在需要显示时才进行渲染
-import {defineAsyncComponent, ref} from "vue";
-import {useRouter} from "vue-router";
+import {ref} from "vue";
 import {reloadUtil} from "@/util/util.js";
-const AsyncCard = defineAsyncComponent(() => import("@/components/dashboard/entertainment/Card.vue"));
-const AsyncChatRoom = defineAsyncComponent(() => import("@/components/dashboard/entertainment/ChatRoom.vue"));
+// import Card from "@/components/dashboard/entertainment/Card.vue";
+import ChatRoom from "@/components/dashboard/entertainment/ChatRoom.vue";
 let isChatRoomAlive = ref(true);
 const reloadChatRoom = () => {
   reloadUtil(isChatRoomAlive)
@@ -36,10 +33,8 @@ const reloadChatRoom = () => {
 </script>
 
 <style>
-.demo-tabs > .el-tabs__content {
-  padding: 32px;
-  color: #6b778c;
-  font-size: 32px;
-  font-weight: 600;
+.demo-tabs{
+  margin-left: 30px;
+  width: 90%;
 }
 </style>

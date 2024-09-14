@@ -1,15 +1,13 @@
 <template>
   <div class="outer-div">
-    <div>
-      <div class="activeStyle">
-        <div>
-          <el-icon class="active-icon" :size="27" :color="articleActive.isLove?'#62b9ec':''" @click="doLove(article)"><Sugar /></el-icon>
-          <span class="active-num">{{articleActive.love}}</span>
-        </div>
-        <div>
-          <el-icon class="active-icon" :size="27" :color="articleActive.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>
-          <span class="active-num">{{articleActive.collectionCount}}</span>
-        </div>
+    <div class="activeStyle">
+      <div>
+        <el-icon class="active-icon" :size="27" :color="articleActive.isLove?'#62b9ec':''" @click="doLove(article)"><Sugar /></el-icon>
+        <span class="active-num">{{articleActive.love}}</span>
+      </div>
+      <div>
+        <el-icon class="active-icon" :size="27" :color="articleActive.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>
+        <span class="active-num">{{articleActive.collectionCount}}</span>
       </div>
     </div>
     <div class="center-div">
@@ -29,56 +27,62 @@
         <Comment v-if="isCommentAlive"></Comment>
       </div>
     </div>
-    <div>
-      <div class="UserAndDir">
-        <div class="UserMessage">
-          <!--名字用article.author属性-->
-          <div>
-            <el-avatar style="vertical-align: middle;margin-right: 10px" @click="toUserDetail(article.userId)" :src="userActive.avatar" :size="70"></el-avatar>
-            <span style="display: inline-block;">{{article.author}}</span>
-          </div>
-          <div style="opacity: 0.5;display: flex;gap: 10px;justify-content: center">
-            <span>关注：{{userActive.follows}}</span>
-            <span>粉丝：{{userActive.fans}}</span>
-          </div>
-          <div v-if="user.id !== article.userId">
-            <div @click="follow" >
-              <el-button style="color:white" v-if="isFollow" class="follow-btn"> 关注 </el-button>
-              <el-button v-else class="follow-btn" style="background: #a19999 ;color:black"> 取关 </el-button>
-            </div>
-          </div>
+    <div class="UserAndDir">
+      <div class="UserMessage">
+        <!--名字用article.author属性-->
+        <div>
+          <el-avatar style="vertical-align: middle;margin-right: 10px;cursor: pointer" @click="toUserDetail(article.userId)" :src="userActive.avatar" :size="70"></el-avatar>
+          <span style="display: inline-block;">{{article.author}}</span>
         </div>
-
-        <div class="directory" v-show="catalog.length > 0">
-          <h3 style="text-align: center;">目录</h3>
-          <el-anchor :offset="70">
-            <!--通过id选择器指定锚点-->
-            <el-anchor-link v-for="(item, index) in catalog"
-                            :key="index" :href="'#' + item.id">
-              <span :style="{'margin-left':`${item.level}px`}"></span>
-              {{item.title}}
-            </el-anchor-link>
-          </el-anchor>
+        <div style="opacity: 0.5;display: flex;gap: 10px;justify-content: center">
+          <span>关注：{{userActive.follows}}</span>
+          <span>粉丝：{{userActive.fans}}</span>
+        </div>
+        <div v-if="user.id !== article.userId">
+          <div @click="follow" >
+            <el-button style="color:white" v-if="isFollow" class="follow-btn"> 关注 </el-button>
+            <el-button v-else class="follow-btn" style="background: #a19999 ;color:black"> 取关 </el-button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div class="directory" v-show="!isEmpty(catalog)">
+        <h3 style="text-align: center;">目录</h3>
+        <el-anchor :offset="70">
+          <!--通过id选择器指定锚点-->
+          <el-anchor-link v-for="(item, index) in catalog"
+                          :key="index" :href="'#' + item.id">
+            <span :style="{'margin-left':`${item.level}px`}"></span>
+            {{item.title}}
+          </el-anchor-link>
+        </el-anchor>
+      </div>
   </div>
+    <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
+      <template #footer>
+        <CreateCol></CreateCol>
+        <ColList v-if="listIsAlive"></ColList>
+      </template>
+    </el-dialog>
+    </div>
 </template>
 <script setup>
 import {inject, onBeforeMount, provide, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
-import {doGet, doPostxwww} from "@/http/httpRequest.js";
+import {doDeletexwww, doGet, doPostxwww} from "@/http/httpRequest.js";
 import {useRoute, useRouter} from "vue-router";
 
 import ArticleContentView from "@/components/dashboard/article/ArticleContentView.vue";
 import Comment from "@/components/dashboard/article/Comment.vue";
 import {newRoute} from "@/util/router.js";
-import {reloadUtil} from "@/util/util.js";
+import {isEmpty, reloadUtil} from "@/util/util.js";
+import ColList from "@/components/dashboard/collection/ColList.vue";
+import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
 
 let user = inject("user");
-let article = reactive({
-  id:'',
-});
+let article = ref({
+
+})
 let articleActive = reactive({});
 const route = useRoute();
 const router = useRouter();
@@ -88,15 +92,16 @@ let userActive = reactive({
   userId:'',fans:'',follows:''
 });
 let catalog = ref([]);
-
 let isCommentAlive = ref(true);
+let dialogVisible = ref(false);
+let listIsAlive = ref(true);
 onBeforeMount(() => {
   getArticle();
   getUser();
 
 })
 const getUser = () => {
-  doGet("article/getUser/"+article.id).then((resp) => {
+  doGet("article/getUser/"+params.articleId).then((resp) => {
     if(resp.data.code === 1){
       Object.assign(userActive,resp.data.data);
     }else{
@@ -105,16 +110,17 @@ const getUser = () => {
   })
 }
 const getArticle = async () => {
-  article.id = params.articleId;
-  const resp = await doGet("article/"+article.id)
-    if(resp.data.code === 1){
-      const tempArticle = resp.data.data;
-      Object.assign(article,tempArticle);
-    }else{
-      ElMessage.error("服务器繁忙");
-    }
+
+  article.value.id = params.articleId;
+  const resp = await doGet("article/"+params.articleId)
+  if(resp.data.code === 1){
+    article.value = resp.data.data;
+  }else{
+    ElMessage.error("服务器繁忙");
+  }
+
   // 浏览量加一
-  doPostxwww("article_active/watch",{articleId:article.id});
+  doPostxwww("article_active/watch",{articleId:params.articleId});
   getArticleActive();
   getIsFollow();
 }
@@ -146,7 +152,9 @@ const makeDirectory = (contentRef) => {
     catalog.value = titles;
   });
 }
-
+const reloadCol = () => {
+  reloadUtil(listIsAlive);
+}
 const doLove = (article) => {
   doPostxwww("/article_active/love",{articleId:article.id}).then((resp) => {
     if(resp.data.code === 1){
@@ -166,27 +174,26 @@ const doLove = (article) => {
     }
   });
 }
-const doCollection = (article) => {
-  doPostxwww("/article_active/collection",{articleId:article.id}).then((resp) => {
-    if(resp.data.code === 1){
-      const isAdd = resp.data.data;
-      // 收藏
-      if(isAdd){
-        articleActive.isCollection = true;
-        articleActive.collectionCount++;
-      }
-      // 取消收藏
-      else{
+const doCollection = () => {
+  // 取消收藏
+  if(articleActive.isCollection){
+    doDeletexwww("/article_active/collection",{articleId:params.articleId}).then((resp) => {
+      if(resp.data.code === 1){
         articleActive.isCollection = false;
         articleActive.collectionCount--;
+        ElMessage.success("取消收藏");
+      }else{
+        ElMessage.error("服务器繁忙");
       }
-    }else{
-      ElMessage.error("服务器繁忙");
-    }
-  })
+    })
+  }
+  // 收藏
+  else{
+    dialogVisible.value = true;
+  }
 }
 const getIsFollow = () => {
-  doGet("/user_active/isFollow/"+article.userId).then((resp) => {
+  doGet("/user_active/isFollow/"+article.value.userId).then((resp) => {
     if(resp.data.code === 1){
       isFollow.value = resp.data.data;
     }else{
@@ -199,7 +206,7 @@ const reloadComment = () => {
 }
 const follow = () => {
   doPostxwww("/user_active/follow",{
-    toUserId:article.userId,
+    toUserId:article.value.userId,
     isFollow:isFollow.value,
   }).then((resp) => {
     if(resp.data.code === 1){
@@ -218,16 +225,24 @@ const follow = () => {
   })
 }
 const toUserDetail = (id) => {
-  newRoute('/dashboard/user_detail/'+id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
-
+const closeColDialog = (collections) => {
+  collections.value.forEach((collection) => {
+    collection.isChoosed = false;
+  })
+  dialogVisible.value = false;
+}
 let articleId = ref(null);
-watch(() => article.id,(newValue) => {
+watch(() => article.value.id,(newValue) => {
   articleId.value = newValue;
 })
 
 provide("articleId",articleId);
+provide("article",article);
 provide("reloadComment",reloadComment);
+provide('reload',reloadCol);
+provide("closeColDialog",closeColDialog)
 </script>
 <style scoped>
 .outer-div{
@@ -235,11 +250,12 @@ provide("reloadComment",reloadComment);
   font-family: Roboto;
   display: flex;
   font-size: 16px;
-  gap:60px;
+  gap:50px;
+  min-width: 0;
+  overflow: auto;
 }
 
 .article-detail,.comment-detail {
-  width: 100%;
   padding: 20px 10px;
   background: var(--main-beside-color);
 }
@@ -249,9 +265,8 @@ provide("reloadComment",reloadComment);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  position: fixed;
-  margin: 0 10px;
-  top:30%;
+  margin-left: 100px;
+  position: relative;
 }
 
 .active-num{
@@ -259,9 +274,9 @@ provide("reloadComment",reloadComment);
   border-radius: 50%;
   padding: 0 12px;
   font-size: 20px;
-  color: #0d5b0d;
+  color: #664c94;
   position: absolute;
-  left: 50px;
+  left: 40px;
 }
 
 .active-icon{
@@ -276,9 +291,9 @@ provide("reloadComment",reloadComment);
 }
 
 .UserAndDir{
-  overflow: auto;
-  position: fixed;
-  width: 230px;
+  min-width: 250px;
+  overflow: hidden;
+  margin-right: 50px;
 }
 
 .UserMessage{
@@ -334,11 +349,11 @@ provide("reloadComment",reloadComment);
 }
 
 .center-div{
-  margin-left: 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 60vw;
+  width: 1400px;
+  min-width: 1000px;
 }
 
 .follow-btn{
@@ -346,11 +361,8 @@ provide("reloadComment",reloadComment);
   border:none;
   width:65%
 }
-
+/*
 @media screen and (max-width: 1050px){
-  .UserAndDir{
-    display: none;
-  }
   .article-detail,.comment-detail{
     width: 85vw;
   }
@@ -369,4 +381,6 @@ provide("reloadComment",reloadComment);
     left: -160px;
   }
 }
+*/
+
 </style>

@@ -13,8 +13,15 @@ import ArticleEditor from '@/views/dashboard/article/ArticleEditor.vue'
 import ArticleContent from "@/views/dashboard/article/ArticleContent.vue";
 import UserDetail from "@/views/dashboard/module/user/UserDetail.vue";
 import Search from "@/views/dashboard/article/Search.vue";
-import Fols from "@/components/dashboard/user/Fols.vue";
-import Fans from "@/components/dashboard/user/Fans.vue";
+import ArticleView from "@/views/dashboard/user/ArticleView.vue";
+import ShuoShuo from "@/views/dashboard/user/ShuoShuo.vue";
+import Fols from "@/views/dashboard/user/follow/Fols.vue";
+import Fans from "@/views/dashboard/user/follow/Fans.vue";
+import Follow from "@/views/dashboard/user/Follow.vue";
+import CollectionView from "@/views/dashboard/user/CollectionView.vue";
+import ArticleList from "@/views/dashboard/article/ArticleList.vue";
+import SearchArticle from "@/views/dashboard/search/SearchArticle.vue";
+import SearchUser from "@/views/dashboard/search/SearchUser.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,23 +39,45 @@ const router = createRouter({
         {path: '',name: 'Home',component:Home},
         {path: 'entertainment',name: 'Entertainment',component:Entertainment},
         {path: 'moment',name: 'Moment',component:Moment},
-        {path: 'article',name: 'Article',component:Article},
+        {
+          path: 'article',
+          name: 'Article',
+          component:Article,
+          children: [
+            {path: 'list/:type',name:'ArticleList',component: ArticleList}
+          ]
+        },
         {path: 'collection',name: 'Collection',component:Collection},
         {path: 'other',name: 'Other',component:Other},
         {path: 'user',name:'User',component:User},
         {
-          path: 'user_detail/:id',
+          path: 'user_detail',
           name:'UserDetail',
           component:UserDetail,
           children:[
-            {path: 'fols',name:'Fols',component:Fols},
-            {path: 'fans',name:'Fans',component:Fans}
+            {path: 'article_view/:userId',name:'ArticleView',component:ArticleView},
+            {path: 'shuo_shuo/:id',name:'ShuoShuo',component:ShuoShuo},
+            {path: 'collection_view/:id',name:'CollectionView',component:CollectionView},
+            {path: 'follow',name:'Follow',component:Follow,
+              children: [
+                {path: 'fols/:id',name:'Fols',component:Fols},
+                {path: 'fans/:id',name:'Fans',component:Fans}
+              ]
+            },
           ]
         },
         {path: 'article_editor/:articleId',name:'ArticleEditor',component:ArticleEditor},
         {path: 'article/content/:articleId',name:'ArticleContent',component:ArticleContent},
-        {path: 'search/:name',name:'Search',component:Search},
-        {path: 'collection',name: 'Collection',component:Collection}
+        {
+          path: 'search',
+          name:'Search',
+          component:Search,
+          children: [
+            {path: 'article',name:'SearchArticle',component:SearchArticle},
+            {path: 'user',name:'UserArticle',component:SearchUser}
+          ]
+        },
+        {path: 'collection',name: 'Collection',component:Collection},
       ]
     },
   ]

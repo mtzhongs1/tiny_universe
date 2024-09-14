@@ -132,9 +132,4 @@ function saveUser() {
 :deep(.el-divider--horizontal) {
   border-top: 1px solid var(--text-color);
 }
-
-.el-radio {
-  color: var(--text-color);
-  border-color: var(--text-color);
-}
 </style>

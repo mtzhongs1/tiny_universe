@@ -1,6 +1,6 @@
 <template>
   <div class="setting">
-    <el-icon @click="drawer=true" class="setting_icon" :color="color.text_color">
+    <el-icon @click="drawer=true" class="setting_icon" style="color: var(--common-color)">
       <Setting/>
     </el-icon>
     <el-drawer v-model="drawer" :size="300">

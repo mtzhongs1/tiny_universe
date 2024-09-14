@@ -33,6 +33,7 @@ import {inject, reactive, ref} from "vue";
 import FuncButton from "@/components/common/button/FuncButton.vue";
 let user = inject("user");
 let reload = inject("reload");
+let userId = inject("userId");
 let collection = reactive({
   isPublic:1,
   name:""

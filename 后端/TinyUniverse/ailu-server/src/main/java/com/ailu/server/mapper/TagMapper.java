@@ -24,4 +24,6 @@ public interface TagMapper {
 
     @Select("select at.article_id from article_tag at,tag t where at.tag_id = t.id and t.id = #{tagId}")
     Set<Long> getArticleIdById(Integer tagId);
+
+    void removeArticle(List<Long> articleIds);
 }

@@ -2,7 +2,7 @@ package com.ailu.server.service.impl.user;
 
 import com.ailu.dto.user.MessageDTO;
 import com.ailu.dto.user.UserSocketPageDTO;
-import com.ailu.server.config.RedisCache;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.UserMapper;
 import com.ailu.server.service.user.SocketServcie;
 import com.ailu.server.socket.EchoChannel;

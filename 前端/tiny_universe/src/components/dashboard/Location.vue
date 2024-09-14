@@ -8,6 +8,7 @@
         :text-color="color.text_color"
         active-text-color="#00f0fc"
         router
+        :default-active="path"
     >
 
     <!--@select="handleSelect" -->
@@ -17,8 +18,8 @@
 
       <div class="flex-grow" />
 
-    <!-- TODO:通过emit子传父机制实现双向数据绑定 -->
-      <SearchInput v-model="content" @updateValue="updateValue" @search="search" ></SearchInput>
+    <!-- TODO:通过emit子传父机制实现双向3数据绑定 -->
+      <SearchInput @updateValue="updateValue" @search="search" ></SearchInput>
 
       <el-sub-menu class="small-screen">
         <template #title>菜单</template>
@@ -44,14 +45,14 @@
 <script setup>
 import {inject, ref} from "vue";
 import {newRoute} from "@/util/router.js";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import * as ElIcons from '@element-plus/icons-vue';
 import SearchInput from "@/components/common/input/SearchInput.vue";
-
+let route = useRoute();
 let router = useRouter();
 //查询
 let content = ref('');
-
+let path = route.path;
 //TODO：监听事件
 //节流函数
 function throttle(func, limit) {
@@ -96,7 +97,7 @@ const menuItems = [
 // const router = useRouter();
 
 const toUserDetail = (id) => {
-  newRoute('/dashboard/user_detail/'+id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
 const updateValue = (value) => {
   content.value = value;
@@ -105,7 +106,7 @@ const search = () => {
   if(content.value === ''){
     return;
   }
-  newRoute('/dashboard/search/'+content.value,router);
+  newRoute('/dashboard/search',router,{content:content.value});
 }
 
 

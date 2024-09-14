@@ -3,23 +3,23 @@
       <div class="sand">
         <!-- 波浪 -->
         <div class="wave">
-          <div class="wave-cell01">
-            <div class="wave-01"></div>
-            <div class="wave-02"></div>
-            <div class="wave-03"></div>
-            <div class="wave-04"></div>
-            <div class="wave-05"></div>
-            <div class="wave-06"></div>
-            <div class="wave-07"></div>
-            <div class="wave-08"></div>
-            <div class="wave-09"></div>
-            <div class="wave-10"></div>
-            <div class="wave-11"></div>
-            <div class="wave-12"></div>
-            <div class="wave-13"></div>
-            <div class="wave-14"></div>
-            <div class="wave-15"></div>
-          </div>
+<!--          <div class="wave-cell01">-->
+<!--            <div class="wave-01"></div>-->
+<!--            <div class="wave-02"></div>-->
+<!--            <div class="wave-03"></div>-->
+<!--            <div class="wave-04"></div>-->
+<!--            <div class="wave-05"></div>-->
+<!--            <div class="wave-06"></div>-->
+<!--            <div class="wave-07"></div>-->
+<!--            <div class="wave-08"></div>-->
+<!--            <div class="wave-09"></div>-->
+<!--            <div class="wave-10"></div>-->
+<!--            <div class="wave-11"></div>-->
+<!--            <div class="wave-12"></div>-->
+<!--            <div class="wave-13"></div>-->
+<!--            <div class="wave-14"></div>-->
+<!--            <div class="wave-15"></div>-->
+<!--          </div>-->
           <div class="wave-cell02">
             <div class="wave-01"></div>
             <div class="wave-02"></div>
@@ -38,126 +38,126 @@
             <div class="wave-15"></div>
           </div>
         </div>
-        <!-- 椰子树 -->
-        <div class="tree">
-          <div class="trunk-box">
-            <div class="trunk">
-              <div class="line1"></div>
-              <div class="line1 line2"></div>
-              <div class="line1 line3"></div>
-              <div class="line1 line4"></div>
-              <div class="line1 line5"></div>
-            </div>
-          </div>
-          <div class="coconut">
-            <div class="coconut1"></div>
-            <div class="coconut1 coconut2"></div>
-            <div class="coconut1 coconut3"></div>
-          </div>
-          <div class="leaf">
-            <div class="leaf1 leafO"></div>
-            <div class="leaf1 leaf2"></div>
-            <div class="leaf1 leaf3"></div>
-            <div class="leaf1 leaf4"></div>
-            <div class="leaf1 leaf5"></div>
-          </div>
-        </div>
-        <!-- 泥土 -->
-        <div class="earth">
-          <div class="earth1 earth1-left">
-            <div class="sand1"></div>
-            <div class="sand1 sand2"></div>
-            <div class="sand1 sand3"></div>
-            <div class="sand1 sand4"></div>
-            <div class="sand1 sand5"></div>
-            <div class="sand1 sand6"></div>
-            <div class="sand1 sand7"></div>
-            <div class="sand1 sand8"></div>
-          </div>
-          <div class="earth1 earth2">
-            <div class="sand1"></div>
-            <div class="sand1 sand2"></div>
-            <div class="sand1 sand3"></div>
-            <div class="sand1 sand4"></div>
-            <div class="sand1 sand5"></div>
-            <div class="sand1 sand6"></div>
-            <div class="sand1 sand7"></div>
-            <div class="sand1 sand8"></div>
-          </div>
-        </div>
-        <!-- 石头 -->
-        <div class="stone">
-          <div class="stone1"></div>
-          <div class="stone1 stone2"></div>
-          <div class="stone1 stone3"></div>
-          <div class="stone1 stone4"></div>
-          <div class="stone1 stone5"></div>
-          <div class="stone1 stone6"></div>
-          <div class="stone1 stone7"></div>
-          <div class="stone1 stone8"></div>
-          <div class="stone1 stone9"></div>
-          <div class="stone1 stone10"></div>
-        </div>
-        <div class="stone-big">
-          <div class="stone-big-1">
-            <div class="spot1"></div>
-            <div class="spot1 spot2"></div>
-            <div class="spot1 spot3"></div>
-          </div>
-          <div class="stone-big-2">
-            <div class="spot1"></div>
-            <div class="spot1 spot2"></div>
-            <div class="spot1 spot3"></div>
-          </div>
-          <div class="stone-big-3">
-            <div class="spot1"></div>
-            <div class="spot1 spot2"></div>
-            <div class="spot1 spot3"></div>
-          </div>
-        </div>
-        <!-- 海星 -->
-        <div class="starfish">
-          <div class="star">
-          </div>
-          <div class="star-b"></div>
-        </div>
-        <div class="starfish starfish-pos2">
-          <div class="star"></div>
-          <div class="star-b"></div>
-        </div>
-        <div class="starfish starfish-pos3">
-          <div class="star"></div>
-          <div class="star-b"></div>
-        </div>
-        <!-- 海星2--start -->
-        <div class="h-star">
-          <div class="h-star0 h-star1"></div>
-          <div class="h-star0 h-star2"></div>
-          <div class="h-star0 h-star3"></div>
-          <div class="h-star0 h-star4"></div>
-          <div class="h-star0 h-star5"></div>
-        </div>
-        <!-- end -->
+<!--        &lt;!&ndash; 椰子树 &ndash;&gt;-->
+<!--        <div class="tree">-->
+<!--          <div class="trunk-box">-->
+<!--            <div class="trunk">-->
+<!--              <div class="line1"></div>-->
+<!--              <div class="line1 line2"></div>-->
+<!--              <div class="line1 line3"></div>-->
+<!--              <div class="line1 line4"></div>-->
+<!--              <div class="line1 line5"></div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="coconut">-->
+<!--            <div class="coconut1"></div>-->
+<!--            <div class="coconut1 coconut2"></div>-->
+<!--            <div class="coconut1 coconut3"></div>-->
+<!--          </div>-->
+<!--          <div class="leaf">-->
+<!--            <div class="leaf1 leafO"></div>-->
+<!--            <div class="leaf1 leaf2"></div>-->
+<!--            <div class="leaf1 leaf3"></div>-->
+<!--            <div class="leaf1 leaf4"></div>-->
+<!--            <div class="leaf1 leaf5"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 泥土 &ndash;&gt;-->
+<!--        <div class="earth">-->
+<!--          <div class="earth1 earth1-left">-->
+<!--            <div class="sand1"></div>-->
+<!--            <div class="sand1 sand2"></div>-->
+<!--            <div class="sand1 sand3"></div>-->
+<!--            <div class="sand1 sand4"></div>-->
+<!--            <div class="sand1 sand5"></div>-->
+<!--            <div class="sand1 sand6"></div>-->
+<!--            <div class="sand1 sand7"></div>-->
+<!--            <div class="sand1 sand8"></div>-->
+<!--          </div>-->
+<!--          <div class="earth1 earth2">-->
+<!--            <div class="sand1"></div>-->
+<!--            <div class="sand1 sand2"></div>-->
+<!--            <div class="sand1 sand3"></div>-->
+<!--            <div class="sand1 sand4"></div>-->
+<!--            <div class="sand1 sand5"></div>-->
+<!--            <div class="sand1 sand6"></div>-->
+<!--            <div class="sand1 sand7"></div>-->
+<!--            <div class="sand1 sand8"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 石头 &ndash;&gt;-->
+<!--        <div class="stone">-->
+<!--          <div class="stone1"></div>-->
+<!--          <div class="stone1 stone2"></div>-->
+<!--          <div class="stone1 stone3"></div>-->
+<!--          <div class="stone1 stone4"></div>-->
+<!--          <div class="stone1 stone5"></div>-->
+<!--          <div class="stone1 stone6"></div>-->
+<!--          <div class="stone1 stone7"></div>-->
+<!--          <div class="stone1 stone8"></div>-->
+<!--          <div class="stone1 stone9"></div>-->
+<!--          <div class="stone1 stone10"></div>-->
+<!--        </div>-->
+<!--        <div class="stone-big">-->
+<!--          <div class="stone-big-1">-->
+<!--            <div class="spot1"></div>-->
+<!--            <div class="spot1 spot2"></div>-->
+<!--            <div class="spot1 spot3"></div>-->
+<!--          </div>-->
+<!--          <div class="stone-big-2">-->
+<!--            <div class="spot1"></div>-->
+<!--            <div class="spot1 spot2"></div>-->
+<!--            <div class="spot1 spot3"></div>-->
+<!--          </div>-->
+<!--          <div class="stone-big-3">-->
+<!--            <div class="spot1"></div>-->
+<!--            <div class="spot1 spot2"></div>-->
+<!--            <div class="spot1 spot3"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 海星 &ndash;&gt;-->
+<!--        <div class="starfish">-->
+<!--          <div class="star">-->
+<!--          </div>-->
+<!--          <div class="star-b"></div>-->
+<!--        </div>-->
+<!--        <div class="starfish starfish-pos2">-->
+<!--          <div class="star"></div>-->
+<!--          <div class="star-b"></div>-->
+<!--        </div>-->
+<!--        <div class="starfish starfish-pos3">-->
+<!--          <div class="star"></div>-->
+<!--          <div class="star-b"></div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 海星2&#45;&#45;start &ndash;&gt;-->
+<!--        <div class="h-star">-->
+<!--          <div class="h-star0 h-star1"></div>-->
+<!--          <div class="h-star0 h-star2"></div>-->
+<!--          <div class="h-star0 h-star3"></div>-->
+<!--          <div class="h-star0 h-star4"></div>-->
+<!--          <div class="h-star0 h-star5"></div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; end &ndash;&gt;-->
 
-        <!-- 贝壳 -->
-        <div class="shell">
-          <div class="shell-b"></div>
-          <div class="shell-p-b">
-            <div class="shell-p1"></div>
-            <div class="shell-p1 shell-p2"></div>
-            <div class="shell-p1 shell-p3"></div>
-            <div class="shell-p1 shell-p4"></div>
-          </div>
-        </div>
-        <div class="shell shell-pos2">
-          <div class="shell-b"></div>
-          <div class="shell-p-b">
-            <div class="shell-p1"></div>
-            <div class="shell-p1 shell-p2"></div>
-            <div class="shell-p1 shell-p3"></div>
-            <div class="shell-p1 shell-p4"></div>
-          </div>
-        </div>
+<!--        &lt;!&ndash; 贝壳 &ndash;&gt;-->
+<!--        <div class="shell">-->
+<!--          <div class="shell-b"></div>-->
+<!--          <div class="shell-p-b">-->
+<!--            <div class="shell-p1"></div>-->
+<!--            <div class="shell-p1 shell-p2"></div>-->
+<!--            <div class="shell-p1 shell-p3"></div>-->
+<!--            <div class="shell-p1 shell-p4"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="shell shell-pos2">-->
+<!--          <div class="shell-b"></div>-->
+<!--          <div class="shell-p-b">-->
+<!--            <div class="shell-p1"></div>-->
+<!--            <div class="shell-p1 shell-p2"></div>-->
+<!--            <div class="shell-p1 shell-p3"></div>-->
+<!--            <div class="shell-p1 shell-p4"></div>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
     </div>
 </template>

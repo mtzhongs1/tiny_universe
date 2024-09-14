@@ -1,7 +1,10 @@
 package com.ailu.server.service.collection;
 
 import com.ailu.dto.collection.CollectionDTO;
+import com.ailu.entity.Collections;
 import com.ailu.result.PageResult;
+
+import java.util.List;
 
 /**
  * @author: ailu
@@ -10,13 +13,13 @@ import com.ailu.result.PageResult;
  */
 
 public interface CollectionService {
-    PageResult collections(int pageSize,int pageNum);
+    List<Collections> collections(Long userId);
 
     void saveCollections(CollectionDTO collectionDTO);
 
     void saveCollection(CollectionDTO collectionDTO);
 
-    PageResult collection(int pageSize, int pageNum, Long parentId);
+    List<Collections> collection(Long userId, Long parentId);
 
     void deleteCollection(Long id);
 

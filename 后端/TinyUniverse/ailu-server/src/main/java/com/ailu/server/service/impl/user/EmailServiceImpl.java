@@ -1,7 +1,7 @@
 package com.ailu.server.service.impl.user;
 
 import com.ailu.exception.BaseException;
-import com.ailu.server.config.RedisCache;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.properties.EmailProperties;
 import com.ailu.server.service.user.EmailService;
 import com.ailu.util.CodeUtil;

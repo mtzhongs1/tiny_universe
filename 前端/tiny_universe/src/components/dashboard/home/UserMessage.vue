@@ -3,10 +3,12 @@
   <div class="own-aside">
     <el-avatar @click="toUser" style="margin: 0 auto" fit="cover" :size="120" :src="user.avatar" />
     <span class="name">{{user.username}}</span>
-    <span class="description" style="font-size: 10px">{{user.description}}</span>
+    <span class="description" style="font-size: 14px">{{user.description}}</span>
     <div style="font-size: 15px">
-      <span style="margin-right: 10px" class="UserActiveDiv">粉丝：{{userActive.fans}}</span>
-      <span class="UserActiveDiv">关注：{{userActive.follows}}</span>
+      <span style="margin-right: 10px" class="UserActiveDiv" @click="toFan">
+        粉丝：{{userActive.fans}}</span>
+      <span class="UserActiveDiv" @click="toFol">
+        关注：{{userActive.follows}}</span>
     </div>
   </div>
 
@@ -20,7 +22,13 @@ let user = ref(props.user);
 const router = useRouter();
 let userActive = inject('userActive')
 function toUser(){
-  newRoute("/dashboard/user_detail/"+user.value.id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+user.value.id,router);
+}
+const toFol = () => {
+  newRoute('/dashboard/user_detail/follow/fols/'+user.value.id,router);
+}
+const toFan = () => {
+  newRoute('/dashboard/user_detail/follow/fans/'+user.value.id,router);
 }
 </script>
 <style scoped>
@@ -44,8 +52,10 @@ function toUser(){
   place-items: center;
   gap: 20px;
   padding: 30px 10px;
-
   color: var(--text-color);
+  border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
+  filter: drop-shadow(7.03px 1.87px 13.59px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
 }
 
 .UserActiveDiv:hover{

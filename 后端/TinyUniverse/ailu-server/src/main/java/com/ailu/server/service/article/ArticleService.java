@@ -6,6 +6,7 @@ import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
 import com.ailu.result.PageResult;
 import com.ailu.vo.article.ArticleVO;
+import org.apache.mahout.cf.taste.common.TasteException;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public interface ArticleService {
     void publishArticle(Article article);
 
-    PageResult pageQueryArticle(ArticlePageDTO articlePageDTO);
+    PageResult pageQueryArticle(ArticlePageDTO articlePageDTO) throws TasteException;
 
     ArticleVO getArticle(Long articleId);
 

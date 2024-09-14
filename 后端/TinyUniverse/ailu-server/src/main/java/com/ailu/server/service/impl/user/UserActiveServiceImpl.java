@@ -5,17 +5,14 @@ import com.ailu.dto.user.FolFanDTO;
 import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.entity.UserActive;
 import com.ailu.result.PageResult;
-import com.ailu.server.config.RedisCache;
+import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.UserMapper;
 import com.ailu.server.service.user.UserActiveService;
-import com.ailu.vo.user.UserSocketVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +62,7 @@ public class UserActiveServiceImpl implements UserActiveService {
         // FolFanDTO fol = new FolFanDTO(userActiveDTO.getToUserId(), userActiveDTO.getToUserName(), userActiveDTO.getToAvatar());
 
         // 关注
-        // TODO: 依据redis的管道机制批量实现redis操作
+        // TODO: 依据redis的事务机制实现连续的redis操作
         redisCache.redisTemplate.execute(new SessionCallback() {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
@@ -123,4 +120,6 @@ public class UserActiveServiceImpl implements UserActiveService {
         Double score = setOperations.score(folkey, followId);
         return score == null;
     }
+
+
 }

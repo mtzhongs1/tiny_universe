@@ -4,10 +4,12 @@ import com.ailu.dto.user.FolFanDTO;
 import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
+import com.ailu.result.PageResult;
 import com.ailu.server.aop.AutoFill;
 import com.ailu.server.aop.InsertOrUpdate;
 import com.ailu.vo.user.UserSocketVO;
 import com.ailu.vo.user.UserVO;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -45,4 +47,7 @@ public interface UserMapper {
 
     @Update("update user set password = #{password} where id = #{id}")
     void updatePwd(Long id, String password);
+
+    @Select("select id,username,avatar from user where username like  CONCAT('%', #{content}, '%')")
+    Page<FolFanDTO> search(String content);
 }

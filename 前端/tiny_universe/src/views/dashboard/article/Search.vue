@@ -1,56 +1,38 @@
 <template>
-  <el-tabs type="border-card">
-    <el-tab-pane label="文章">
-      <div class="article-list">
-        <el-tabs style="width: 58vw">
-          <el-tab-pane label="热门">
-            <AsyncArticleList :type="0" :getArticles="getArticles" :name="name" :isModify="true"></AsyncArticleList>
-          </el-tab-pane>
-          <el-tab-pane label="最新">
-            <AsyncArticleList :type="1" :getArticles="getArticles" :name="name" :isModify="true"></AsyncArticleList>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-tab-pane>
-    <el-tab-pane label="用户">专门定义一个用户组件</el-tab-pane>
-  </el-tabs>
-
+<div>
+  <!--TODO: 不同组件的切换，选择下面的菜单格式-->
+  <el-menu
+      class="el-menu-demo"
+      mode="horizontal"
+      :ellipsis="false"
+      active-text-color="#00f0fc"
+      router
+      :default-active="subItemPath[0]"
+  >
+    <!--@select="handleSelect" -->
+    <el-menu-item :index="subItemPath[0]" id="文章" :route="{path:subItemPath[0],query:{content:content}}">
+      <h1>文章</h1>
+    </el-menu-item>
+    <el-menu-item :index="subItemPath[1]" id="用户" :route="{path:subItemPath[1],query:{content:content}}">
+      <h1>用户</h1>
+    </el-menu-item>
+  </el-menu>
+  <router-view :key="route.path"></router-view>
+</div>
 </template>
 <script setup>
-import {useRoute} from "vue-router";
-import {defineAsyncComponent, inject, ref} from "vue";
-import {doGet} from "@/http/httpRequest.js";
-import {ElMessage} from "element-plus";
-import ArticleList from "@/components/dashboard/home/ArticleList.vue";
-const AsyncArticleList = defineAsyncComponent(() => import("@/components/dashboard/home/ArticleList.vue"));
+import {useRoute, useRouter} from "vue-router";
+import {onBeforeMount} from "vue";
 
-const route = useRoute();
-let params = route.params;
-let name = params.name;
-let user = inject("user");
+let route = useRoute();
+let router = useRouter();
 
-const getArticles = (pageNum,pageSize,total,articles,type,name) => {
-  if(user.id !== undefined && user.id !== '') {
-    // 一页显示五条数据
-    doGet("/article/search/" + pageNum.value + "/" + pageSize.value + "/" + type+ "/" + name).then((resp) => {
-      if (resp.data.code === 1) {
-        //TODO:特定字符串高亮设置
-        const reg = new RegExp("(" + name + ")", "g");
-        articles.value = resp.data.data.records;
-        total.value = resp.data.data.total;
-        articles.value.forEach((article) => {
-          const cover = article.cover === null || article.cover === "" ? [] : article.cover.split(",");
-          article.cover = cover;
-          article.content = article.content.replace(reg, "<span style='color: red'>$1</span>");
-          article.title = article.title.replace(reg, "<span style='color: red'>$1</span>");
-        })
-      } else {
-        ElMessage.error("服务器繁忙");
-      }
-    })
-  }
-}
-
+//TODO：content=xx&moduleId=xx的参数获取方法（router.resolve传参方式）
+const content = route.query.content;
+let subItemPath = ['/dashboard/search/article','/dashboard/search/user'];
+onBeforeMount(() => {
+  router.push({path:subItemPath[0],query:{content:content}})
+})
 
 </script>
 <style scoped>

@@ -3,6 +3,7 @@ package com.ailu.server.service.user;
 import com.ailu.dto.user.UserLoginDTO;
 import com.ailu.dto.user.UserRegisterDTO;
 import com.ailu.dto.user.UserUpdateDTO;
+import com.ailu.result.PageResult;
 import com.ailu.vo.user.UserVO;
 
 /**
@@ -23,4 +24,5 @@ public interface UserService {
 
     void updatePwd(String email,String password);
 
+    PageResult search(String content, Integer pageNum, Integer pageSize, Integer type);
 }

@@ -8,6 +8,9 @@ server:
 
 
 spring:
+  #TODO：解决使用Redisson和@Cacheable同时使用报错的问题
+  cache:
+    type: redis
   profiles:
     active: dev
   main:
@@ -78,6 +81,9 @@ ailu:
   jwt:
     secret: ailu
     expiration: 604800000
+  search-types:
+    article: articleDataSource
+    user: userDataSource
 
 
 mybatis:
@@ -92,7 +98,7 @@ logging:
   level:
     com:
       ailu:
-        mapper: debug
+        mapper: info
         service: info
         controller: info
 

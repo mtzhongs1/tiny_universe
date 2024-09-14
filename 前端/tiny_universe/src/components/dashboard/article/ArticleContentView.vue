@@ -2,8 +2,6 @@
   <div>
     <div class="editor-content-view line-numbers" id="editor-content-view" ref="contentRef" v-html="props.content">
     </div>
-
-
   </div>
 </template>
 <script setup>

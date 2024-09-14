@@ -8,19 +8,23 @@
     <select id="pageQueryArticle" resultType="com.ailu.vo.article.ArticleAndActiveVO">
         select a.id,u.username as author,a.title,a.description,a.cover,a.create_time,LEFT(a.content,40) as content
         from article a,user u
-        where
-        a.user_id = u.id and
-        <if test="userId != null">
-            a.user_id = #{userId} and
+        <if test="tag != null and tag > -1">
+            ,article_tag at
         </if>
-        a.type = 1 and
-        a.status = 1
-        <if test="type == 1">
-            order by a.create_time desc
-        </if>
-        <if test="type == 0">
-            order by a.create_time asc
-        </if>
+        <where>
+            a.user_id = u.id
+            and a.type = 1
+            and a.status = 1
+            <if test="userId != null">
+                and a.user_id = #{userId}
+            </if>
+            <if test="tag != null and tag > -1">
+                and at.article_id = a.id and at.tag_id = #{tag}
+            </if>
+            <if test="type == 1">
+                order by a.create_time desc
+            </if>
+        </where>
     </select>
     <delete id="deleteArtOrDra">
         delete from article where id in
@@ -45,15 +49,54 @@
         select a.id,a.content,a.author,a.title,a.description,a.cover,a.create_time
         from article a
         where
-        a.type = 1 and
-        a.status = 1 and
-        a.id in
+        a.type = 1
+        and a.status = 1
+        and a.id in
         <foreach collection="articleIds" close=")" open="(" separator="," item="id">
             #{id}
         </foreach>
-        <if test="type == 1">
+        <if test="type != null and type == 1">
             order by a.create_time desc
         </if>
+    </select>
+    <select id="pageQueryArticleByIds" resultType="com.ailu.vo.article.ArticleAndActiveVO">
+        select a.id,u.username as author,a.title,a.description,a.cover,a.create_time,LEFT(a.content,40) as content
+        from article a,user u
+        <if test="tag != null and tag > -1">
+            ,article_tag at
+        </if>
+        <where>
+            a.user_id = u.id
+            and a.type = 1
+            and a.status = 1
+            <if test="articleScoreDTOs != null and articleScoreDTOs.size() > 0">
+                and a.id in
+                <foreach collection="articleScoreDTOs" close=")" open="(" separator="," item="articleScoreDTO">
+                    #{articleScoreDTO.id}
+                </foreach>
+            </if>
+            <if test="tag != null and tag > -1">
+                and at.article_id = a.id and at.tag_id = #{tag}
+            </if>
+        </where>
+        order by field
+        <foreach item="articleScoreDTO" collection="articleScoreDTOs" separator="," close=")" open="(">
+            #{articleScoreDTO.score}
+        </foreach>
+    </select>
+    <select id="getArticleIdsByTag" resultType="java.lang.Long">
+        select a.id
+        from article a
+        <if test="tag != null and tag > -1">
+            ,article_tag at
+        </if>
+        <where>
+            and a.type = 1
+            and a.status = 1
+            <if test="tag != null and tag > -1">
+                and at.article_id = a.id and at.tag_id = #{tag}
+            </if>
+        </where>
     </select>
 
 </mapper>

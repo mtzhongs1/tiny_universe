@@ -3,6 +3,7 @@ package com.ailu.server.service.impl.article;
 import com.ailu.server.mapper.TagMapper;
 import com.ailu.server.service.article.TagService;
 import com.ailu.vo.article.TagVO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,12 @@ public class TagServiceImpl implements TagService {
     @Override
     public Set<Long> getArticleIdById(Integer tagId) {
         return tagMapper.getArticleIdById(tagId);
+    }
+
+    @Override
+    public void removeArticle(List<Long> ids) {
+        if(ObjectUtils.isNotEmpty(ids)){
+            tagMapper.removeArticle(ids);
+        }
     }
 }

@@ -7,6 +7,8 @@ import com.ailu.server.aop.InsertOrUpdate;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 /**
  * @author: ailu
  * @description: TODO
@@ -17,7 +19,7 @@ import org.apache.ibatis.annotations.*;
 public interface CollectionMapper {
     //1是收藏夹
     @Select("select * from collection where type = 1 and user_id = #{userId} order by create_time desc")
-    Page<Collections> getAllCollections(Long userId);
+    List<Collections> getAllCollections(Long userId);
 
     @AutoFill(InsertOrUpdate.INSERT)
     @Insert("insert into collection(name,user_id,article_id,is_public,type,parent_id,create_time,update_time) " +
@@ -25,7 +27,7 @@ public interface CollectionMapper {
     void saveCollection(CollectionDTO collectionDTO);
 
     @Select("select * from collection where parent_id = #{parentId} and user_id = #{currentId} order by create_time")
-    Page<Collections> getAllCollection(Long parentId, Long currentId);
+    List<Collections> getAllCollection(Long parentId, Long currentId);
 
     @Delete("delete from collection where id = #{id} or parent_id = #{id}")
     void deleteCollections(Long id);

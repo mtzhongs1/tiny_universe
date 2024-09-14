@@ -2,8 +2,6 @@
   <el-row class="articleDiv">
     <el-col v-for = "(article,index) in articles" :key="index" class="colDiv">
       <div class="article">
-<!--        <h2 class="title" @click="toArticleContent(article)">{{article.title}}</h2>-->
-
         <router-link class="title" :to="{
          path:'/dashboard/article/content/'+article.id,
         }">
@@ -30,25 +28,6 @@
             <el-icon class="icon-pointer" :color="article.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>{{article.collectionCount}}
           </span>
         </div>
-
-        <div v-if="reload">
-        <el-button
-            key="primary"
-            type="primary"
-            text
-            @click="updateArticle(article.id)"
-        >
-          修改
-        </el-button>
-        <el-button
-            key="danger"
-            type="danger"
-            text
-            @click = "deleteArticle(article.id)"
-        >
-          删除
-        </el-button>
-      </div>
       </div>
       <br>
     </el-col>
@@ -56,15 +35,16 @@
       <el-empty :image-size="275" description="这里什么都没有，快来施展你的才华！" />
     </el-col>
     <el-col>
-        <el-pagination style="padding-left: 45%"
-            v-model:current-page="pageNum"
-            :page-size="pageSize"
-            :size="articles.length"
-            :total = "total"
-            layout="total, prev, pager, next"
-            @current-change="handleCurrentChange"
-            v-show="articles.length > 0"
-        />
+<!--        <el-pagination style="padding-left: 45%"-->
+<!--            v-model:current-page="page.pageNum"-->
+<!--            :page-size="page.pageSize"-->
+<!--            :size="articles.length"-->
+<!--            :total = "page.total"-->
+<!--            layout="total, prev, pager, next"-->
+<!--            @current-change="handleCurrentChange"-->
+<!--            v-show="!isEmpty(articles)"-->
+<!--        />-->
+      <div v-if="loading" class="loading-spinner">Loading...</div>
     </el-col>
     <!--为UserMessage组件隔开距离-->
     <el-col>
@@ -72,7 +52,7 @@
     </el-col>
   </el-row>
   <div>
-    <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
+    <el-dialog @close="closeColDialog" v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
       <template #footer>
         <CreateCol></CreateCol>
         <ColList v-if="listIsAlive"></ColList>
@@ -81,45 +61,73 @@
   </div>
 </template>
 <script setup>
-import {inject, onBeforeMount, provide, ref, watch} from 'vue';
-import {doDelete, doDeletexwww, doPostxwww} from "@/http/httpRequest.js";
+import {inject, onBeforeMount, onUnmounted, provide, reactive, ref, watch} from 'vue';
+import {doDeletexwww, doGet, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
-import {useRouter} from "vue-router";
+import {useRoute} from "vue-router";
 import ColList from "@/components/dashboard/collection/ColList.vue";
 import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
-import {reloadUtil} from "@/util/util.js";
+import {isEmpty, reloadUtil} from "@/util/util.js";
 
-const router = useRouter();
-//父传来的数据
-let user = inject('user');
-//TODO:默认非必须
-let props = defineProps(['reload','getArticles','name','isModify','type']);
-const type = props.type;
+const route = useRoute();
+const params = route.params;
 const tag = ref(inject("tag"));
-const reload = props.reload;
-const name = props.name;
-const getArticles = props.getArticles;
+let props = defineProps(['reloadArticleList']);
 //文章数据和参数数据
 let articles = ref([]);
-const pageSize = ref(5);
-const total = ref(0);
-let pageNum = ref(1);
-let dialogVisible = ref(false);
+let page = reactive({
+  pageSize:10,
+  total:0,
+  pageNum:1,
+})
 let article = ref();
+let dialogVisible = ref(false);
 let listIsAlive = ref(true);
+let loading = ref(false);
 onBeforeMount(() => {
-  getArticles(pageNum,pageSize,total,articles,type,name,tag.value);
-  highlightName();
+  window.addEventListener('scroll', handleScroll);
+  getArticles();
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll',handleScroll);
 })
 //分页相关操作
-const handleCurrentChange = (val) => {
-  pageNum.value = val;
-  getArticles(pageNum,pageSize,total,articles,1);
+const handleScroll = () => {
+  if (
+      window.innerHeight + document.documentElement.scrollTop !==
+      document.documentElement.offsetHeight
+  ) {
+    return;
+  }
+  loading.value = true;
+  getArticles();
 }
-
-// const toArticleContent = (article) => {
-//   router.push("/dashboard/article/content/"+article.id)
-// }
+const handleCurrentChange = (val) => {
+  page.pageNum = val;
+  getArticles();
+}
+const getArticles = () => {
+  // 一页显示五条数据
+  doGet("/article/page/",{
+    pageNum:page.pageNum,
+    pageSize:page.pageSize,
+    type:params.type,
+    tag:tag.value
+  }).then((resp) => {
+    if (resp.data.code === 1) {
+      loading.value = false;
+      articles.value = resp.data.data.records;
+      page.total = resp.data.data.total;
+      articles.value.forEach((article) => {
+        const cover = isEmpty(article.cover) ? [] : article.cover.split(",");
+        article.cover = cover;
+      })
+      page.pageNum++;
+    } else {
+      ElMessage.error("服务器繁忙");
+    }
+  })
+}
 // 文章活动属性相关操作
 const doLove = (article) => {
   doPostxwww("/article_active/love",{articleId:article.id}).then((resp) => {
@@ -147,6 +155,7 @@ const doCollection = (tempArt) => {
       if(resp.data.code === 1){
         tempArt.isCollection = false;
         tempArt.collectionCount--;
+        ElMessage.success("取消收藏");
       }else{
         ElMessage.error("服务器繁忙");
       }
@@ -161,75 +170,63 @@ const doCollection = (tempArt) => {
 const reloadCol = () => {
   reloadUtil(listIsAlive);
 }
-const deleteArticle = (id) => {
-  const ids = [id];
-  // const fd = new FormData();
-  // fd.append("ids", JSON.stringify(ids));
-  // console.log(fd.get("ids"))
-  doDelete("/article",JSON.stringify(ids)).then((resp) => {
-    if(resp.data.code === 1){
-      reload();
-      ElMessage.success("删除成功");
-    }else{
-      ElMessage.error("服务器繁忙");
-    }
-  })
-}
-const updateArticle = (id) => {
-  router.push("/dashboard/article_editor/"+id);
-}
-
-// TODO：子组件获取不到父组件的user，因为父组件请求user信息是异步的，所以子组件采用监听的方式
-watch(() => user.id,() => {
-  getArticles(pageNum,pageSize,total,articles,type,name);
-});
 watch(() => tag.value,(tag) => {
-  if(tag !== undefined){
-    getArticles(pageNum,pageSize,total,articles,type,name,tag);
+  if(!isEmpty(tag)){
+    props.reloadArticleList();
   }
 })
-//
-const highlightName = () => {
-
-}
 const closeColDialog = () => {
+  reloadCol();
   dialogVisible.value = false;
 }
-provide("article",article);
 provide('reload',reloadCol);
-provide("closeColDialog",closeColDialog)
+provide("closeColDialog",closeColDialog);
+provide("article",article);
 </script>
 <style scoped>
-.article{
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  /* 其他样式... */
+}
+
+.article {
   background: var(--main-beside-color);
   padding: 20px 20px;
 }
-.coverStyle{
+
+.coverStyle {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   margin: 5px;
 }
-.activeStyle{
+
+.activeStyle {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   margin: 5px;
 }
+
 .articleDiv {
-  max-height: 1000px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
+  background: var(--main-beside-color);
 }
-.title:hover{
+
+.title:hover {
   color: var(--common-color);
   cursor: pointer;
 }
-.title{
+
+.title {
   color: var(--text-color);
   text-decoration: none;
 }
-.icon-pointer :hover{
+
+.icon-pointer :hover {
   color: var(--common-color);
   cursor: pointer;
 }

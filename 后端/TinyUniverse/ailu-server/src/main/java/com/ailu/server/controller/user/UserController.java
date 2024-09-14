@@ -5,7 +5,9 @@ import com.ailu.aop.OperationType;
 import com.ailu.dto.user.UserLoginDTO;
 import com.ailu.dto.user.UserRegisterDTO;
 import com.ailu.dto.user.UserUpdateDTO;
+import com.ailu.result.PageResult;
 import com.ailu.result.Result;
+import com.ailu.server.dataSource.searchType.DataSourceFactory;
 import com.ailu.server.service.user.UserService;
 import com.ailu.vo.user.UserVO;
 import io.swagger.annotations.Api;
@@ -27,6 +29,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DataSourceFactory dataSourceFactory;
 
     @ApiOperation("登录")
     @PostMapping("/login")
@@ -53,7 +58,7 @@ public class UserController {
 
     @ApiOperation("修改用户信息")
     @PutMapping("/updateMsg")
-    @CacheEvict(value = "user",key = "#userUpdateDTO.id")
+    // @CacheEvict(value = "user",key = "#userUpdateDTO.id")
     @Log(title="个人信息", operationType = OperationType.UPDATE)
     public Result updateMsg(@RequestBody UserUpdateDTO userUpdateDTO){
         userService.updateMsg(userUpdateDTO);
@@ -65,5 +70,12 @@ public class UserController {
     public Result updatePwd(@RequestParam String email, @RequestParam String password){
         userService.updatePwd(email,password);
         return Result.success();
+    }
+
+    @ApiOperation("根据用户名模糊查询用户")
+    @GetMapping("/search")
+    public Result search(@RequestParam String content, @RequestParam int pageNum, @RequestParam int pageSize){
+        PageResult user = dataSourceFactory.getDataSource("user").search(content, pageNum, pageSize, null);
+        return Result.success(user);
     }
 }

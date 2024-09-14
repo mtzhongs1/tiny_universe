@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ailu.server.mapper.BottleMapper">
+
+
+    <select id="getBottle" resultType="com.ailu.entity.Bottle">
+        select b.id,u.id as user_id,u.username,b.title,b.content,b.is_public
+        from user u,bottle b
+        where b.user_id = u.id and b.user_id != #{userId} and b.parent_id is null
+        <if test="bottleIds != null and bottleIds.size() > 0">
+            and b.id not in
+            <foreach collection="bottleIds" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+        order by b.create_time asc limit 1
+    </select>
+    <select id="getBottles" resultType="com.ailu.entity.Bottle">
+        select b.id,u.id as user_id,u.username,b.title,b.content,b.is_public
+        from user u,bottle b
+        where b.user_id = u.id and b.parent_id is null
+        and b.id in
+        <foreach collection="bottleIds" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+        order by b.create_time desc
+    </select>
+</mapper>

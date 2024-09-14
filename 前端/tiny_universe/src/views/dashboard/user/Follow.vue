@@ -1,6 +1,6 @@
 <template>
   <div class="outer">
-    <p>{{ isFollow ? "关注列表" : "粉丝列表" }}</p>
+    <p>用户列表</p>
     <div class="menu">
       <el-menu
           class="el-menu-demo"
@@ -8,21 +8,19 @@
           :ellipsis="false"
           active-text-color="#409eff"
           router
-          :default-active="'/dashboard/user_detail/'+userId+'/fols'"
       >
         <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
         <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->
-        <el-menu-item :index="'/dashboard/user_detail/'+userId+'/fols'" @click="isFollow=true">关注列表</el-menu-item>
-        <el-menu-item :index="'/dashboard/user_detail/'+userId+'/fans'" @click="isFollow=false">粉丝列表</el-menu-item>
+        <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+userId">关注列表</el-menu-item>
+        <el-menu-item :index="'/dashboard/user_detail/follow/fans/'+userId">粉丝列表</el-menu-item>
       </el-menu>
     </div>
     <router-view></router-view>
   </div>
 </template>
 <script setup>
-import {inject, ref} from "vue";
+import {inject} from "vue";
 
-let isFollow = ref(true);
 let userId = inject("userId");
 
 </script>
@@ -36,11 +34,17 @@ let userId = inject("userId");
 }
 .outer{
   position: relative;
+  background: var(--main-beside-color);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  p{
+    margin: 30px;
+  }
 }
 .menu{
   position: absolute;
   right: 0;
-  top: -20px;
 }
 
 </style>

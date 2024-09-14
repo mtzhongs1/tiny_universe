@@ -19,6 +19,7 @@ import CommentEditor from "@/components/common/editor/CommentEditor.vue";
 import {doGet, doPost} from "@/http/httpRequest.js";
 import {inject, onMounted, provide, ref, watch} from "vue";
 import CommentItem from "@/components/dashboard/article/CommentItem.vue";
+import {isEmpty} from "@/util/util.js";
 
 
 let user = inject("user");
@@ -42,7 +43,7 @@ const removeComment = (comment) => {
 }
 
 const getComments = () => {
-  if(articleId.value === undefined){
+  if(isEmpty(articleId.value)){
     return;
   }
   doGet("/comment/comments/"+articleId.value+"/"+1).then(res => {

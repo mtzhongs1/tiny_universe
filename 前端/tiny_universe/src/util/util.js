@@ -65,6 +65,7 @@ export function setCssVariable(theme,color){
         color.message_text_color = getCssVariable('--message-text-white-color');
         color.shadow_color = getCssVariable('--shadow-white-color');
         color.comment_color = getCssVariable('--comment-white-color');
+        color.compare_color = getCssVariable('--compare-white-color');
     }else{
         //夜晚
         color.header_color = getCssVariable('--header-black-color');
@@ -75,6 +76,7 @@ export function setCssVariable(theme,color){
         color.message_text_color = getCssVariable('--message-text-black-color');
         color.shadow_color = getCssVariable('--shadow-black-color');
         color.comment_color = getCssVariable('--comment-black-color');
+        color.compare_color = getCssVariable('--compare-black-color');
     }
     setProperty('--header-color',color.header_color);
     setProperty('--main-color',color.main_color);
@@ -84,6 +86,7 @@ export function setCssVariable(theme,color){
     setProperty('--message-text-color',color.message_text_color);
     setProperty('--shadow-color',color.shadow_color);
     setProperty('--comment-color',color.comment_color);
+    setProperty('--compare-color',color.compare_color)
 }
 
 export const reloadUtil = (isRouterAlive) => {
@@ -92,3 +95,34 @@ export const reloadUtil = (isRouterAlive) => {
         isRouterAlive.value = true;
     });
 };
+
+export function isEmpty(obj) {
+    // 数字判空
+    if (isNumber(obj)) {
+        return false;
+    }
+    // 字符串和数组判空
+    if (obj && obj.length > 0) {
+        return false;
+    }
+    // 按照对应的数据类型进行数据判空
+    let objType = Object.prototype.toString.call(obj);
+    // 字符串和数组判空
+    if (objType === '[object Array]' || objType === '[object String]') {
+        if (obj && obj.length > 0) {
+            return false;
+        }
+    }
+    // 如果是对象
+    if (objType === '[object Object]' && !(JSON.stringify(obj) == "{}")) {
+        return false;
+    }
+    return true;
+}
+
+export function isNumber(obj) {
+    if (parseFloat(obj).toString() == "NaN") {
+        return false;
+    }
+    return true;
+}

@@ -20,7 +20,6 @@ const reload = () => {
   reloadUtil(listIsAlive);
 }
 provide('reload',reload);
-
 </script>
 <style scoped>
 

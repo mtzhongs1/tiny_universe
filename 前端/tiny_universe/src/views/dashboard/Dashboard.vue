@@ -27,7 +27,6 @@
       </a>
     </div>
   </div>
-
 </template>
 <script setup>
 //导入区
@@ -36,7 +35,7 @@ import { doGet } from '@/http/httpRequest.js'
 // TODO：导入资源
 import Location from '@/components/dashboard/Location.vue';
 import Setting from "@/components/dashboard/Setting.vue";
-import { setCssVariable, setProperty} from "@/util/util.js";
+import {isEmpty, setCssVariable, setProperty} from "@/util/util.js";
 import {ElMessage} from "element-plus";
 
 //生命周期区
@@ -127,7 +126,7 @@ const getImages = () => {
 }
 const switchTheme = () => {
   let theme = window.localStorage.getItem("theme");
-  if (theme === null) {
+  if (isEmpty(theme)) {
     theme = true;
     window.localStorage.setItem("theme", JSON.stringify(theme));
   } else {
@@ -173,6 +172,10 @@ provide("userActive",userActive);
   background-repeat: no-repeat;
   transition: all 1s;
   z-index:2;
+}
+
+.headerDiv .el-icon{
+  color: var(--text-color);
 }
 
 .mainDiv {

@@ -2,6 +2,7 @@ package com.ailu.server.mapper;
 
 import com.ailu.dto.article.ArticleDTO;
 import com.ailu.dto.article.ArticlePageDTO;
+import com.ailu.dto.article.ArticleScoreDTO;
 import com.ailu.dto.article.ArticleTextDTO;
 import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
@@ -12,6 +13,7 @@ import com.ailu.vo.article.ArticleVO;
 import com.ailu.vo.article.DraftVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -47,4 +49,12 @@ public interface ArticleMapper {
 
     @Select("select u.id as user_id,u.avatar as avatar from article a,user u where a.id = #{articleId} and a.user_id = u.id")
     UserActiveVO getUserIdByArticleId(Long articleId);
+
+    @Select("select id from article")
+    List<Long> getArticleIds();
+
+    List<Long> getArticleIdsByTag(Integer tag);
+
+
+    Page<ArticleAndActiveVO> pageQueryArticleByIds(@Param(value="articleScoreDTOs") List<ArticleScoreDTO> articleScoreDTOs, @Param(value = "tag") Integer tag);
 }

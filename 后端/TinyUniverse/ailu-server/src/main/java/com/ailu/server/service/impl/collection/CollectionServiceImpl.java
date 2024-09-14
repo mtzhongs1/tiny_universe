@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @Description:
@@ -24,17 +25,15 @@ public class CollectionServiceImpl implements CollectionService {
     @Autowired
     private CollectionMapper collectionMapper;
     @Override
-    public PageResult collections(int pageSize, int pageNum) {
-        PageHelper.startPage(pageNum,pageSize);
-        Page<Collections> page = collectionMapper.getAllCollections(BaseContext.getCurrentId());
-        return new PageResult(page.getTotal(),page.getResult());
+    public List<Collections> collections(Long userId) {
+        List<Collections> allCollections = collectionMapper.getAllCollections(userId);
+        return allCollections;
     }
 
     @Override
-    public PageResult collection(int pageSize, int pageNum, Long parentId) {
-        PageHelper.startPage(pageNum,pageSize);
-        Page<Collections> page = collectionMapper.getAllCollection(parentId,BaseContext.getCurrentId());
-        return new PageResult(page.getTotal(),page.getResult());
+    public List<Collections> collection(Long userId, Long parentId) {
+        List<Collections> allCollection = collectionMapper.getAllCollection(parentId, userId);
+        return allCollection;
     }
 
     @Override
