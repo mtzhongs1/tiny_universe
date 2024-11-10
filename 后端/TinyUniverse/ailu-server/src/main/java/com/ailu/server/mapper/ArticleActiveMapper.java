@@ -2,8 +2,6 @@ package com.ailu.server.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 /**
  * @author: ailu
  * @description: TODO

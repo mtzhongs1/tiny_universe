@@ -35,15 +35,6 @@
       <el-empty :image-size="275" description="这里什么都没有，快来施展你的才华！" />
     </el-col>
     <el-col>
-<!--        <el-pagination style="padding-left: 45%"-->
-<!--            v-model:current-page="page.pageNum"-->
-<!--            :page-size="page.pageSize"-->
-<!--            :size="articles.length"-->
-<!--            :total = "page.total"-->
-<!--            layout="total, prev, pager, next"-->
-<!--            @current-change="handleCurrentChange"-->
-<!--            v-show="!isEmpty(articles)"-->
-<!--        />-->
       <div v-if="loading" class="loading-spinner">Loading...</div>
     </el-col>
     <!--为UserMessage组件隔开距离-->
@@ -68,7 +59,6 @@ import {useRoute} from "vue-router";
 import ColList from "@/components/dashboard/collection/ColList.vue";
 import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
 import {isEmpty, reloadUtil} from "@/util/util.js";
-
 const route = useRoute();
 const params = route.params;
 const tag = ref(inject("tag"));
@@ -93,18 +83,20 @@ onUnmounted(() => {
 })
 //分页相关操作
 const handleScroll = () => {
-  if (
-      window.innerHeight + document.documentElement.scrollTop !==
-      document.documentElement.offsetHeight
-  ) {
-    return;
+  // 获取可视窗口的高度
+  var windowHeight = window.innerHeight || document.documentElement.clientHeight;
+  // 当前滚动的距离
+  var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  // 文档的总高度
+  var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+
+  // 当滚动条位置加上窗口高度接近文档总高度时，说明已经接近底部
+  if (scrollTop + windowHeight >= scrollHeight - 1) {
+    console.log('已滑动到底部');
+    // 在这里执行你需要的操作，比如加载更多数据
+    loading.value = true;
+    getArticles();
   }
-  loading.value = true;
-  getArticles();
-}
-const handleCurrentChange = (val) => {
-  page.pageNum = val;
-  getArticles();
 }
 const getArticles = () => {
   // 一页显示五条数据
@@ -116,7 +108,7 @@ const getArticles = () => {
   }).then((resp) => {
     if (resp.data.code === 1) {
       loading.value = false;
-      articles.value = resp.data.data.records;
+      articles.value.push(...resp.data.data.records);
       page.total = resp.data.data.total;
       articles.value.forEach((article) => {
         const cover = isEmpty(article.cover) ? [] : article.cover.split(",");
@@ -184,6 +176,9 @@ provide("closeColDialog",closeColDialog);
 provide("article",article);
 </script>
 <style scoped>
+body{
+  font-family: Roboto;
+}
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -193,8 +188,8 @@ provide("article",article);
 }
 
 .article {
-  background: var(--main-beside-color);
   padding: 20px 20px;
+  border-bottom: 0.1px solid var(--text-color);
 }
 
 .coverStyle {
@@ -212,9 +207,13 @@ provide("article",article);
 }
 
 .articleDiv {
+  max-height: 1000px;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
-  background: var(--main-beside-color);
+  margin-bottom: 20px;
 }
+
 
 .title:hover {
   color: var(--common-color);

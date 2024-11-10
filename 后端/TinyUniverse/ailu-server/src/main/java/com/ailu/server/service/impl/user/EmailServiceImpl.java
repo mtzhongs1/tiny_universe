@@ -1,9 +1,9 @@
 package com.ailu.server.service.impl.user;
 
 import com.ailu.exception.BaseException;
-import com.ailu.server.util.RedisCache;
 import com.ailu.server.properties.EmailProperties;
 import com.ailu.server.service.user.EmailService;
+import com.ailu.server.util.RedisCache;
 import com.ailu.util.CodeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

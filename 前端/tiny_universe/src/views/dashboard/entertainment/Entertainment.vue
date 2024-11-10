@@ -1,20 +1,7 @@
 <template>
-    <div>
-      <el-tabs class="demo-tabs">
-<!--        <el-tab-pane label="音乐">-->
-<!--          <Music></Music>-->
-<!--        </el-tab-pane>-->
-<!--        <el-tab-pane label="卡片">-->
-<!--          <card></card>-->
-<!--&lt;!&ndash;          <AsyncCard></AsyncCard>&ndash;&gt;-->
-<!--        </el-tab-pane>-->
-        <el-tab-pane label="在线聊天室">
-<!--          <chat-room></chat-room>-->
-          <ChatRoom v-if="isChatRoomAlive" :reloadChatRoom="reloadChatRoom"></ChatRoom>
-        </el-tab-pane>
-      </el-tabs>
-
-    </div>
+  <ChatRoom2 v-if="isChatRoomAlive" :reloadChatRoom="reloadChatRoom"></ChatRoom2>
+  <div>
+  </div>
 </template>
 
 <script setup>
@@ -26,6 +13,7 @@ import {ref} from "vue";
 import {reloadUtil} from "@/util/util.js";
 // import Card from "@/components/dashboard/entertainment/Card.vue";
 import ChatRoom from "@/components/dashboard/entertainment/ChatRoom.vue";
+import ChatRoom2 from "@/components/dashboard/entertainment/ChatRoom2.vue";
 let isChatRoomAlive = ref(true);
 const reloadChatRoom = () => {
   reloadUtil(isChatRoomAlive)

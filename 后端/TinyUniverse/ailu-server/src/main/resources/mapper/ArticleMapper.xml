@@ -79,10 +79,11 @@
                 and at.article_id = a.id and at.tag_id = #{tag}
             </if>
         </where>
-        order by field
-        <foreach item="articleScoreDTO" collection="articleScoreDTOs" separator="," close=")" open="(">
-            #{articleScoreDTO.score}
+        order by field(a.id,
+        <foreach item="articleScoreDTO" collection="articleScoreDTOs" separator=",">
+            #{articleScoreDTO.id}
         </foreach>
+        )
     </select>
     <select id="getArticleIdsByTag" resultType="java.lang.Long">
         select a.id
@@ -97,6 +98,11 @@
                 and at.article_id = a.id and at.tag_id = #{tag}
             </if>
         </where>
+    </select>
+    <select id="search" resultType="com.ailu.vo.article.ArticleAndActiveVO">
+        select id,author,LEFT(content,40) as content,title
+        from article
+        where content like concat('%',#{name},'%')
     </select>
 
 </mapper>

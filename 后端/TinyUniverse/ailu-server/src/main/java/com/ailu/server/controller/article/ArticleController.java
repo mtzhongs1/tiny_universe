@@ -1,5 +1,7 @@
 package com.ailu.server.controller.article;
 
+import com.ailu.aop.Log;
+import com.ailu.aop.OperationType;
 import com.ailu.dto.article.ArticleDTO;
 import com.ailu.dto.article.ArticlePageDTO;
 import com.ailu.dto.user.UserActiveVO;
@@ -82,6 +84,7 @@ public class ArticleController {
 
     @GetMapping("/search/{pageNum}/{pageSize}/{type}/{content}")
     @ApiOperation("分词搜索")
+    @Log(title = "搜索", operationType = OperationType.OTHER)
     public Result<PageResult> search(@PathVariable String content,@PathVariable Integer pageNum,
                                      @PathVariable Integer pageSize,@PathVariable Integer type){
         PageResult page = dataSourceFactory.getDataSource("article").search(content,pageNum,pageSize,type);

@@ -137,13 +137,15 @@ const getArticles = () =>{
       page.total = resp.data.data.total;
       articles.value = resp.data.data.records;
       const reg = new RegExp("(" + params.content + ")", "g");
-      console.log(articles.value);
+
       articles.value.forEach((article) => {
         const cover = isEmpty(article.cover) ? [] : article.cover.split(",");
         article.cover = cover;
+        article.description = article.description.replace(reg, "<span style='color: #c95353'>$1</span>");
         article.content = article.content.replace(reg, "<span style='color: #c95353'>$1</span>");
         article.title = article.title.replace(reg, "<span style='color: #c95353'>$1</span>");
       })
+      console.log(articles.value);
     }else{
       ElMessage.error('服务器繁忙');
     }

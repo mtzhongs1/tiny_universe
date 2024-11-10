@@ -30,13 +30,14 @@
         </el-space>
         </div>
       </el-header>
-      <el-main style="width: 80vw">
+      <el-main style="width: 80vw;margin-top: -20px">
         <el-menu
             class="el-menu-demo"
             mode="horizontal"
             :ellipsis="false"
             active-text-color="#409eff"
             router
+            style="margin-bottom: 20px"
         >
           <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
           <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->

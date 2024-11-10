@@ -5,12 +5,15 @@ import com.ailu.dto.user.FolFanDTO;
 import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.entity.UserActive;
 import com.ailu.result.PageResult;
-import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.UserMapper;
 import com.ailu.server.service.user.UserActiveService;
+import com.ailu.server.util.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.BoundZSetOperations;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

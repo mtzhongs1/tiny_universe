@@ -1,6 +1,7 @@
 package com.ailu.server.filter;
 
 import com.ailu.context.BaseContext;
+import com.ailu.context.IndexNameContext;
 import com.ailu.result.Result;
 import com.ailu.server.properties.JwtProperties;
 import com.ailu.util.JwtUtil;
@@ -70,13 +71,14 @@ public class JwtAuthenticationTokenFilter implements Filter{
         }
         Claims claims;
         try{
-            claims = JwtUtil.parseJWT(jwtProperties.getSecret(),token);
+            claims = JwtUtil.parseJWT(token,jwtProperties.getSecret());
         }catch(Exception e){
             log.error("token解析失败");
             WebUtils.renderString(response,Result.errorToken("token解析失败"));
             return;
         }
         String userId = claims.get("userId").toString();
+        // 设置存储位置（类似bucket）
         BaseContext.setCurrentId(Long.valueOf(userId));
         filterChain.doFilter(request,response);
     }

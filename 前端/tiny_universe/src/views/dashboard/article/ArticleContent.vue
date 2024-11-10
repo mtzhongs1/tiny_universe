@@ -1,13 +1,15 @@
 <template>
   <div class="outer-div">
-    <div class="activeStyle">
-      <div>
-        <el-icon class="active-icon" :size="27" :color="articleActive.isLove?'#62b9ec':''" @click="doLove(article)"><Sugar /></el-icon>
-        <span class="active-num">{{articleActive.love}}</span>
-      </div>
-      <div>
-        <el-icon class="active-icon" :size="27" :color="articleActive.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>
-        <span class="active-num">{{articleActive.collectionCount}}</span>
+    <div class="article-style-outer">
+      <div class="activeStyle">
+        <div>
+          <el-icon class="active-icon" :size="65" :color="articleActive.isLove?'#62b9ec':''" @click="doLove(article)"><Sugar /></el-icon>
+          <span class="active-num">{{articleActive.love}}</span>
+        </div>
+        <div>
+          <el-icon class="active-icon" :size="65" :color="articleActive.isCollection?'#62b9ec':''" @click="doCollection(article)"><Star /></el-icon>
+          <span class="active-num">{{articleActive.collectionCount}}</span>
+        </div>
       </div>
     </div>
     <div class="center-div">
@@ -27,47 +29,50 @@
         <Comment v-if="isCommentAlive"></Comment>
       </div>
     </div>
-    <div class="UserAndDir">
-      <div class="UserMessage">
-        <!--名字用article.author属性-->
-        <div>
-          <el-avatar style="vertical-align: middle;margin-right: 10px;cursor: pointer" @click="toUserDetail(article.userId)" :src="userActive.avatar" :size="70"></el-avatar>
-          <span style="display: inline-block;">{{article.author}}</span>
-        </div>
-        <div style="opacity: 0.5;display: flex;gap: 10px;justify-content: center">
-          <span>关注：{{userActive.follows}}</span>
-          <span>粉丝：{{userActive.fans}}</span>
-        </div>
-        <div v-if="user.id !== article.userId">
-          <div @click="follow" >
-            <el-button style="color:white" v-if="isFollow" class="follow-btn"> 关注 </el-button>
-            <el-button v-else class="follow-btn" style="background: #a19999 ;color:black"> 取关 </el-button>
+    <div style="width: 250px;">
+        <div :class="'UserAndDir'">
+          <div class="UserMessage">
+            <!--名字用article.author属性-->
+            <div>
+              <el-avatar style="vertical-align: middle;margin-right: 10px;cursor: pointer" @click="toUserDetail(article.userId)" :src="userActive.avatar" :size="70"></el-avatar>
+              <span style="display: inline-block;">{{article.author}}</span>
+            </div>
+            <div style="opacity: 0.5;display: flex;gap: 10px;justify-content: center">
+              <span>关注：{{userActive.follows}}</span>
+              <span>粉丝：{{userActive.fans}}</span>
+            </div>
+            <div v-if="user.id !== article.userId">
+              <div @click="follow" >
+                <el-button style="color:white" v-if="isFollow" class="follow-btn"> 关注 </el-button>
+                <el-button v-else class="follow-btn" style="background: #a19999 ;color:black"> 取关 </el-button>
+              </div>
+            </div>
           </div>
+          <div class="directory" v-show="!isEmpty(catalog)">
+            <h3 style="text-align: center;">目录</h3>
+            <el-anchor :offset="70">
+              <!--通过id选择器指定锚点-->
+              <el-anchor-link v-for="(item, index) in catalog"
+                              :key="index" :href="'#' + item.id">
+                <span :style="{'margin-left':`${item.level}px`}"></span>
+                {{item.title}}
+              </el-anchor-link>
+            </el-anchor>
+          </div>
+          <img src="@/assets/海报1.png" alt="" width="250px"/>
+          <img src="@/assets/海报2.png" alt="" width="250px"/>
         </div>
+        <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
+          <template #footer>
+            <CreateCol></CreateCol>
+            <ColList v-if="listIsAlive"></ColList>
+          </template>
+        </el-dialog>
       </div>
-
-      <div class="directory" v-show="!isEmpty(catalog)">
-        <h3 style="text-align: center;">目录</h3>
-        <el-anchor :offset="70">
-          <!--通过id选择器指定锚点-->
-          <el-anchor-link v-for="(item, index) in catalog"
-                          :key="index" :href="'#' + item.id">
-            <span :style="{'margin-left':`${item.level}px`}"></span>
-            {{item.title}}
-          </el-anchor-link>
-        </el-anchor>
-      </div>
-  </div>
-    <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
-      <template #footer>
-        <CreateCol></CreateCol>
-        <ColList v-if="listIsAlive"></ColList>
-      </template>
-    </el-dialog>
     </div>
 </template>
 <script setup>
-import {inject, onBeforeMount, provide, reactive, ref, watch} from "vue";
+import {inject, onBeforeMount, onUnmounted, provide, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 import {doDeletexwww, doGet, doPostxwww} from "@/http/httpRequest.js";
 import {useRoute, useRouter} from "vue-router";
@@ -80,9 +85,7 @@ import ColList from "@/components/dashboard/collection/ColList.vue";
 import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
 
 let user = inject("user");
-let article = ref({
-
-})
+let article = ref({})
 let articleActive = reactive({});
 const route = useRoute();
 const router = useRouter();
@@ -95,10 +98,13 @@ let catalog = ref([]);
 let isCommentAlive = ref(true);
 let dialogVisible = ref(false);
 let listIsAlive = ref(true);
+let articleId = ref(null);
+// let isSticky = ref('');
+
 onBeforeMount(() => {
   getArticle();
   getUser();
-
+  // window.addEventListener('scroll', handleScroll);
 })
 const getUser = () => {
   doGet("article/getUser/"+params.articleId).then((resp) => {
@@ -227,13 +233,13 @@ const follow = () => {
 const toUserDetail = (id) => {
   newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
+
 const closeColDialog = (collections) => {
   collections.value.forEach((collection) => {
     collection.isChoosed = false;
   })
   dialogVisible.value = false;
 }
-let articleId = ref(null);
 watch(() => article.value.id,(newValue) => {
   articleId.value = newValue;
 })
@@ -253,6 +259,11 @@ provide("closeColDialog",closeColDialog)
   gap:50px;
   min-width: 0;
   overflow: auto;
+  width: 100%;
+}
+
+.center-div{
+  width: 1400px;
 }
 
 .article-detail,.comment-detail {
@@ -265,8 +276,13 @@ provide("closeColDialog",closeColDialog)
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-left: 100px;
-  position: relative;
+  position: fixed;
+  left: 50px;
+  top: 300px;
+}
+
+.article-style-outer{
+  width: 150px;
 }
 
 .active-num{
@@ -291,9 +307,11 @@ provide("closeColDialog",closeColDialog)
 }
 
 .UserAndDir{
-  min-width: 250px;
-  overflow: hidden;
   margin-right: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: fixed;
 }
 
 .UserMessage{
@@ -301,11 +319,11 @@ provide("closeColDialog",closeColDialog)
   font-size: 18px;
   padding: 20px 10px;
   background: var(--main-beside-color);
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 10px;
+  width: 200px;
 }
 
 .directory{
@@ -314,8 +332,8 @@ provide("closeColDialog",closeColDialog)
   padding: 20px 0;
   font-size: 18px;
   /*max-height: 200px;*/
-  overflow: auto;
   max-height:300px;
+  width: 100%;
 }
 
 :deep(.el-anchor__link) {
@@ -336,51 +354,23 @@ provide("closeColDialog",closeColDialog)
   margin: 10px;
 }
 
-.cover-image {
-  width: 100%;
-  height: auto;
-}
-
-#content {
-  width: 100%;
-  overflow: hidden;
-  height: 100vh;
-  border: none;
-}
-
-.center-div{
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 1400px;
-  min-width: 1000px;
-}
-
 .follow-btn{
   background: #0184e5;
   border:none;
   width:65%
 }
-/*
-@media screen and (max-width: 1050px){
-  .article-detail,.comment-detail{
-    width: 85vw;
-  }
-}
 
-@media screen and (max-width: 800px){
+@media screen and (max-width: 1000px){
+  .article-style-outer{
+    width: 0;
+  }
   .activeStyle{
     display: none;
   }
-  .outer-div{
-    justify-content: center;
-  }
-  .article-detail,.comment-detail{
-    width: 100vw;
-    position: relative;
-    left: -160px;
+  .center-div{
+    width: 100%;
   }
 }
-*/
+
 
 </style>

@@ -91,7 +91,7 @@ const menuItems = [
   {name:'动态',path:'/dashboard/moment',icon:ElIcons['User']},
   {name:'文章',path:'/dashboard/article',icon:ElIcons['EditPen']},
   {name:'收藏',path:'/dashboard/collection',icon:ElIcons['StarFilled']},
-  {name:'其他',path:'/dashboard/other',icon:ElIcons['MoreFilled']},
+  {name:'其他',path:'/dashboard/other/bottle',icon:ElIcons['MoreFilled']},
 ]
 // const activeIndex = menuItems[0].path;
 // const router = useRouter();

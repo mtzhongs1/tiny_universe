@@ -18,6 +18,7 @@
 p{
     word-wrap: break-word;
 }
+
 /* 定义全局变量 */
 :root{
     --w-e-textarea-border-color: var(--text-color);
@@ -41,6 +42,7 @@ p{
     --shadow-black-color: 0px 0px 4px #fff;
     --comment-black-color: #565353;
     --compare-black-color: #032767;
+    --main-black-bg-color: url('@/assets/cat.png');
 
 
     /*白色*/
@@ -53,6 +55,7 @@ p{
     --shadow-white-color: 0px 0px 4px #676767;
     --comment-white-color: rgba(241, 210, 210, 0.3);
     --compare-white-color: #F7F8FC;
+    --main-white-bg-color: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
 
     --header-color: var(--header-black-color);
     --main-color: var(--main-black-color);
@@ -63,6 +66,8 @@ p{
     --shadow-color: var(--shadow-black-color);
     --comment-color: var(--comment-black-color);
     --compare-color: var(--compare-black-color);
+    --main-bg-color: var(--main-black-color);
+
     --common-color: #088cda;
     --common-shallow-color: #5c7d94;
     --common-shadow-color: 1px 1px 1px 1px rgb(131, 133, 129),
@@ -129,7 +134,7 @@ html {
 /*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
     width: 5px; /*对垂直流动条有效*/
-    height: 5px; /*对水平流动条有效*/
+    height: 7px; /*对水平流动条有效*/
 }
 
 /*滚动条颜色*/
@@ -144,10 +149,16 @@ html {
 }
 
 /* 隐藏滚动条 */
-/*::-webkit-scrollbar {*/
-/*    display: none;*/
-/*}*/
+::-webkit-scrollbar {
+    display: none;
+}
 
+:root {
+    cursor: var(--cursor);
+    --cursor: var(--default-cursor);
+    --default-cursor: auto;
+    --custom-cursor: url('@/assets/捕捞.ico'),pointer;
+}
 
 </style>
 </html>

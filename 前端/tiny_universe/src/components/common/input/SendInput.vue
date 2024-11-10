@@ -24,6 +24,9 @@ const send = () => {
   display: flex;
   flex-direction: column;
   place-items: center;
+  button {
+    margin-bottom: 10px;
+  }
 }
 
 .search input {

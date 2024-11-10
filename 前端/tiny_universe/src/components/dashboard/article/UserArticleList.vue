@@ -79,15 +79,17 @@
 </template>
 <script setup>
 import {onBeforeMount, provide, reactive, ref} from 'vue';
-import { doDeletexwww, doGet, doPostxwww} from "@/http/httpRequest.js";
+import {doDelete, doDeletexwww, doGet, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import ColList from "@/components/dashboard/collection/ColList.vue";
 import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
 import {isEmpty, reloadUtil} from "@/util/util.js";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 //文章数据和参数数据
 let route = useRoute();
+let router = useRouter();
+let emit = defineEmits(['reload']);
 let params = route.params;
 let articles = ref([]);
 let page = reactive({
@@ -176,12 +178,27 @@ const closeColDialog = () => {
   reloadCol();
   dialogVisible.value = false;
 }
+const deleteArticle = (id) => {
+  const ids = [id];
+  doDelete("/article",JSON.stringify(ids)).then((resp) => {
+    if(resp.data.code === 1){
+      ElMessage.success("删除成功");
+      emit('reload');
+    }else{
+      ElMessage.error("服务器繁忙");
+    }
+  })
+}
+const updateArticle = (id) => {
+  router.push("/dashboard/article_editor/"+id);
+}
 provide("article", article);
 provide('reload', reloadCol);
 provide("closeColDialog", closeColDialog)
 </script>
 <style scoped>
 .article {
+  border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
   background: var(--main-beside-color);
   padding: 20px 20px;
 }
@@ -205,7 +222,6 @@ provide("closeColDialog", closeColDialog)
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
-  background: var(--main-beside-color);
   margin-bottom: 20px;
 }
 

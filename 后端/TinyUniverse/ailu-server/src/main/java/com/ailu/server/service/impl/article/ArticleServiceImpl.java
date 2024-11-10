@@ -1,5 +1,6 @@
 package com.ailu.server.service.impl.article;
 
+import cn.hutool.core.lang.Pair;
 import com.ailu.constant.ArticleScoreConstant;
 import com.ailu.context.BaseContext;
 import com.ailu.dto.article.ArticleDTO;
@@ -9,7 +10,6 @@ import com.ailu.dto.user.UserActiveVO;
 import com.ailu.entity.Article;
 import com.ailu.entity.UserActive;
 import com.ailu.result.PageResult;
-import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.ArticleActiveMapper;
 import com.ailu.server.mapper.ArticleMapper;
 import com.ailu.server.mapper.ArticleTagMapper;
@@ -19,12 +19,12 @@ import com.ailu.server.service.article.TagService;
 import com.ailu.server.service.comment.CommentService;
 import com.ailu.server.service.common.MinioService;
 import com.ailu.server.service.user.UserActiveService;
+import com.ailu.server.util.RedisCache;
 import com.ailu.util.DocUtils;
 import com.ailu.vo.article.ArticleAndActiveVO;
 import com.ailu.vo.article.ArticleVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,8 +43,8 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -282,11 +282,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public PageResult search(String name, int pageNum, int pageSize,int type) {
+
         List<Long> articleIds = redisCache.getCacheMapValue("article_word", name);
-        PageHelper.startPage(pageNum, pageSize);
         if(ObjectUtils.isEmpty(articleIds)){
             return new PageResult(0L,new ArrayList<>());
         }
+        PageHelper.startPage(pageNum, pageSize);
+        // Page<ArticleAndActiveVO> page = articleMapper.search(name,type);
         Page<ArticleAndActiveVO> page = articleMapper.getArticlesByIds(articleIds,type);
         List<ArticleAndActiveVO> articles = page.getResult();
         for (ArticleAndActiveVO article : articles) {

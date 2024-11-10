@@ -10,20 +10,21 @@ ailu:
     minio:
       endpoint: http://127.0.0.1:9000
       accessKey: ailu
-      secretKey: 12345678
+      secretKey: dfDF51d5
       bucket: public
 
   redis:
     database: 2
     host: 127.0.0.1
     port: 6379
+    user: default
     password: 123456
 
 xxl:
   job:
     accessToken: default_token
     admin:
-      addresses: http://127.0.0.1:8080/xxl-job-admin
+      addresses: http://127.0.0.1:12001/xxl-job-admin
     executor:
       address: ''
       appname: tiny-universe

@@ -6,8 +6,6 @@ import com.ailu.aop.OperationStatus;
 import com.ailu.config.PropertyPreExcludeFilter;
 import com.ailu.context.BaseContext;
 import com.ailu.entity.LogEntity;
-import com.ailu.server.async.AsyncFactory;
-import com.ailu.server.async.AsyncManager;
 import com.ailu.server.service.Log.LogService;
 import com.ailu.util.http.AddressUtils;
 import com.ailu.util.http.IpUtils;
@@ -34,8 +32,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @Description:

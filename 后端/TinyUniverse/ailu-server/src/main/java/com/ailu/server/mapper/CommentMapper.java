@@ -5,7 +5,10 @@ import com.ailu.dto.comment.CommentUpdateDTO;
 import com.ailu.dto.comment.CommentVO;
 import com.ailu.server.aop.AutoFill;
 import com.ailu.server.aop.InsertOrUpdate;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

@@ -3,10 +3,10 @@
     <!-- TODO：动态样式，注意：路径中不能有空格！！！ -->
     <div :style="{ 'background-image': `url(${bgImagePath})` }" class="headerDiv">
       <Location class="location"></Location>
-      <el-icon v-show="upDown" id="leftIcon" @click="setIndex(true)">
+      <el-icon v-show="upDown" class="arrow-icon" id="leftIcon" @click="setIndex(true)" :size="50">
         <ArrowLeftBold />
       </el-icon>
-      <el-icon v-show="upDown" id="rightIcon" @click="setIndex(false)">
+      <el-icon v-show="upDown" class="arrow-icon" id="rightIcon" @click="setIndex(false)" :size="50">
         <ArrowRightBold />
       </el-icon>
       <el-icon v-if="upDown" class="upDownIcon" @click="setUpDown">
@@ -27,14 +27,19 @@
       </a>
     </div>
   </div>
+<!--  <el-button class="file-box" text>-->
+<!--    <el-button @click="uploadFile"></el-button>-->
+<!--  </el-button>-->
 </template>
 <script setup>
+
 //导入区
 import {onMounted, ref, reactive, provide, computed} from 'vue';
-import { doGet } from '@/http/httpRequest.js'
+import {doGet} from '@/http/httpRequest.js'
 // TODO：导入资源
 import Location from '@/components/dashboard/Location.vue';
 import Setting from "@/components/dashboard/Setting.vue";
+import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {isEmpty, setCssVariable, setProperty} from "@/util/util.js";
 import {ElMessage} from "element-plus";
 
@@ -174,14 +179,9 @@ provide("userActive",userActive);
   z-index:2;
 }
 
-.headerDiv .el-icon{
-  color: var(--text-color);
-}
-
 .mainDiv {
   width: 100%;
   position: relative;
-  background-color: var(--main-color);
 }
 
 .upDownIcon {
@@ -197,17 +197,17 @@ provide("userActive",userActive);
 }
 
 #leftIcon {
-  position: absolute;
-  top: 50%;
   left: 1px;
-  padding: 10px;
 }
-
 #rightIcon {
+  right: 1px;
+}
+.arrow-icon{
+  padding: 10px;
   position: absolute;
   top: 50%;
-  right: 1px;
-  padding: 10px;
+  z-index: 15;
+  color: white;
 }
 
 .location{
@@ -228,18 +228,19 @@ provide("userActive",userActive);
   flex-direction: column;
   min-height: 100vh;
   overflow: hidden;
+  background: var(--main-bg-color);
 }
 
 .footer {
   width: 100%;
   background: #42ace8;
   color: white;
-  text-align: center;
   padding: 40px 0 40px 0;
   font-size: 18px;
   margin-top: auto;
   z-index:10;
+  display: flex;
+  justify-content: center;
 }
-
 
 </style>

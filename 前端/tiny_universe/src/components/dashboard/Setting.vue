@@ -1,8 +1,13 @@
 <template>
   <div class="setting">
-    <el-icon @click="drawer=true" class="setting_icon" style="color: var(--common-color)">
-      <Setting/>
-    </el-icon>
+    <el-space direction="vertical">
+      <el-icon class="upDownIcon" @click="scrollToTop">
+        <ArrowUpBold />
+      </el-icon>
+      <el-icon @click="drawer=true" class="setting_icon" style="color: var(--common-color)">
+        <Setting/>
+      </el-icon>
+    </el-space>
     <el-drawer v-model="drawer" :size="300">
       <div>
         <p>风格：</p>
@@ -22,13 +27,9 @@
             </svg>
           </el-space>
           <el-radio-group v-model="isBlack" class="ml-4" @change="switchStyle">
-            <el-space :size="60">
-              <el-radio :value="true" size="large">不嘻嘻
-                <img style="height: 18px;" src="../../assets/不嘻嘻.svg" alt="">
-              </el-radio>
-              <el-radio :value="false" size="large">嘻嘻
-                <img style="height: 18px;" src="../../assets/嘻嘻.svg" alt="">
-              </el-radio>
+            <el-space :size="90">
+              <el-radio :value="true" size="large">黑夜</el-radio>
+              <el-radio :value="false" size="large">白天</el-radio>
             </el-space>
           </el-radio-group>
         </el-space>
@@ -53,6 +54,9 @@ import {inject, reactive, ref} from "vue";
 import {setCssVariable} from "@/util/util.js";
 import {doPostFile, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
+import {ArrowUpBold} from "@element-plus/icons-vue";
+
+
 
 let color = inject('color');
 
@@ -90,7 +94,14 @@ const updateImages = (index) => (fileObject) => {
     }
   })
 }
-
+const scrollToTop = () => {
+  window.scrollTo({
+    // top: document.documentElement.offsetHeight, //回到底部
+    top: 0, //回到顶部
+    left: 0,
+    behavior: "smooth", //smooth 平滑；auto:瞬间
+  });
+};
 function switchStyle() {
   //当前的主题
   var theme = !isBlack.value;
@@ -115,9 +126,13 @@ function switchStyle() {
 }
 
 .icon {
-  box-shadow: var(--el-box-shadow);
+  box-shadow: var(--shadow-white-color);
 }
-
+.upDownIcon {
+  cursor: pointer;
+  z-index:100;
+  color: var(--common-color);
+}
 .bgImage {
   cursor: pointer;
   width: 100px;

@@ -2,14 +2,15 @@ package com.ailu.server.service.impl.user;
 
 import com.ailu.dto.user.MessageDTO;
 import com.ailu.dto.user.UserSocketPageDTO;
-import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.UserMapper;
 import com.ailu.server.service.user.SocketServcie;
 import com.ailu.server.socket.EchoChannel;
+import com.ailu.server.util.RedisCache;
 import com.ailu.vo.user.DataAndCnt;
 import com.ailu.vo.user.UserSocketVO;
 import com.ailu.vo.user.UserVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class SocketServcieImpl implements SocketServcie {
 
     @Override
     public void sendAll(MessageDTO message) {
+
         String messageJson = JSON.toJSONString(message);
         echoChannel.sendToAllClient(messageJson);
     }
@@ -59,9 +61,16 @@ public class SocketServcieImpl implements SocketServcie {
             return new DataAndCnt<>(new ArrayList<>(map.values()),cnt.intValue());
         }else{
             //根据名字模糊查询
-            Map<String,UserSocketVO> map = redisCache.redisTemplate.opsForHash().entries("chat");
-            Collection<UserSocketVO> userSocketVOs = map.values();
-            List<UserSocketVO> filters = userSocketVOs.stream().filter((userSocketVO) -> userSocketVO.getUsername().contains(username)).collect(Collectors.toList());
+            Map<String, JSONObject> map = redisCache.redisTemplate.opsForHash().entries("chat");
+            Collection<JSONObject> userSocketVOs = map.values();
+            List<UserSocketVO> filters = new ArrayList<>();
+            //如果用户名等于username，则移到filters中
+            for (JSONObject jsonObject : userSocketVOs) {
+                if(jsonObject.getString("username").contains(username)){
+                    UserSocketVO userSocketVO = new UserSocketVO(jsonObject.getLong("id"),jsonObject.getString("username"), jsonObject.getString("avatar"));
+                    filters.add(userSocketVO);
+                }
+            }
             return new DataAndCnt<>(filters, userSocketVOs.size());
         }
     }

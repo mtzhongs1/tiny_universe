@@ -1,8 +1,9 @@
 <template>
-  <div class="flex-col shrink-0 section_19">
+  <div class="flex-col shrink-0 section_19" style="margin-top: 20px">
     <div class="flex-col section_4">
       <div class="flex-row justify-between items-center group_17">
         <div class="flex-row items-center">
+<!--          <div class = "switchAssistant" @click="listAssistant">切换助理</div>-->
           <el-space direction="vertical">
             <img src="@/assets/机器人.svg" alt="" width="20px">
             <span class="font text">学习小助理</span>
@@ -15,13 +16,16 @@
           <div class="flex-row items-center problems">
             <span @click="send('如何学习Java?')" class="problem">如何学习Java?  &nbsp;&nbsp;&nbsp;></span>
             <span @click="send('PHP是不是世界上最好的语言？')" class="problem">PHP是不是世界上最好的语言？ &nbsp;&nbsp;&nbsp;></span>
-            <div v-for="message in messages" class="message">
+            <div v-for="message in messages" :key="message" class="message">
               <!--TODO:根据不同情况绑定class类选择对应的样式-->
               <div class="message-content" :class="message.self ? 'rightMessage' : 'leftMessage'">
                 <div style="display: flex" :class="message.self ? 'rightUser' : 'leftUser'">
                   <p class="username"> {{message.self?'我':'学习小助理'}} </p>
                 </div>
-                <p class="content">{{ message.content }}</p>
+                <div v-if="!isEmpty(message.urls)">
+                  <img v-for="(url, index) in message.urls" :key="index" class="content" :src="url" alt="" style="width: 365px;">
+                </div>
+                <div class="content" v-html="message.content"></div>
               </div>
             </div>
           </div>
@@ -29,22 +33,75 @@
       </el-scrollbar>
       <div style="margin-top: 25px">
         <SendInput @send="send" @updateValue="updateValue"></SendInput>
+        <el-upload
+            class="avatar-uploader"
+            :show-file-list="false"
+            :http-request="uploadBaseKnowledge"
+            style="position: absolute;bottom: 10px"
+        >
+          <p style="color: #0fc9ee">上传文档</p>
+        </el-upload>
+        <p>{{knowledgeName}}</p>
       </div>
     </div>
   </div>
+  <el-dialog
+      v-model="dialog.dialogVisible"
+      title="智能体列表"
+      width="800"
+      :center="true"
+  >
+    <template #footer>
+      <Agent></Agent>
+    </template>
+  </el-dialog>
 </template>
 <script setup>
 import SendInput from "@/components/common/input/SendInput.vue";
 import {inject, reactive, ref} from "vue";
-import {doGet} from "@/http/httpRequest.js";
+import {doGet, doPostFile, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {isEmpty} from "@/util/util.js";
+import Agent from "@/components/dashboard/agent/Agent.vue";
+
 let content = ref('');
 let user = inject("user");
+let dialog = reactive({
+  dialogVisible:false
+})
+let knowledgeId = ref(0);
+let knowledgeName = ref('');
 let messages = reactive([]);
+let isLoad = ref(false);
 const updateValue = (contentValue) => {
   content.value = contentValue;
 }
+const uploadBaseKnowledge = (fileObject) => {
+  // const formData = new FormData();
+  // formData.append("doc", fileObject.file)
+  // formData.append("knowledgeId",fileObject.uid)
+  knowledgeId.value = generateUUID();
+  console.log(fileObject)
+  doPostFile('/knowledge/save', {
+    "doc":fileObject.file,
+    "knowledgeId":knowledgeId.value
+  }).then((resp) => {
+    if(resp.data.code === 1){
+      ElMessage.success('上传成功');
+      knowledgeName.value = fileObject.file.name;
+    }else{
+      ElMessage.error('上传失败');
+    }
+  })
+}
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const send = (tempContent) => {
   if(!isEmpty(tempContent)){
     content.value = tempContent;
@@ -58,18 +115,34 @@ const send = (tempContent) => {
     content:content.value,
   }
   messages.push(selfMessage);
-  doGet("/gpt/chat",{content:content.value}).then((resp) => {
+  isLoad.value = true;
+  doGet("/gpt/agent",{problem:content.value,knowledgeId:knowledgeId.value}).then((resp) => {
     if(resp.data.code === 1){
       const aiMessage = {
         self:false,
         content:resp.data.data,
+        urls: extractUrls(resp.data.data)
       }
       content.value = '';
       messages.push(aiMessage);
+      isLoad.value = false;
     }else{
       ElMessage.error('请求繁忙');
     }
   })
+}
+function extractUrls(text) {
+  // 正则表达式匹配常见的图片文件扩展名
+  const regex = /https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif)(\?[^"\s]*)?/gi;
+  let urls = [];
+  let match;
+
+  // 使用正则表达式的 exec 方法遍历所有匹配项
+  while ((match = regex.exec(text)) !== null) {
+    urls.push(match[0]);
+  }
+
+  return urls;
 }
 </script>
 <style lang="scss" scoped>
@@ -170,11 +243,9 @@ const send = (tempContent) => {
 }
 
 .section_19 {
-  margin: 25px 0;
-  background-color: var(--compare-color);
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
   filter: drop-shadow(7.03px 1.87px 13.59px rgba(0, 0, 0, 0.1));
-  overflow: hidden;
+  overflow: auto;
   font-size: 16px;
 }
 

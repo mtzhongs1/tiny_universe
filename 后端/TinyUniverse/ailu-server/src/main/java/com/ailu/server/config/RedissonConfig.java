@@ -3,6 +3,8 @@ package com.ailu.server.config;
 import lombok.Data;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.Codec;
+import org.redisson.codec.SerializationCodec;
 import org.redisson.config.Config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,8 @@ public class RedissonConfig {
     private String host;
 
     private Integer port;
+
+    private String user;
     // 如果redis默认没有密码，则不用写
     private String password;
 
@@ -32,12 +36,13 @@ public class RedissonConfig {
                 // 设置数据库
                 .setDatabase(database)
                 // 设置redis的地址
-                .setAddress("redis://" + host + ":" + port)
-        // 设置redis的密码(redis有密码才设置)
-                       .setPassword(password);
+                .setAddress("redis://" + host + ":" + port);
+                 // 设置redis的密码(redis有密码才设置)
+                 //       .setPassword(password);
 
+        Codec codec = new SerializationCodec();
+        config.setCodec(codec);
         // 2.创建Redisson实例
-        RedissonClient redisson = Redisson.create(config);
-        return redisson;
+        return Redisson.create(config);
     }
 }

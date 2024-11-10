@@ -20,7 +20,7 @@ import java.util.*;
 @Component
 @Slf4j
 @ServerEndpoint("/ws/{sid}")
-public class EchoChannel implements com.ailu.socket.SocketObservable {
+public class EchoChannel implements com.ailu.server.socket.SocketObservable {
 
     //存放会话对象
     private static Map<String, Session> sessionMap = new HashMap();

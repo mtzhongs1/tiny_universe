@@ -64,13 +64,13 @@ function saveUser() {
     return;
   }
   const formData = new FormData();
+  const birthday = handleDateChange(user.birthday)
   formData.append("id",user.id);
   formData.append("username", user.username);
   formData.append("sex", user.sex);
-  formData.append("birthday", user.birthday);
+  formData.append("birthday", birthday);
   formData.append("description", user.description);
   formData.append("avatar", user.avatar);
-
   doPut("/user/updateMsg", formData).then((resp) => {
     if (resp.data.code === 1) {
       ElMessage.success("修改成功");
@@ -78,6 +78,13 @@ function saveUser() {
       ElMessage.error("服务器繁忙");
     }
   })
+}
+//将date转化为yyyy-mm-dd格式
+const handleDateChange = (date) => {
+  let year = date.getFullYear().toString();
+  let month = ('0'+(date.getMonth()+1)).slice(-2);
+  let day = ('0'+date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
 }
 </script>
 <style scoped>

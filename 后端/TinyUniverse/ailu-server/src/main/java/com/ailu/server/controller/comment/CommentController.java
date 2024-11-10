@@ -2,17 +2,11 @@ package com.ailu.server.controller.comment;
 
 import com.ailu.dto.comment.CommentDTO;
 import com.ailu.dto.comment.CommentUpdateDTO;
-import com.ailu.dto.comment.CommentVO;
 import com.ailu.result.PageResult;
 import com.ailu.result.Result;
 import com.ailu.server.service.comment.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @Description:

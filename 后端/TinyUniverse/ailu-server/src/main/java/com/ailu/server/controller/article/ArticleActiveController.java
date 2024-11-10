@@ -1,7 +1,6 @@
 package com.ailu.server.controller.article;
 
 import com.ailu.dto.collection.ColDTO;
-import com.ailu.dto.collection.CollectionDTO;
 import com.ailu.entity.ArticleActive;
 import com.ailu.result.Result;
 import com.ailu.server.service.article.ArticleActiveService;
@@ -9,8 +8,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @Description:

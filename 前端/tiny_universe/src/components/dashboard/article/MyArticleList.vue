@@ -53,7 +53,7 @@
       <el-empty :image-size="275" description="这里什么都没有，快来施展你的才华！" />
     </el-col>
     <el-col>
-      <el-pagination style="padding-left: 45%"
+      <el-pagination style="padding-left: 45%;"
                      v-model:current-page="page.pageNum"
                      :page-size="page.pageSize"
                      :size="articles.length"
@@ -203,9 +203,13 @@ provide('reload', reloadCol);
 provide("closeColDialog", closeColDialog);
 </script>
 <style scoped>
+body{
+  font-family: Roboto;
+}
 .article {
   background: var(--main-beside-color);
   padding: 20px 20px;
+  border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
 }
 
 .coverStyle {
@@ -227,7 +231,6 @@ provide("closeColDialog", closeColDialog);
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
-  background: var(--main-beside-color);
   margin-bottom: 20px;
 }
 

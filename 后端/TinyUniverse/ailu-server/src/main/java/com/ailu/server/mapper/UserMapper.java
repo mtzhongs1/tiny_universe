@@ -1,10 +1,8 @@
 package com.ailu.server.mapper;
 
 import com.ailu.dto.user.FolFanDTO;
-import com.ailu.dto.user.FolFanPageDTO;
 import com.ailu.dto.user.UserUpdateDTO;
 import com.ailu.entity.User;
-import com.ailu.result.PageResult;
 import com.ailu.server.aop.AutoFill;
 import com.ailu.server.aop.InsertOrUpdate;
 import com.ailu.vo.user.UserSocketVO;
@@ -16,7 +14,6 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author: ailu

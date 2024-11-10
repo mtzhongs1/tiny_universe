@@ -2,7 +2,6 @@ package com.ailu.server.dataSource.searchType;
 
 import com.ailu.result.PageResult;
 import com.ailu.server.service.user.UserService;
-import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

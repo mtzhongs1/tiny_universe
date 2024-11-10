@@ -4,40 +4,41 @@
       v-model="dialogVisible"
       title="草稿箱"
       width="1000"
+      @close="closeDialog"
       :center="true"
   >
     <template #footer>
-      <el-row v-if="drafts.length > 0" justify="center" class="dialog-content">
-        <div style="display: flex;gap: 20px">
+      <el-row justify="center" class="dialog-content">
+        <div style="display: flex;gap: 20px;margin-bottom: 10px">
           <el-input v-model="draftName" placeholder="请输入标题"></el-input>
           <el-icon class="selectIcon" @click="getDrafts"><Search /></el-icon>
         </div>
-        <el-col class="draft-item" v-for="(draft,index) in drafts" :key="index" @click="toArticle(draft.id)">
-          <div>
-            <p>{{draft.title}}</p>
-            <div style="opacity: 0.5">
-              <p>创建时间：{{draft.createTime}}</p>
-              <p>更新时间：{{draft.updateTime}}</p>
+        <el-col v-if="drafts.length > 0" class="drafts">
+          <div class="draft-item" v-for="(draft,index) in drafts" :key="index" @click="toArticle(draft.id)">
+            <div>
+              <p>{{draft.title}}</p>
+              <div style="opacity: 0.5">
+                <p>创建时间：{{draft.createTime}}</p>
+                <p>更新时间：{{draft.updateTime}}</p>
+              </div>
+              <el-icon class="deleteIcon" @click.stop="deleteDraft(draft.id)"><Delete /></el-icon>
             </div>
-            <el-icon class="deleteIcon" @click.stop="deleteDraft(draft.id)"><Delete /></el-icon>
           </div>
-        </el-col>
-        <div>
           <el-pagination
               v-model:current-page="pageNum"
               :page-size="pageSize"
               :size="drafts.length"
-              :background="true"
               :total = "total"
               layout="total, prev, pager, next"
               @current-change="handleCurrentChange"
-              style="margin:10px"
+              style="margin:10px;text-align: center"
           />
-        </div>
+        </el-col>
+        <el-col v-else style="height: 500px;display:flex;justify-content: center;align-items: center">
+          <el-empty description="空空空空空如也~" />
+        </el-col>
       </el-row>
-      <div v-else style="height: 500px;display:flex;justify-content: center;align-items: center">
-        <el-empty description="空空空空空如也~" />
-      </div>
+
     </template>
   </el-dialog>
 </template>
@@ -48,7 +49,7 @@ import {ElMessage} from "element-plus";
 import {inject, ref} from "vue";
 import {useRouter} from "vue-router";
 import {newRoute} from "@/util/router.js";
-
+let router = useRouter();
 let drafts = ref([]);
 let total = ref(0);
 let pageSize = ref(3);
@@ -92,19 +93,30 @@ const deleteDraft = (id) => {
     }
   })
 }
+const closeDialog = () => {
+  dialogVisible.value = false;
+  draftName.value = ''
+}
 //草稿转为文章
 const toArticle = (id) => {
-  newRoute("/dashboard/article_editor/"+id);
+  newRoute("/dashboard/article_editor/"+id,router);
 }
 
 </script>
 <style scoped>
-.dialog-content :hover{
-  background: var(--main-color);
+.drafts{
+  display: flex;
+  flex-direction: column;
+  place-items: center;
 }
 .draft-item {
   z-index: 1;
   cursor: pointer;
+  padding: 5px 0;
+  width: 100%;
+}
+.draft-item:hover{
+  background: var(--main-color);
 }
 .deleteIcon :hover,.selectIcon :hover{
   z-index: 10;

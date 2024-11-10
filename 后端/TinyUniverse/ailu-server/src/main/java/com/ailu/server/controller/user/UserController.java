@@ -13,7 +13,6 @@ import com.ailu.vo.user.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,6 @@ public class UserController {
 
     @ApiOperation("登录")
     @PostMapping("/login")
-
     public Result login(@RequestBody UserLoginDTO userLoginDTO){
         String token = userService.login(userLoginDTO);
         return Result.success(token);

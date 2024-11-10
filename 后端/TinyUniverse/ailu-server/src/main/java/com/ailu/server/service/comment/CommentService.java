@@ -2,7 +2,6 @@ package com.ailu.server.service.comment;
 
 import com.ailu.dto.comment.CommentDTO;
 import com.ailu.dto.comment.CommentUpdateDTO;
-import com.ailu.dto.comment.CommentVO;
 import com.ailu.result.PageResult;
 
 import java.util.List;

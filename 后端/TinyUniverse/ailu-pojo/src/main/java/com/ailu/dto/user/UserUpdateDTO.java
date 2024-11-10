@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -16,7 +17,8 @@ import java.time.LocalDateTime;
  */
 
 @Data
-public class UserUpdateDTO {
+public class UserUpdateDTO implements Serializable {
+    private static final long serialVersionUID = 1615654864897L;
     @NotNull(message = "用户id不能为空")
     private Long id;
     @NotBlank(message = "用户名不能为空")

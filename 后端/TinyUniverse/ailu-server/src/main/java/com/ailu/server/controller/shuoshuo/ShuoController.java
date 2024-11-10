@@ -8,11 +8,7 @@ import com.ailu.result.Result;
 import com.ailu.server.service.shuoshuo.ShuoService;
 import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @Description:

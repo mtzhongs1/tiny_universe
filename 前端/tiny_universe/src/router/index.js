@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/login/LoginView.vue'
-
 import Dashboard from '@/views/dashboard/Dashboard.vue'
 import Home from '@/views/dashboard/home/Home.vue'
 import Entertainment from '@/views/dashboard/entertainment/Entertainment.vue'
@@ -22,6 +21,8 @@ import CollectionView from "@/views/dashboard/user/CollectionView.vue";
 import ArticleList from "@/views/dashboard/article/ArticleList.vue";
 import SearchArticle from "@/views/dashboard/search/SearchArticle.vue";
 import SearchUser from "@/views/dashboard/search/SearchUser.vue";
+import BottleView from "@/views/dashboard/other/BottleView.vue";
+import SSEClassRoom from "@/views/dashboard/other/SSEClassRoom.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,7 +49,16 @@ const router = createRouter({
           ]
         },
         {path: 'collection',name: 'Collection',component:Collection},
-        {path: 'other',name: 'Other',component:Other},
+        {
+          path: 'other',
+          name: 'Other',
+          component: Other,
+          children:[
+            {path: 'bottle',name: 'bottle',component:BottleView},
+            // {path: 'class_room',name: 'ClassRoom',component:ClassRoom}
+            {path: 'class_room',name: 'SSEClassRoom',component:SSEClassRoom}
+          ]
+        },
         {path: 'user',name:'User',component:User},
         {
           path: 'user_detail',

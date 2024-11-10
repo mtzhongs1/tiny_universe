@@ -1,7 +1,6 @@
 package com.ailu.server.controller.user;
 
 import com.ailu.dto.user.FolFanPageDTO;
-import com.ailu.dto.user.UserActiveDTO;
 import com.ailu.entity.UserActive;
 import com.ailu.result.PageResult;
 import com.ailu.result.Result;

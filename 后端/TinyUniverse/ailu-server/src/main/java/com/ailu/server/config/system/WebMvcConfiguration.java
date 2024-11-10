@@ -50,6 +50,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/gpt/sse/produceProblem/**");
     }
 
     //TODO: 允许跨域 ,本质是给“请求”添加解决跨域问题所需要的响应头
@@ -57,7 +58,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     protected void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST","OPTIONS", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .allowedOrigins("https://www.ailu.fun/")

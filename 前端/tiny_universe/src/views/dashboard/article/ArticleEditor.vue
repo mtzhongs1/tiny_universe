@@ -3,7 +3,7 @@
   <div style="padding: 50px">
     <div class="editor-container">
       <el-row class="editor-toolbar">
-      <!--TODO: 响应式布局-->
+        <!--TODO: 响应式布局-->
         <el-col :sm="16" :md="2">标题：</el-col>
         <el-col :span="22">
           <el-input style="width: 70%;" size="large" type="text" v-model="article.title" placeholder="请输入文章标题" maxlength="20" show-word-limit></el-input>
@@ -21,7 +21,7 @@
               content="根据文章内容生成描述"
           >
             <template #reference>
-              <el-button @click="produceDescription" style="margin: 0 0 10px 10px">AI生成</el-button>
+              <el-button :loading="loading" @click="produceDescription" style="margin: 0 0 10px 10px">AI生成</el-button>
             </template>
           </el-popover>
         </el-col>
@@ -38,6 +38,7 @@
             <Editor :defaultConfig="editorConfig" @onCreated="handleEditorCreated"/>
           </el-col>
         </el-col>
+        <el-button @click="dialogVisible = true" style="margin: 400px 0 0 10px">AI润色</el-button>
       </el-row>
       <el-row>
         <el-col :sm="16" :md="2">封面：</el-col>
@@ -66,7 +67,7 @@
                     :checked="tag.status"
                     @click="setTagStatus(index)"
                 >
-                {{ tag.name }}
+                  {{ tag.name }}
                 </el-check-tag>
               </div>
             </template>
@@ -74,7 +75,7 @@
         </el-col>
       </el-row>
       <el-row>
-      <!--选中的标签-->
+        <!--选中的标签-->
         <el-tag
             v-for="(tag,index) in onTags"
             :key="index"
@@ -100,7 +101,40 @@
           <FuncButton @click="updateArticle(true)" :message="'修改文章'"></FuncButton>
         </div>
       </div>
+
     </div>
+    <el-scrollbar :max-height="400">
+      <el-dialog
+          v-model="dialogVisible"
+          title="润色方向"
+          width="800"
+          :center="true"
+      >
+        <template #footer>
+          <div>
+            <div>
+              <el-select
+                  v-model="option.selected"
+                  placeholder="Select"
+                  size="large"
+                  style="width: 240px"
+              >
+                <el-option
+                    v-for="item in option.options"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                />
+              </el-select>
+              <el-button :loading="loading" @click="modifyArticle" style="margin-left: 10px">改写</el-button>
+            </div>
+            <el-divider></el-divider>
+            <div style="padding: 20px;background: var(--main-color);margin-bottom: 10px" v-html="article.modifyContent"></div>
+            <FuncButton @click="sureModify" :message="'确定修改'"></FuncButton>
+          </div>
+        </template>
+      </el-dialog>
+    </el-scrollbar>
   </div>
 </template>
 <script setup>
@@ -109,13 +143,14 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import {inject, onBeforeUnmount, onMounted, reactive, ref, shallowRef} from "vue";
 import FuncButton from "@/components/common/button/FuncButton.vue";
 import axios from "axios";
-import { getToken} from "@/util/util.js";
+import {getToken, isEmpty} from "@/util/util.js";
 import ArticleCropper from "@/components/common/cropper/ArticleCropper.vue";
 import {doGet, doPost, doPut} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {Validator} from "@/util/validator.js";
 import {useRoute} from "vue-router";
 import Draft from "@/components/dashboard/article/Draft.vue";
+const dialogVisible = ref(false);
 //Editor 组件用于创建编辑器实例，并通过 defaultConfig 选项配置默认设置
 const editor = shallowRef(null);
 //文章数据
@@ -127,6 +162,7 @@ let article = reactive({
   cover: [],
   type:'',
   tag:'',
+  modifyContent:'',
 })
 let tags = reactive([{
   name:'',
@@ -138,9 +174,43 @@ let name = ref('');
 //父组件获得的数据
 let color = inject('color');
 let user = inject('user');
+let loading = ref(false);
 const route = useRoute();
 const params = route.params;
-
+let option = reactive({
+  options:[
+    '记叙风格','议论风格','描写风格','抒情风格','幽默风格','讽刺风格','古典风格'
+  ],
+  selected:'记叙风格'
+})
+const modifyArticle = () => {
+  const fd = new FormData();
+  fd.append('content',editor.value.getHtml())
+  fd.append('type',option.selected)
+  // const loadingInstance = ElLoading.service({ fullscreen: true })
+  loading.value = true;
+  doPost('/gpt/modifyArticle',fd).then((resp) => {
+    // loadingInstance.close();
+    loading.value = false;
+    if(resp.data.code === 1){
+      var content = resp.data.data.choices[0].message.content;
+      article.modifyContent = content.substring(2,content.length-2);
+    }else{
+      ElMessage.error("服务端繁忙");
+    }
+  })
+}
+const sureModify = () => {
+  if(isEmpty(article.modifyContent)){
+    ElMessage.error("请先点击改写按钮");
+    return;
+  }
+  article.content = article.modifyContent;
+  editor.value.setHtml(article.content);
+  dialogVisible.value = false;
+  article.modifyContent = '';
+  option.selected = option.options[0];
+}
 //编辑器配置（即文本框的内容）
 const editorConfig = {
   // MENU_CONF:{},
@@ -162,10 +232,10 @@ const editorConfig = {
 // 隐藏部分工具
 const toolbarConfig = {
   excludeKeys: [
-      'group-video',
-      'fullScreen',
-      'color',
-      'bgColor'
+    'group-video',
+    'fullScreen',
+    'color',
+    'bgColor'
   ]
 }
 
@@ -307,16 +377,21 @@ const getArticle = () => {
 const produceDescription = () => {
   // const fd = new FormData();
   // fd.append("content",editor.value.getText())
+  // const loadingInstance = ElLoading.service({ fullscreen: true })
+  loading.value = true;
   doGet("/gpt/description",{
     id:user.id,
     content:editor.value.getText()
   }).then((resp) => {
+    loading.value = false;
+    // loadingInstance.close();
     if(resp.data.code === 1){
       article.description = resp.data.data;
     }else{
       ElMessage.error(resp.data.msg);
     }
   });
+
 }
 
 
@@ -351,7 +426,9 @@ const getArticleFd = (isArticle) => {
 /*  display: flex;*/
 
 /*}*/
-
+body{
+  font-family: Roboto;
+}
 
 .buttonDiv{
   display: flex;

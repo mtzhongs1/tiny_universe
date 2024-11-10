@@ -28,7 +28,7 @@
           <div v-else style="opacity: 0.5">当前收藏夹暂无数据 Σ(°ロ°)</div>
         </el-collapse-item>
       </el-collapse>
-      <el-space :size="50">
+      <el-space :size="50" style="margin-top: 50px">
         <el-button v-if="article" @click="doCollection">确定</el-button>
       </el-space>
     </div>
@@ -183,6 +183,7 @@ watch(() => user.id,(userId) => {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  font-size: 20px;
 }
 /* 解决标题太长问题 */
 :deep(.el-collapse-item__header){

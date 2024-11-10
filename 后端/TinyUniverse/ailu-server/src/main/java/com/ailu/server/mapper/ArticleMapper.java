@@ -57,4 +57,6 @@ public interface ArticleMapper {
 
 
     Page<ArticleAndActiveVO> pageQueryArticleByIds(@Param(value="articleScoreDTOs") List<ArticleScoreDTO> articleScoreDTOs, @Param(value = "tag") Integer tag);
+
+    Page<ArticleAndActiveVO> search(String name, int type);
 }

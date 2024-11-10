@@ -2,7 +2,6 @@ package com.ailu.server.service.collection;
 
 import com.ailu.dto.collection.CollectionDTO;
 import com.ailu.entity.Collections;
-import com.ailu.result.PageResult;
 
 import java.util.List;
 

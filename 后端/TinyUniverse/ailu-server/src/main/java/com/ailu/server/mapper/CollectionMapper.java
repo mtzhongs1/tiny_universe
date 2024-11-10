@@ -4,7 +4,6 @@ import com.ailu.dto.collection.CollectionDTO;
 import com.ailu.entity.Collections;
 import com.ailu.server.aop.AutoFill;
 import com.ailu.server.aop.InsertOrUpdate;
-import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

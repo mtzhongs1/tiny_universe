@@ -1,8 +1,8 @@
 package com.ailu.server.schedule;
 
 import com.ailu.dto.article.ArticleTextDTO;
-import com.ailu.server.util.RedisCache;
 import com.ailu.server.mapper.ArticleMapper;
+import com.ailu.server.util.RedisCache;
 import com.ailu.util.DocUtils;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -30,7 +30,7 @@ public class SearchTask {
     private ArticleMapper articleMapper;
 
     //TODO:基于分词+倒排索引存储到redis
-    @XxlJob("tokenizedInvertedInRedis")
+    // 待放开：@XxlJob("tokenizedInvertedInRedis")
     public void tokenizedInvertedInRedis(){
         //先删除原本的缓存
         redisCache.deleteObject("article_word");

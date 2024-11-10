@@ -2,7 +2,6 @@ package com.ailu.server.controller.collection;
 
 import com.ailu.dto.collection.CollectionDTO;
 import com.ailu.entity.Collections;
-import com.ailu.result.PageResult;
 import com.ailu.result.Result;
 import com.ailu.server.service.collection.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;

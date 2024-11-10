@@ -66,6 +66,7 @@ export function setCssVariable(theme,color){
         color.shadow_color = getCssVariable('--shadow-white-color');
         color.comment_color = getCssVariable('--comment-white-color');
         color.compare_color = getCssVariable('--compare-white-color');
+        color.main_bg_color = getCssVariable('--main-white-bg-color');
     }else{
         //夜晚
         color.header_color = getCssVariable('--header-black-color');
@@ -77,6 +78,7 @@ export function setCssVariable(theme,color){
         color.shadow_color = getCssVariable('--shadow-black-color');
         color.comment_color = getCssVariable('--comment-black-color');
         color.compare_color = getCssVariable('--compare-black-color');
+        color.main_bg_color = getCssVariable('--main-black-bg-color');
     }
     setProperty('--header-color',color.header_color);
     setProperty('--main-color',color.main_color);
@@ -87,6 +89,7 @@ export function setCssVariable(theme,color){
     setProperty('--shadow-color',color.shadow_color);
     setProperty('--comment-color',color.comment_color);
     setProperty('--compare-color',color.compare_color)
+    setProperty('--main-bg-color',color.main_bg_color);
 }
 
 export const reloadUtil = (isRouterAlive) => {
