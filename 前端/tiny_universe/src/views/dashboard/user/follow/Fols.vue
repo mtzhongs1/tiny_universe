@@ -47,7 +47,7 @@ onMounted(() => {
   getFols();
 })
 const toUser = (id) => {
-  newRoute('/dashboard/user_detail/article_view/'+id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
 const handleCurrentChange = (val) => {
   page.pageNum = val;

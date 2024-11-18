@@ -22,7 +22,7 @@ let user = ref(props.user);
 const router = useRouter();
 let userActive = inject('userActive')
 function toUser(){
-  newRoute('/dashboard/user_detail/article_view/'+user.value.id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+user.value.id,router);
 }
 const toFol = () => {
   newRoute('/dashboard/user_detail/follow/fols/'+user.value.id,router);

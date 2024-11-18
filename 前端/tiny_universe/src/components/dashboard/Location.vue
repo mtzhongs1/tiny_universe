@@ -13,7 +13,7 @@
 
     <!--@select="handleSelect" -->
       <el-menu-item @click="toUserDetail(user.id)" id="username">
-        <h1 style="font-size: 24px">{{user.username}}</h1>
+        <h1>{{user.username}}</h1>
       </el-menu-item>
 
       <div class="flex-grow" />
@@ -88,6 +88,7 @@ const menuItems = [
   //TODO：动态渲染图标
   {name:'首页',path:'/dashboard',icon:ElIcons['HomeFilled']},
   {name:'娱乐',path:'/dashboard/entertainment',icon:ElIcons['Camera']},
+  {name:'动态',path:'/dashboard/moment',icon:ElIcons['User']},
   {name:'文章',path:'/dashboard/article',icon:ElIcons['EditPen']},
   {name:'收藏',path:'/dashboard/collection',icon:ElIcons['StarFilled']},
   {name:'其他',path:'/dashboard/other/bottle',icon:ElIcons['MoreFilled']},
@@ -96,7 +97,7 @@ const menuItems = [
 // const router = useRouter();
 
 const toUserDetail = (id) => {
-  newRoute('/dashboard/user_detail/article_view/'+id,router);
+  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
 }
 const updateValue = (value) => {
   content.value = value;

@@ -41,6 +41,7 @@
         >
           <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
           <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->
+          <el-menu-item :index="'/dashboard/user_detail/shuo_shuo/'+params.id">动态</el-menu-item>
           <el-menu-item :index="'/dashboard/user_detail/article_view/'+params.id">文章</el-menu-item>
           <el-menu-item :index="'/dashboard/user_detail/collection_view/'+params.id">收藏</el-menu-item>
           <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+params.id">社交</el-menu-item>
@@ -108,7 +109,7 @@ const getUser = async () => {
 provide("userId",params.id);
 const toUserMessage = () => {
   router.push("/dashboard/user")
-  // newRoute('/dashboard/user_detail/article_view/'+params.id,router);
+  // newRoute('/dashboard/user_detail/shuo_shuo/'+params.id,router);
 }
 
 const follow = () => {

@@ -27,7 +27,6 @@
       </a>
     </div>
   </div>
-  <el-button @click="setMessage('你好',1000)">回答消息</el-button>
 <!--  <el-button class="file-box" text>-->
 <!--    <el-button @click="uploadFile"></el-button>-->
 <!--  </el-button>-->
@@ -35,7 +34,7 @@
 <script setup>
 
 //导入区
-import {onMounted, ref, reactive, provide, computed, inject} from 'vue';
+import {onMounted, ref, reactive, provide, computed} from 'vue';
 import {doGet} from '@/http/httpRequest.js'
 // TODO：导入资源
 import Location from '@/components/dashboard/Location.vue';
@@ -43,15 +42,12 @@ import Setting from "@/components/dashboard/Setting.vue";
 import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {isEmpty, setCssVariable, setProperty} from "@/util/util.js";
 import {ElMessage} from "element-plus";
-import KanBan from "@/components/dashboard/KanBan.vue";
-import {setMessageBox} from "live2d-render";
 
 //生命周期区
 onMounted(() => {
   getImages();
   switchTheme();
   getUser();
-
 })
 
 
@@ -168,7 +164,7 @@ let color = reactive({
 provide("user", user);
 provide("color", color);
 provide("userActive",userActive);
-const setMessage = inject("setMessage");
+
 </script>
 
 <style scoped>
@@ -233,9 +229,6 @@ const setMessage = inject("setMessage");
   min-height: 100vh;
   overflow: hidden;
   background: var(--main-bg-color);
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
 }
 
 .footer {
