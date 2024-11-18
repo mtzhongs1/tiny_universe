@@ -9,6 +9,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 const app = createApp(App)
 import './index.css'
+import './styles/preflight.css'
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)

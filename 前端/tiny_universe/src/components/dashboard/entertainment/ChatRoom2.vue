@@ -192,7 +192,7 @@ const onMessage = (event) => {
 }
 
 const toUser = (userId) => {
-  newRoute('/dashboard/user_detail/shuo_shuo/'+userId,router);
+  newRoute('/dashboard/user_detail/article_view/'+userId,router);
 }
 
 const getUsers = () => {
@@ -214,6 +214,9 @@ const getUsers = () => {
 </script>
 
 <style scoped>
+p{
+  color: white;
+}
 .wave-animation {
   animation: wave 5s linear infinite;
   transform-origin: center;

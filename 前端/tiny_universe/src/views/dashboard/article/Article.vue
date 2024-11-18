@@ -44,10 +44,11 @@
             <!--TODO：key解决在同一组件只改变路由参数而不刷新组件的问题-->
             <router-view :key="route.path" :reloadArticleList="reloadArticleList" v-if="isViewAlive"></router-view>
           </div>
-          <el-space :size="50" direction="vertical" style="position: fixed;top: 130px">
-            <img src="@/assets/海报3.png" alt="" width="200px"/>
-            <img src="@/assets/海报4.png" alt="" width="200px"/>
-          </el-space>
+<!--          TODO:待修改-->
+<!--          <el-space :size="50" direction="vertical" style="position: fixed;top: 130px">-->
+<!--            <img src="@/assets/海报3.png" alt="" width="200px"/>-->
+<!--            <img src="@/assets/海报4.png" alt="" width="200px"/>-->
+<!--          </el-space>-->
         </el-space>
       </el-main>
     </el-container>

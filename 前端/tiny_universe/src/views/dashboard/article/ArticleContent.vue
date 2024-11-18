@@ -15,7 +15,7 @@
     <div class="center-div">
       <div class="article-detail">
         <div class="header">
-          <h1>{{ article.title }}</h1>
+          <h1 style="font-size: 24px">{{ article.title }}</h1>
           <p class="meta">
             <span>{{ article.author }}</span>
             <span>{{ article.createTime }}</span>
@@ -59,8 +59,9 @@
               </el-anchor-link>
             </el-anchor>
           </div>
-          <img src="@/assets/海报1.png" alt="" width="250px"/>
-          <img src="@/assets/海报2.png" alt="" width="250px"/>
+<!--TODO:待修改          -->
+<!--          <img src="@/assets/海报1.png" alt="" width="250px"/>-->
+<!--          <img src="@/assets/海报2.png" alt="" width="250px"/>-->
         </div>
         <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
           <template #footer>
@@ -231,7 +232,7 @@ const follow = () => {
   })
 }
 const toUserDetail = (id) => {
-  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
+  newRoute('/dashboard/user_detail/article_view/'+id,router);
 }
 
 const closeColDialog = (collections) => {
