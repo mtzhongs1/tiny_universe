@@ -155,7 +155,7 @@ provide('reload',reload);
 }
 .user-header{
   padding: 20px;
-  background: var(--main-beside-color);
+  background: var(--article-bg-color);
 }
 .collection {
   text-align: center;

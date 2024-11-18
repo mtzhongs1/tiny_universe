@@ -207,7 +207,7 @@ body{
   font-family: Roboto;
 }
 .article {
-  background: var(--main-beside-color);
+  background: var(--article-bg-color);
   padding: 20px 20px;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
 }

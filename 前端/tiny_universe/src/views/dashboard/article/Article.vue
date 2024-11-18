@@ -140,7 +140,7 @@ body{
 .article-list{
   padding: 10px 25px;
   position: relative;
-  background: var(--main-beside-color);
+  background: var(--article-bg-color);
   display: flex;
   flex-direction: column;
   width:1000px;

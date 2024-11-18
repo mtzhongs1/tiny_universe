@@ -27,6 +27,6 @@ provide('reload',reload);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background: var(--main-beside-color);
+  background: var(--article-bg-color);
 }
 </style>

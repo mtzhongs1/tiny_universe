@@ -46,29 +46,5 @@ provide("setMessage",setMessage);
 header {
   line-height: 1.5;
 }
-#live2dMessageBox-content {
-    background-color: #FF95BC;
-    color: white;
-    font-family: var(--base-font);
-    padding: 10px;
-    height: fit-content;
-    border-radius: .7em;
-    word-break: break-all;
-    border-right: 1px solid transparent;
-}
 
-.live2dMessageBox-content-hidden {
-    opacity: 0;
-    transform: scaleY(0.2);
-    transition: all 0.35s ease-in;
-    -moz-transition: all 0.35s ease-in;
-    -webkit-transition: all 0.35s ease-in;
-}
-
-.live2dMessageBox-content-visible {
-    opacity: 1;
-    transition: all 0.35s ease-out;
-    -moz-transition: all 0.35s ease-out;
-    -webkit-transition: all 0.35s ease-out;
-}
 </style>
