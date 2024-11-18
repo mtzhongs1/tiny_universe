@@ -139,7 +139,7 @@ body{
 .article-list{
   padding: 10px 25px;
   position: relative;
-  background: var(--article-bg-color);
+  background: var(--main-beside-color);
   display: flex;
   flex-direction: column;
   width:1000px;

@@ -42,6 +42,7 @@ import Setting from "@/components/dashboard/Setting.vue";
 import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {isEmpty, setCssVariable, setProperty} from "@/util/util.js";
 import {ElMessage} from "element-plus";
+import KanBan from "@/components/dashboard/KanBan.vue";
 
 //生命周期区
 onMounted(() => {

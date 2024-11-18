@@ -199,7 +199,7 @@ provide("closeColDialog", closeColDialog)
 <style scoped>
 .article {
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
-  background: var(--article-bg-color);
+  background: var(--main-beside-color);
   padding: 20px 20px;
 }
 

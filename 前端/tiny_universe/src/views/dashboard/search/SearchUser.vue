@@ -95,7 +95,7 @@ const follow = (user) => {
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
-  background: var(--article-bg-color);
+  background: var(--main-beside-color);
   margin-bottom: 20px;
 }
 .followers{
