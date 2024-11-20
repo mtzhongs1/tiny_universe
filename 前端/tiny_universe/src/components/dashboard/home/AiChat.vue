@@ -6,7 +6,7 @@
 <!--          <div class = "switchAssistant" @click="listAssistant">切换助理</div>-->
           <el-space direction="vertical">
             <img src="@/assets/机器人.svg" alt="" width="20px">
-            <span class="font text">学习小助理</span>
+            <span class="font text">miku</span>
           </el-space>
         </div>
       </div>
@@ -20,7 +20,7 @@
               <!--TODO:根据不同情况绑定class类选择对应的样式-->
               <div class="message-content" :class="message.self ? 'rightMessage' : 'leftMessage'">
                 <div style="display: flex" :class="message.self ? 'rightUser' : 'leftUser'">
-                  <p class="username"> {{message.self?'我':'学习小助理'}} </p>
+                  <p class="username"> {{message.self?'我':'miku'}} </p>
                 </div>
                 <div v-if="!isEmpty(message.urls)">
                   <img v-for="(url, index) in message.urls" :key="index" class="content" :src="url" alt="" style="width: 365px;">

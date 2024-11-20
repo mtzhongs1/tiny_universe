@@ -44,9 +44,9 @@
             <!--TODO：key解决在同一组件只改变路由参数而不刷新组件的问题-->
             <router-view :key="route.path" :reloadArticleList="reloadArticleList" v-if="isViewAlive"></router-view>
           </div>
-          <el-space :size="50" direction="vertical" style="position: fixed;top: 130px">
-            <img src="@/assets/海报3.png" alt="" width="200px"/>
-            <img src="@/assets/海报4.png" alt="" width="200px"/>
+          <el-space class="imgObj" :size="50" direction="vertical" style="position: fixed;top: 130px">
+            <img src="@/assets/海报1.png" alt="" width="350"/>
+            <img src="@/assets/海报2.png" alt="" width="350"/>
           </el-space>
         </el-space>
       </el-main>
@@ -96,6 +96,11 @@ provide("tag",onTag);
 <style>
 body{
   font-family: Roboto;
+}
+
+.imgObj img{
+  max-width: 350px;
+  min-width: 350px;
 }
 .article-all{
   position: relative;

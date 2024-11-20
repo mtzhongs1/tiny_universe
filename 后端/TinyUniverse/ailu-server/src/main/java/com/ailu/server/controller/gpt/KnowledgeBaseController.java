@@ -83,6 +83,7 @@ public class KnowledgeBaseController{
         DocumentSplitter documentSplitter = DocumentSplitters.recursive(
                 parameters.get(segmentSize),parameters.get(overlapSize), new OpenAiTokenizer(GPT_3_5_TURBO));
         // TODO:构建嵌入存储导入器，用于处理文档段落的向量化和存储
+        ragProperties.init(uuid,null);
         EmbeddingStoreIngestor embeddingStoreIngestor = EmbeddingStoreIngestor.builder()
                 .documentSplitter(documentSplitter)
                 .embeddingModel(ragProperties.getEmbeddingModel())

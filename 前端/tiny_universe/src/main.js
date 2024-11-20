@@ -10,6 +10,7 @@ import 'element-plus/dist/index.css'
 const app = createApp(App)
 import './index.css'
 app.use(createPinia())
+import './styles/preflight.css'
 app.use(router)
 app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

@@ -193,7 +193,7 @@ const modifyArticle = () => {
     // loadingInstance.close();
     loading.value = false;
     if(resp.data.code === 1){
-      var content = resp.data.data.choices[0].message.content;
+      var content = resp.data.data;
       article.modifyContent = content.substring(2,content.length-2);
     }else{
       ElMessage.error("服务端繁忙");

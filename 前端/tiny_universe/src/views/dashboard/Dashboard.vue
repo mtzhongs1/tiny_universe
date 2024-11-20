@@ -34,7 +34,7 @@
 <script setup>
 
 //导入区
-import {onMounted, ref, reactive, provide, computed} from 'vue';
+import {onMounted, ref, reactive, provide, computed, inject} from 'vue';
 import {doGet} from '@/http/httpRequest.js'
 // TODO：导入资源
 import Location from '@/components/dashboard/Location.vue';
@@ -42,7 +42,6 @@ import Setting from "@/components/dashboard/Setting.vue";
 import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {isEmpty, setCssVariable, setProperty} from "@/util/util.js";
 import {ElMessage} from "element-plus";
-import KanBan from "@/components/dashboard/KanBan.vue";
 
 //生命周期区
 onMounted(() => {
@@ -50,7 +49,6 @@ onMounted(() => {
   switchTheme();
   getUser();
 })
-
 
 //变量区
 // TODO:轮播图切换
@@ -165,6 +163,7 @@ let color = reactive({
 provide("user", user);
 provide("color", color);
 provide("userActive",userActive);
+const setMessage = inject("setMessage");
 
 </script>
 
@@ -230,6 +229,9 @@ provide("userActive",userActive);
   min-height: 100vh;
   overflow: hidden;
   background: var(--main-bg-color);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .footer {
@@ -243,5 +245,19 @@ provide("userActive",userActive);
   display: flex;
   justify-content: center;
 }
-
+.__live2d-toolbox-item {
+    margin: 2px;
+    padding: 2px;
+    display: flex;
+    height: 20px;
+    width: 20px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+    background-color: rgb(255, 149, 188);
+    color: white;
+    border-radius: 0.9em;
+    transition: .5s ease;
+}
 </style>

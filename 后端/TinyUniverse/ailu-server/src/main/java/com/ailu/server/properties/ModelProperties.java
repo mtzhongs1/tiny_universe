@@ -18,4 +18,12 @@ public class ModelProperties {
     public static final String GLM_4 = Constants.ModelChatGLM4;
     //免费模型
     public static final String GLM_4_FLASH = "glm-4-flash";
+
+
+     /**
+     *千问
+     */
+     public static final String QWEN_KEY = "sk-1719a3c98c3f40c59b056ec988068a03";
+     public static final String QWEN_MAX = "qwen-max";
+
 }

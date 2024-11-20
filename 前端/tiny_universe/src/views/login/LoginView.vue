@@ -26,7 +26,7 @@
             <input name="email" id="email" v-model = "user.email" type="text" placeholder="email">
             <span>
             <label v-show="false" for="code"></label>
-						<input name="code" id="code" v-model = "user.code" style="width: 55px;" type="text" placeholder="code">
+						<input name="code" id="code" v-model = "user.code" style="width: 55px;margin-right: 10px" type="text" placeholder="code">
 						<button :disabled="codeProp.isTimerActive" @click="sendCode" class="sendBtn">
 							<span class="button_top"> {{ codeProp.msg }} </span>
 						</button>
@@ -233,6 +233,12 @@ h1 {
 	color: rgb(0, 0, 0);
 }
 
+input,
+::before,
+::after{
+  box-sizing: unset; /* 1 */
+  border-width: 0; /* 2 */
+}
 
 .logon {
 

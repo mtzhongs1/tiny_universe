@@ -34,9 +34,9 @@
         <div v-else-if="isObject === 1">
           <div class="problem-list">
             <p style="margin-right: 50px">题目：{{problem.content}}</p>
-            <p style="margin-top: 20px">A：{{problem.a}}</p>
-            <p>B：{{problem.b}}</p>
-            <p>C：{{problem.c}}</p>
+            <p style="margin-top: 20px">A：{{problem.A}}</p>
+            <p>B：{{problem.B}}</p>
+            <p>C：{{problem.C}}</p>
           </div>
           <div class="select-option">
             <div style="white-space: nowrap">选择:</div>
@@ -56,9 +56,9 @@
             <p class="next-item" @click="nextProblem">{{index === 4 ? '完成' : '下一题'}}</p>
           </div>
           <div v-show="isCommited" style="margin-top: 100px;padding: 50px">
-            <el-icon :color="'red'" class="redI" v-if="option.selected !== problem.t"><CloseBold /></el-icon>
+            <el-icon :color="'red'" class="redI" v-if="option.selected !== problem.T"><CloseBold /></el-icon>
             <el-icon :color="'yellow'" class="redI" v-else><Select /></el-icon>
-            <p>答案解析：{{problem.p}}</p>
+            <p>答案解析：{{problem.P}}</p>
           </div>
         </div>
         <div v-else>
@@ -78,6 +78,7 @@
 import {reactive, ref} from "vue";
 import {ElLoading, ElMessage} from "element-plus";
 import {getTokenName} from "@/util/util.js";
+
 let isObject = ref(0);
 const isDialogAlive = ref(false);
 let isCommited = ref(false);
@@ -97,11 +98,11 @@ let scores = reactive({
 let index = ref(0);
 let problem = reactive({
   content: '',
-  a:'',
-  b:'',
-  c:'',
-  t:'',
-  p:'',
+  A:'',
+  B:'',
+  C:'',
+  T:'',
+  P:'',
   type:'',
 })
 const evaluate = {
@@ -113,7 +114,7 @@ const evaluate = {
 };
 const commit = () => {
   isCommited.value = true;
-  scores[index.value] = option.selected !== problem.t ? 0 : 25;
+  scores[index.value] = option.selected !== problem.T ? 0 : 25;
 }
 const closeDialog = () => {
   isDialogAlive.value = false;
@@ -122,8 +123,9 @@ const closeDialog = () => {
   closeProblem();
 }
 const closeProblem = () => {
-  Object.assign(problem,{content:'',a:'',b:'',c:'',t:'',p:''})
+  Object.assign(problem,{content:'',A:'',B:'',C:'',T:'',P:''})
   option.selected = 'A';
+  problemData = '';
   isCommited.value = false;
 }
 const startLearn = () => {
@@ -147,6 +149,7 @@ const nextProblem = () => {
   index.value++;
   toProblem(problem.type);
 }
+let problemData = '';
 const toProblem = (type) => {
   const loadingInstance = ElLoading.service();
   isObject.value = 1;
@@ -166,29 +169,46 @@ const toProblem = (type) => {
   //   Object.assign(problem,JSON.parse(event.data))
   // })
   eventSource.onmessage = function (event) {
-    var data = event.data.replace(/"/g, '');
-    let split = data.split(":");
-    switch (split[0]){
-      case 'content':
-        problem.content = split[1];
-        break;
-      case 'A':
-        problem.a = split[1];
-        break;
-      case 'B':
-        problem.b = split[1];
-        break;
-      case 'C':
-        problem.c = split[1];
-        break;
-      case 'T':
-        problem.t = split[1];
-        break;
-      case 'P':
-        problem.p = split[1];
-        break;
+    problemData += event.data.replace(/"/g, '');
+    const matches = problemData.match(/\[\[(\w+):([^\]]+)\]\]/g);
+    const result = {};
+    if(matches != null){
+      matches.forEach(match => {
+        // 去掉外面的 [[]]
+        const cleanMatch = match.slice(2, -2);
+        // 分割关键字和值
+        const [key, value] = cleanMatch.split(':');
+        // 存储到结果对象中
+        result[key] = value;
+      })
     }
-    console.log(problem);
+    console.log(result);
+    Object.assign(problem,result);
+
+    // var data = event.data.replace(/"/g, '');
+    // problemData += data;
+    //
+    // let split = data.split(":");
+    // switch (split[0]){
+    //   case 'content':
+    //     problem.content = split[1];
+    //     break;
+    //   case 'A':
+    //     problem.a = split[1];
+    //     break;
+    //   case 'B':
+    //     problem.b = split[1];
+    //     break;
+    //   case 'C':
+    //     problem.c = split[1];
+    //     break;
+    //   case 'T':
+    //     problem.t = split[1];
+    //     break;
+    //   case 'P':
+    //     problem.p = split[1];
+    //     break;
+    // }
   }
   eventSource.onopen = function () {
     console.log("连接成功");

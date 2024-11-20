@@ -1,6 +1,14 @@
 package com.ailu.server.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.validation.constraints.NotNull;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description:
@@ -11,8 +19,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ThreadPoolExecutorFactory {
 
-    // @Bean
-    // public ThreadPoolExecutor freeThreadPoolExecutor(){
+    // @Bean(name = "threadPoolExecutor1")
+    // public ThreadPoolExecutor threadPoolExecutor(){
     //     //线程工厂
     //     ThreadFactory threadFactory = new ThreadFactory() {
     //         @Override
@@ -23,17 +31,6 @@ public class ThreadPoolExecutorFactory {
     //             return thread;
     //         }
     //     };
-    //     return new ThreadPoolExecutor(1,2,100, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>(4),threadFactory);
-    // }
-
-    // @Bean ThreadPoolExecutor vipThreadPoolExecutor() {
-    //     //线程工厂
-    //     ThreadFactory threadFactory = new ThreadFactory() {
-    //         @Override
-    //         public Thread newThread(@NotNull Runnable r) {
-    //             return new Thread(r);
-    //         }
-    //     };
-    //     return new ThreadPoolExecutor(2,4,100, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>(4),threadFactory);
+    //     return new ThreadPoolExecutor(4,8,100, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>(4),threadFactory);
     // }
 }

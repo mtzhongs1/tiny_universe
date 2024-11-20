@@ -66,7 +66,6 @@ const router = createRouter({
           component:UserDetail,
           children:[
             {path: 'article_view/:userId',name:'ArticleView',component:ArticleView},
-            {path: 'shuo_shuo/:id',name:'ShuoShuo',component:ShuoShuo},
             {path: 'collection_view/:id',name:'CollectionView',component:CollectionView},
             {path: 'follow',name:'Follow',component:Follow,
               children: [

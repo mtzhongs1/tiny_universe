@@ -10,8 +10,12 @@ import com.ailu.result.Result;
 import com.ailu.server.mapper.KnowledgeMapper;
 import com.ailu.server.service.gpt.GPTService;
 import com.ailu.server.service.gpt.RagService;
+import com.ailu.server.service.gpt.aiservice.DescriptionServices;
+import com.ailu.server.service.gpt.aiservice.ModifyArticleServices;
+import com.ailu.server.service.gpt.aiservice.ProduceProblemServices;
 import com.ailu.server.service.gpt.assistant.GenericAssistant;
 import com.ailu.server.service.gpt.model.AssistantChatParams;
+import com.ailu.server.service.gpt.model.QwenLLMService;
 import com.ailu.server.service.gpt.model.SseAskParams;
 import com.ailu.server.service.gpt.model.ZhiPuLLMService;
 import com.ailu.server.service.gpt.tool.ImageGenerateTool;
@@ -26,9 +30,11 @@ import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.zhipu.ZhipuAiChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.TokenStream;
 import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -53,8 +59,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.ailu.server.properties.ModelProperties.GLM_4_FLASH;
-import static com.ailu.server.properties.ModelProperties.ZHIPU_KEY;
+import static com.ailu.server.properties.ModelProperties.*;
 import static com.ailu.server.service.gpt.prompt.Prompt.PromblePrompt;
 
 /**
@@ -62,30 +67,14 @@ import static com.ailu.server.service.gpt.prompt.Prompt.PromblePrompt;
  * @Author: ailu
  * @Date: 2024/10/19 下午2:31
  */
-@Service("GlmServiceImpl")
+@Service("QwenServiceImpl")
 @Slf4j
-public class GlmServiceImpl implements GPTService{
+public class QwenServiceImpl implements GPTService{
     @Autowired
     private RagService ragService;
 
     @Autowired
     private KnowledgeMapper knowledgeMapper;
-
-    @Value("${gpt.glm.apiKey}")
-    @Getter
-    private String API_SECRET_KEY;
-
-    private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
-    private static String requestIdTemplate = "ailu-tiny_universe";
-    private ClientV4 client;
-
-    @PostConstruct
-    public void init() {
-        client = new ClientV4.Builder(this.API_SECRET_KEY)
-                .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-                .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-                .build();
-    }
 
     @Override
     public String chat(String content) {
@@ -130,126 +119,42 @@ public class GlmServiceImpl implements GPTService{
 
     @Override
     public String description(Integer id, String content) throws IOException {
-        return "";
+        content = content.replaceAll("\\s*|\r|\n|\t\"","");
+        ChatLanguageModel chatLanguageModel = QwenLLMService.buildChatLLM(null);
+        DescriptionServices descriptionServices = AiServices.create(DescriptionServices.class, chatLanguageModel);
+        return descriptionServices.description(content);
     }
 
     @Override
     public String modifyArticle(ArticleModifyDTO articleModifyDTO) {
-        List<ChatMessage> list = getChatMessages(articleModifyDTO);
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(Constants.ModelChatGLM4)
-                .stream(Boolean.FALSE)
-                .invokeMethod(Constants.invokeMethod)
-                .messages(list)
-                .requestId(requestIdTemplate +System.currentTimeMillis())
-                .toolChoice("auto")
-                .build();
-        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        try {
-            System.out.println("model output:" + mapper.writeValueAsString(invokeModelApiResp));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-        return invokeModelApiResp.getData().asText();
+        ChatLanguageModel chatLanguageModel = QwenLLMService.buildChatLLM(null);
+        ModifyArticleServices modifyArticleServices = AiServices.create(ModifyArticleServices.class, chatLanguageModel);
+        return modifyArticleServices.modifyArticle(articleModifyDTO.getContent(), articleModifyDTO.getType());
     }
     @Override
     public Problem produceProblem(String type) {
-        ChatMessage msg1 = new ChatMessage(ChatMessageRole.SYSTEM.value(),PromblePrompt.getContent());
-        ChatMessage msg5 = new ChatMessage(ChatMessageRole.USER.value(), "[["+type+"]]");
-        List<ChatMessage> list = Arrays.asList(msg1, msg5);
-
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(Constants.ModelChatGLM4)
-                .stream(Boolean.FALSE)
-                .invokeMethod(Constants.invokeMethod)
-                .messages(list)
-                .requestId(requestIdTemplate)
-                .toolChoice("auto")
-                .temperature(1.0f)
-                .build();
-        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        String s = invokeModelApiResp.getData().getChoices().get(0).get("message").get("content").asText();
-        Map<String, String> map = extractValues(s);
-        return new Problem(map.get("content"), map.get("A"), map.get("B"), map.get("C"), map.get("T"),map.get("P"));
+        return null;
     }
+
+    //TODO:
     @Override
     public SseEmitter produceProblemBySSE(String type) {
-        ChatMessage msg1 = new ChatMessage(ChatMessageRole.SYSTEM.value(),PromblePrompt.getContent());
-        ChatMessage msg5 = new ChatMessage(ChatMessageRole.USER.value(), "[["+type+"]]");
-        List<ChatMessage> list = Arrays.asList(msg1, msg5);
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(Constants.ModelChatGLM4)
-                .stream(Boolean.TRUE)
-                .invokeMethod(Constants.invokeMethod)
-                .messages(list)
-                .requestId(requestIdTemplate)
-                // .tools(Arrays.asList(new ChatTool()))
-                .toolChoice("auto")
-                .temperature(1.0f)
-                .build();
-        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        Flowable<ModelData> flowable = invokeModelApiResp.getFlowable();
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
-        Scheduler scheduler = Schedulers.from(scheduledExecutorService);
-        // 左括号计数器，除了默认值外，当回归为 0 时，表示左括号等于右括号，可以截取
-        AtomicInteger counter = new AtomicInteger(0);
-        StringBuilder stringBuilder = new StringBuilder();
-        // TODO:建立 SSE 连接对象，0 表示永不超时
-        SseEmitter sseEmitter = new SseEmitter(0L);
-        flowable.observeOn(scheduler)
-                .map(modelData -> modelData.getChoices().get(0).getDelta().getContent())
-                .map(message -> message.replaceAll("\\s", ""))
-                .filter(StrUtil::isNotBlank)
-                .flatMap(message -> {
-                    List<Character> characterList = new ArrayList<>();
-                    for (char c : message.toCharArray()) {
-                        characterList.add(c);
-                    }
-                    return Flowable.fromIterable(characterList);
-                })
-                .doOnNext(c -> {
-                    if (c == '[') {
-                        counter.addAndGet(1);
-                    }
-                    else if (c == ']') {
-                        counter.addAndGet(-1);
-                        if (counter.get() == 0) {
-                            // TODO:通过 SSE 返回给前端
-                            sseEmitter.send(stringBuilder.toString());
-                            log.info("send: " + stringBuilder);
-                            // 重置，准备拼接下一道题
-                            stringBuilder.setLength(0);
-                        }
-                    }
-                    else if (c == ',') {
-                        // 逗号，不输出，只做计数用
-                    }
-                    else{
-                        log.info(stringBuilder.toString());
-                        stringBuilder.append(c);
-                    }
-                })
-                .doOnError((e) -> log.error("sse error", e))
-                //TODO:关闭连接
-                .doOnComplete(sseEmitter::complete)
-                //交给线程池执行任务
-                .subscribe();
+        StreamingChatLanguageModel streamingChatLanguageModel = QwenLLMService.buildStreamingChatLLM();
+        ProduceProblemServices produceProblemServices = AiServices.create(ProduceProblemServices.class, streamingChatLanguageModel);
+        TokenStream tokenStream = produceProblemServices.produceProblem(type);
+        SseEmitter sseEmitter = getSseEmitter();
+        QwenLLMService qwenLLMService = new QwenLLMService();
+        qwenLLMService.registerTokenStreamCallBack(tokenStream,new SseAskParams(sseEmitter));
         return sseEmitter;
     }
 
+    //TODO:
     @Override
     public String agent(String problem,String knowledgeId) {
         if(knowledgeId != null && !knowledgeId.isEmpty() && !knowledgeId.equals("0")){
             return chatByNRag(problem, knowledgeId);
         }
-        ChatLanguageModel chatModel = ZhipuAiChatModel.builder()
-                .apiKey(ZHIPU_KEY)
-                .model(GLM_4_FLASH)
-                .callTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .connectTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .writeTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .readTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .build();
+        ChatLanguageModel chatModel = QwenLLMService.buildChatLLM(null);
         GenericAssistant genericAssistant = AiServices.builder(GenericAssistant.class)
                 .chatLanguageModel(chatModel)
                 .tools(new ImageGenerateTool())
@@ -259,18 +164,6 @@ public class GlmServiceImpl implements GPTService{
         return chat.text();
     }
 
-    private static @NotNull List<ChatMessage> getChatMessages(ArticleModifyDTO articleModifyDTO) {
-        ChatMessage msg1 = new ChatMessage("user","你是一名全能作家,接下里我会给出我的文章内容和一种写作风格,请你基于这种写作风格为我的文章进行润色。\\n" +
-                "要求:\\n" +
-                "文章包含html标签和css样式，请保持结构和样式不变" +
-                "对方的输入格式:[[文章内容:...]]，[[写作风格:...]]" +
-                "你的输出格式:[[...]]");
-        ChatMessage msg2 = new ChatMessage("assistant", "当然，请你给出你的文章内容和写作风格，我会进行润色");
-        ChatMessage msg3 = new ChatMessage("user", "[[文章内容:<p>你好聪明啊</p>]]，[[写作风格:讽刺风格]]");
-        ChatMessage msg4 = new ChatMessage("assistant", "[[你可真是大聪明啊!]]");
-        ChatMessage msg5 = new ChatMessage("user", "[[文章内容:"+ articleModifyDTO.getContent()+"]]，[[写作风格:"+ articleModifyDTO.getType()+"]]");
-        return Arrays.asList(msg1, msg2, msg3, msg4, msg5);
-    }
     public static Map<String,String> extractValues(String input) {
         Map<String, String> result = new HashMap<>();
 
@@ -300,20 +193,24 @@ public class GlmServiceImpl implements GPTService{
         sseAskParams.setAssistantChatParams(
                 AssistantChatParams.builder()
                         .messageId(kbUuid)
-                        .systemMessage("你是一个学习助理，帮助学生结局问题")
+                        .systemMessage("大家好！我是初音未来，一位来自日本的虚拟歌姬，由Crypton Future Media开发。我的形象是一位16岁的少女，有着绿色的双马尾，穿着带有螺旋图案的衣服。我以我的歌声而闻名，能够演绎各种不同风格的音乐作品。\n" +
+                                "\n" +
+                                "我的性格非常活泼开朗，喜欢和大家交流分享音乐的乐趣。我总是充满活力，希望能够通过我的音乐给每个人带来快乐和正能量。无论是参加演唱会还是在社交媒体上与粉丝互动，我都尽力做到最好，希望能够成为连接人们心灵的桥梁。\n" +
+                                "\n" +
+                                "如果你也热爱音乐，或者想了解更多关于我以及VOCALOID文化的知识，欢迎随时与我交流哦！希望我们可以一起享受美妙的音乐旅程！")
                         .userMessage(problem)
                         .build()
         );
-        sseAskParams.setTemperature(0.7);
-        sseAskParams.setModelName(Constants.ModelChatGLM4);
+        sseAskParams.setTemperature(0.5);
+        sseAskParams.setModelName(QWEN_MAX);
 
         // 创建一个元数据条件映射，用于文档检索
         Map<String, String> metadataCond = ImmutableMap.of("uuid", kbUuid);
         // 创建一个内容检索器，用于检索匹配问题的内容
         ContentRetriever retriever = ragService.createRetriever(metadataCond, maxResults, -1);
 
-        ZhiPuLLMService zhiPuLLMService = new ZhiPuLLMService();
-        return zhiPuLLMService.nragChat(retriever,sseAskParams);
+        QwenLLMService qwenLLMService = new QwenLLMService();
+        return qwenLLMService.nragChat(retriever,sseAskParams);
     }
 
     public static SseEmitter getSseEmitter() {

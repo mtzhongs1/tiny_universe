@@ -48,7 +48,7 @@ onBeforeMount(() => {
   getUsers();
 })
 const toUser = (id) => {
-  newRoute('/dashboard/user_detail/shuo_shuo/'+id,router);
+  newRoute('/dashboard/user_detail/article_view/'+id,router);
 }
 const handleCurrentChange = (val) => {
   page.pageNum = val;

@@ -117,7 +117,7 @@ const onMessage = (event) => {
 }
 
 const toUser = (userId) => {
-  newRoute('/dashboard/user_detail/shuo_shuo/'+userId,router);
+  newRoute('/dashboard/user_detail/article_view/'+userId,router);
 }
 
 const getUsers = (username) => {

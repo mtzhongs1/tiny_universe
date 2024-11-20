@@ -54,7 +54,7 @@ let props = defineProps(["comments","removeComment","parent"]);
 let user = inject("user");
 let reloadComment = inject("reloadComment");
 const toUser = (userId) => {
-  newRoute('/dashboard/user_detail/shuo_shuo/'+userId,router);
+  newRoute('/dashboard/user_detail/article_view/'+userId,router);
 }
 const doLove = (comment) => {
   doPostxwww("/comment/doLove",{

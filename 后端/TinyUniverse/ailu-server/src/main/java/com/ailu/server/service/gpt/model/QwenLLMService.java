@@ -6,6 +6,8 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.dashscope.QwenChatModel;
+import dev.langchain4j.model.dashscope.QwenStreamingChatModel;
 import dev.langchain4j.model.zhipu.ZhipuAiChatModel;
 import dev.langchain4j.model.zhipu.ZhipuAiStreamingChatModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
@@ -24,53 +26,41 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import static com.ailu.server.properties.ModelProperties.GLM_4_FLASH;
-import static com.ailu.server.properties.ModelProperties.ZHIPU_KEY;
+import static com.ailu.server.properties.ModelProperties.*;
 
 /**
- * @Description:
+ * @Description: 通义千问
  * @Author: ailu
  * @Date: 2024/10/17 下午7:48
  */
 @Accessors(chain = true)
 @Slf4j
-public class ZhiPuLLMService {
+public class QwenLLMService {
 
-    protected ChatLanguageModel buildChatLLM(SseAskParams sseAskParams) {
-        double temperature = 0.7;
-        String model = GLM_4_FLASH;
+    public static ChatLanguageModel buildChatLLM(SseAskParams sseAskParams) {
+        double temperature = 0.95;
+        String model = QWEN_MAX;
         if (null != sseAskParams && sseAskParams.getTemperature() > 0 && sseAskParams.getTemperature() <= 1) {
             temperature = sseAskParams.getTemperature();
             if(StringUtils.isNotBlank(sseAskParams.getModelName())){
                 model = sseAskParams.getModelName();
             }
         }
-        return ZhipuAiChatModel.builder()
-                .apiKey(ZHIPU_KEY)
-                .model(model)
-                .temperature(temperature)
-                .maxRetries(1)
-                .logRequests(true)
-                .logResponses(true)
-                .callTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .readTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .writeTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .connectTimeout(Duration.of(60000, ChronoUnit.MILLIS))
+        return QwenChatModel.builder()
+                .apiKey(QWEN_KEY)
+                .temperature((float) temperature)
+                .modelName(model)
+                .enableSearch(true)
                 .build();
+
     }
 
-    protected StreamingChatLanguageModel buildStreamingChatLLM() {
-        return ZhipuAiStreamingChatModel.builder()
-                .apiKey(ZHIPU_KEY)
-                .model(GLM_4_FLASH)
-                .temperature(0.7)
-                .topP(1.0)
-                .logRequests(true)
-                .logResponses(true)
-                .callTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .readTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .writeTimeout(Duration.of(60000, ChronoUnit.MILLIS))
-                .connectTimeout(Duration.of(60000, ChronoUnit.MILLIS))
+    public static StreamingChatLanguageModel buildStreamingChatLLM() {
+        return QwenStreamingChatModel.builder()
+                .apiKey(QWEN_KEY)
+                .temperature(0.7f)
+                .modelName(QWEN_MAX)
+                .enableSearch(true)
                 .build();
     }
 

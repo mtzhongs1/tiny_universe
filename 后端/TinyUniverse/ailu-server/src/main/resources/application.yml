@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8888
   servlet:
     session:
       cookie:
@@ -28,13 +28,14 @@ spring:
     host: ${ailu.redis.host}
     port: ${ailu.redis.port}
     password: ${ailu.redis.password}
+    user: ${ailu.redis.user}
   mail:
     host: smtp.qq.com  #SMTP服务器地址
-    username: xxx #登陆账号
-    password: xxx #登陆密码（或授权码）
+    username: 2568315961@qq.com #登陆账号
+    password: mwvwtpgypxjvdhic #登陆密码（或授权码）
     port: 587
     properties:
-      from: xxx #邮件发信人（即真实邮箱）
+      from: 2568315961@qq.com #邮件发信人（即真实邮箱）
 
   freemarker:
     # 启用 freemarker 模板
@@ -79,7 +80,7 @@ minio:
 
 ailu:
   jwt:
-    secret: ailu
+    secret: ailu0615061506150615061506150615061506150615
     expiration: 604800000
   search-types:
     article: articleDataSource
@@ -102,6 +103,12 @@ logging:
         service: info
         controller: info
 
+local:
+  files: /RAG/data/files/
+  images: /RAG/data/images/
+  tmp-images: /RAG/data/tmp_images/
+  chat-memory: /RAG/data/chat_memory/
+
 xxl:
   job:
     accessToken: ${xxl.job.accessToken}
@@ -115,9 +122,20 @@ xxl:
       logretentiondays: ${xxl.job.executor.logretentiondays}
       port: ${xxl.job.executor.port}
 
-qianfan:
-  appID: xxx
-  APIKey: xxx
-  SecretKey: xxx
+gpt:
+  llm:
+    qianfan: QianFanServiceImpl
+    glm: GlmServiceImpl
+    qwen: QwenServiceImpl
+  qianfan:
+    appID: 92565648
+    APIKey: 449k1dEkappNvotvX1Hmb6j3
+    SecretKey: mZcN7L8m0Qd8A7RKDtN9CNXncAAzrkaD
+  glm:
+    apiKey: a6ee26ccfb6592978252954fcdb8a45a.XQxJHb2VlpyoxECr
+  qwen:
+    apiKey: sk-1719a3c98c3f40c59b056ec988068a03
+
+
 
 

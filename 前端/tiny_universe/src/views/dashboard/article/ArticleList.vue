@@ -214,7 +214,6 @@ body{
   margin-bottom: 20px;
 }
 
-
 .title:hover {
   color: var(--common-color);
   cursor: pointer;

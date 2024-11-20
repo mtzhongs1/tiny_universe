@@ -28,50 +28,50 @@ public class GPTController {
 
     @GetMapping("/chat")
     public Result chat(String content) throws IOException{
-        GPTService qianFanServiceImpl = llmFactory.getLLMService("glm");
-        String chat = qianFanServiceImpl.chat(content);
+        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+        String chat = qwenServiceImpl.agent(content,null);
         return Result.success(chat);
     }
 
     @GetMapping("/description")
     public Result description(Integer id,String content) throws IOException {
-        GPTService qianFanServiceImpl = llmFactory.getLLMService("glm");
+        GPTService qianFanServiceImpl = llmFactory.getLLMService("qwen");
         String chat = qianFanServiceImpl.description(id,content);
         return Result.success(chat);
     }
 
     @PostMapping("/modifyArticle")
-    public Result<ModelData> modifyArticle(@RequestBody ArticleModifyDTO articleModifyDTO) {
-        GPTService glmServiceImpl = llmFactory.getLLMService("glm");
-        ModelData result = (ModelData) glmServiceImpl.modifyArticle(articleModifyDTO);
+    public Result<String> modifyArticle(@RequestBody ArticleModifyDTO articleModifyDTO) {
+        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+        String result = qwenServiceImpl.modifyArticle(articleModifyDTO);
         return Result.success(result);
     }
 
-    //TODO:同步调用
-    @GetMapping("/produceProblem")
-    public Result<Problem> produceProblem(String type) {
-        GPTService glmServiceImpl = llmFactory.getLLMService("glm");
-        return Result.success(glmServiceImpl.produceProblem(type));
-    }
+    // //TODO:同步调用
+    // @GetMapping("/produceProblem")
+    // public Result<Problem> produceProblem(String type) {
+    //     GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+    //     return Result.success(qwenServiceImpl.produceProblem(type));
+    // }
 
     //TODO:流式输出
     @GetMapping("/sse/produceProblem")
     public SseEmitter produceProblemBySSE(String type) {
-        GPTService glmServiceImpl = llmFactory.getLLMService("glm");
-        return glmServiceImpl.produceProblemBySSE(type);
+        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+        return qwenServiceImpl.produceProblemBySSE(type);
     }
 
     @GetMapping("/chatByRag")
     public SseEmitter chatByRAG(String kbUuid,String problem){
-        GPTService glmServiceImpl = llmFactory.getLLMService("glm");
-        return glmServiceImpl.chatByRag(problem,kbUuid);
+        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+        return qwenServiceImpl.chatByRag(problem,kbUuid);
 
     }
 
     @GetMapping("/agent")
     public Result agent(String problem,String knowledgeId){
-        GPTService glmServiceImpl = llmFactory.getLLMService("glm");
-        String resposne = glmServiceImpl.agent(problem,knowledgeId);
+        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+        String resposne = qwenServiceImpl.agent(problem,knowledgeId);
         return Result.success(resposne);
     }
 

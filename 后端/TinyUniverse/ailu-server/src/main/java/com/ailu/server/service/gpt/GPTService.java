@@ -17,7 +17,7 @@ public interface GPTService {
     String chat(String content) throws IOException;
     SseEmitter chatByRag(String problem, String kbUuid);
     String description(Integer id,String content) throws IOException;
-    Object modifyArticle(ArticleModifyDTO articleModifyDTO);
+    String modifyArticle(ArticleModifyDTO articleModifyDTO);
     Problem produceProblem(String type);
     SseEmitter produceProblemBySSE(String type);
 
