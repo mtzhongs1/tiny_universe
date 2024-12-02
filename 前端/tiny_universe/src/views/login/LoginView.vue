@@ -62,7 +62,7 @@
 
 import { doPost, doPostxwww } from '@/http/httpRequest';
 import { ElMessage } from 'element-plus';
-import { reactive, ref} from 'vue';
+import {inject, reactive, ref} from 'vue';
 import WowButton from '@/components/common/button/WowButton.vue';
 import { useRouter } from 'vue-router';
 import { setToken } from '@/util/util';

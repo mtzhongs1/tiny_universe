@@ -3,6 +3,7 @@ import { getTokenName, removeToken } from "../util/util";
 import { ElMessageBox } from "element-plus";
 
 //TODO:配置后端接口路径前缀
+// axios.defaults.baseURL = "http://120.46.95.186:8888/";
 axios.defaults.baseURL = "http://localhost:8888/";
 // axios.defaults.baseURL = "/api";
 

@@ -10,7 +10,7 @@
 
         <p style="opacity: 0.4;font-size: 18px">发表于{{article.createTime}}</p>
         <p v-if="article.description" v-html="article.description"></p>
-        <p v-else v-html="article.content"></p>
+        <p v-else v-html="md.render(article.content)"></p>
         <div class="coverStyle">
           <img style="height: 200px" v-for = "(cover,index) in article.cover" :key="index" :src="cover" alt=""/>
         </div>
@@ -59,10 +59,12 @@ import {useRoute} from "vue-router";
 import ColList from "@/components/dashboard/collection/ColList.vue";
 import CreateCol from "@/components/dashboard/collection/CreateCol.vue";
 import {isEmpty, reloadUtil} from "@/util/util.js";
+import MarkdownIt from "markdown-it";
 const route = useRoute();
 const params = route.params;
 const tag = ref(inject("tag"));
 let props = defineProps(['reloadArticleList']);
+let md = new MarkdownIt();
 //文章数据和参数数据
 let articles = ref([]);
 let page = reactive({

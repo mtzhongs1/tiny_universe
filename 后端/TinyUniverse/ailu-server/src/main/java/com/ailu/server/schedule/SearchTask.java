@@ -30,7 +30,7 @@ public class SearchTask {
     private ArticleMapper articleMapper;
 
     //TODO:基于分词+倒排索引存储到redis
-    // 待放开：@XxlJob("tokenizedInvertedInRedis")
+    // @XxlJob("tokenizedInvertedInRedis")
     public void tokenizedInvertedInRedis(){
         //先删除原本的缓存
         redisCache.deleteObject("article_word");

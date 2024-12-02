@@ -4,6 +4,7 @@
       <el-icon class="upDownIcon" @click="scrollToTop">
         <ArrowUpBold />
       </el-icon>
+      <el-icon @click="toFeedBack" style="color: var(--common-color);cursor:pointer"><Service /></el-icon>
       <el-icon @click="drawer=true" class="setting_icon" style="color: var(--common-color)">
         <Setting/>
       </el-icon>
@@ -54,12 +55,11 @@ import {inject, reactive, ref} from "vue";
 import {setCssVariable} from "@/util/util.js";
 import {doPostFile, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
-import {ArrowUpBold} from "@element-plus/icons-vue";
-
-
+import {ArrowUpBold, Service} from "@element-plus/icons-vue";
+import {useRouter} from "vue-router";
 
 let color = inject('color');
-
+let router = useRouter()
 let isBlack = ref(JSON.parse(window.localStorage.getItem("theme")));
 let drawer = ref(false);
 let prop = defineProps({
@@ -74,6 +74,9 @@ let prop = defineProps({
 });
 let images = reactive(prop.images);
 let updateBgImage = prop.updateBgImage;
+let toFeedBack = () => {
+  router.push('/dashboard/feedback')
+}
 // TODO：传递自己的参数index的方法
 const updateImages = (index) => (fileObject) => {
   const formData = new FormData();

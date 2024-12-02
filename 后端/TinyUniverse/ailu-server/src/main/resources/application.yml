@@ -35,7 +35,15 @@ spring:
     password: mwvwtpgypxjvdhic #登陆密码（或授权码）
     port: 587
     properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          starttls:
+            enable: true
       from: 2568315961@qq.com #邮件发信人（即真实邮箱）
+    default-encoding: UTF-8
 
   freemarker:
     # 启用 freemarker 模板

@@ -238,25 +238,26 @@ public class GlmServiceImpl implements GPTService{
     }
 
     @Override
-    public String agent(String problem,String knowledgeId) {
-        if(knowledgeId != null && !knowledgeId.isEmpty() && !knowledgeId.equals("0")){
-            return chatByNRag(problem, knowledgeId);
-        }
-        ChatLanguageModel chatModel = ZhipuAiChatModel.builder()
-                .apiKey(ZHIPU_KEY)
-                .model(GLM_4_FLASH)
-                .callTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .connectTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .writeTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .readTimeout(Duration.of(20000, ChronoUnit.MILLIS))
-                .build();
-        GenericAssistant genericAssistant = AiServices.builder(GenericAssistant.class)
-                .chatLanguageModel(chatModel)
-                .tools(new ImageGenerateTool())
-                .build();
-        AiMessage chat = genericAssistant.chat(problem);
-        log.info("Agent获取数据为：{}",chat.text());
-        return chat.text();
+    public SseEmitter agent(String problem,String knowledgeId) {
+        return null;
+        // if(knowledgeId != null && !knowledgeId.isEmpty() && !knowledgeId.equals("0")){
+        //     return chatByNRag(problem, knowledgeId);
+        // }
+        // ChatLanguageModel chatModel = ZhipuAiChatModel.builder()
+        //         .apiKey(ZHIPU_KEY)
+        //         .model(GLM_4_FLASH)
+        //         .callTimeout(Duration.of(20000, ChronoUnit.MILLIS))
+        //         .connectTimeout(Duration.of(20000, ChronoUnit.MILLIS))
+        //         .writeTimeout(Duration.of(20000, ChronoUnit.MILLIS))
+        //         .readTimeout(Duration.of(20000, ChronoUnit.MILLIS))
+        //         .build();
+        // GenericAssistant genericAssistant = AiServices.builder(GenericAssistant.class)
+        //         .chatLanguageModel(chatModel)
+        //         .tools(new ImageGenerateTool())
+        //         .build();
+        // AiMessage chat = genericAssistant.chat(problem);
+        // log.info("Agent获取数据为：{}",chat.text());
+        // return chat.text();
     }
 
     private static @NotNull List<ChatMessage> getChatMessages(ArticleModifyDTO articleModifyDTO) {
@@ -322,7 +323,6 @@ public class GlmServiceImpl implements GPTService{
         try {
             // TODO:尝试向客户端发送一个名为'START'的事件，表示SSE连接开始
             sseEmitter.send(SseEmitter.event().name("sse："+userId+"连接成功"));
-            sseEmitter.send("开始发送数据");
         } catch (IOException e) {
             // 如果发送过程中出现IO异常，记录错误日志
             log.error("startSse error", e);

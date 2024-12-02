@@ -1,12 +1,12 @@
 <template>
-  <div class="flex-col shrink-0 section_19" style="margin-top: 20px">
+  <div class="flex-col shrink-0 section_19 ai-chat-outer-dic" style="margin-top: 20px">
     <div class="flex-col section_4">
       <div class="flex-row justify-between items-center group_17">
         <div class="flex-row items-center">
 <!--          <div class = "switchAssistant" @click="listAssistant">切换助理</div>-->
           <el-space direction="vertical">
             <img src="@/assets/机器人.svg" alt="" width="20px">
-            <span class="font text">miku</span>
+            <span class="font text" style="color: #7ec699">miku</span>
           </el-space>
         </div>
       </div>
@@ -14,18 +14,23 @@
         <div class="flex-row justify-between items-center group_18">
           <!--el-space左对齐-->
           <div class="flex-row items-center problems">
-            <span @click="send('如何学习Java?')" class="problem">如何学习Java?  &nbsp;&nbsp;&nbsp;></span>
-            <span @click="send('PHP是不是世界上最好的语言？')" class="problem">PHP是不是世界上最好的语言？ &nbsp;&nbsp;&nbsp;></span>
+            <span @click="send('你是谁？')" class="problem">你是谁?  &nbsp;&nbsp;&nbsp;></span>
+            <span @click="send('怎么练习能唱得和你一样好听？')" class="problem">怎么练习能唱得和你一样好听？ &nbsp;&nbsp;&nbsp;></span>
             <div v-for="message in messages" :key="message" class="message">
               <!--TODO:根据不同情况绑定class类选择对应的样式-->
               <div class="message-content" :class="message.self ? 'rightMessage' : 'leftMessage'">
                 <div style="display: flex" :class="message.self ? 'rightUser' : 'leftUser'">
                   <p class="username"> {{message.self?'我':'miku'}} </p>
                 </div>
-                <div v-if="!isEmpty(message.urls)">
-                  <img v-for="(url, index) in message.urls" :key="index" class="content" :src="url" alt="" style="width: 365px;">
+                <div style="display: flex" :class="!message.self ? 'rightUser' : 'leftUser'">
+                  <img v-if="message.self" class="username" :src="message.avatar" style="width: 50px"/>
+                  <img v-else class="username" src='@/assets/初音未来.jpg' style="width: 50px"/>
                 </div>
-                <div class="content" v-html="message.content"></div>
+                <div v-if="!isEmpty(message.urls)">
+                  <img v-for="(url, index) in message.urls" :key="index" class="content" :src="url" alt="">
+                </div>
+                <!--markdown格式输出文件-->
+                <div class="content" v-html="md.render(message.content)"></div>
               </div>
             </div>
           </div>
@@ -45,34 +50,21 @@
       </div>
     </div>
   </div>
-  <el-dialog
-      v-model="dialog.dialogVisible"
-      title="智能体列表"
-      width="800"
-      :center="true"
-  >
-    <template #footer>
-      <Agent></Agent>
-    </template>
-  </el-dialog>
 </template>
 <script setup>
 import SendInput from "@/components/common/input/SendInput.vue";
 import {inject, reactive, ref} from "vue";
-import {doGet, doPostFile, doPostxwww} from "@/http/httpRequest.js";
+import {doPostFile} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {isEmpty} from "@/util/util.js";
-import Agent from "@/components/dashboard/agent/Agent.vue";
-
+import MarkdownIt from "markdown-it";
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 let content = ref('');
 let user = inject("user");
-let dialog = reactive({
-  dialogVisible:false
-})
+let md = new MarkdownIt();
 let knowledgeId = ref(0);
 let knowledgeName = ref('');
 let messages = reactive([]);
-let isLoad = ref(false);
 const updateValue = (contentValue) => {
   content.value = contentValue;
 }
@@ -102,7 +94,7 @@ function generateUUID() {
   });
 }
 
-const send = (tempContent) => {
+const send = async (tempContent) => {
   if(!isEmpty(tempContent)){
     content.value = tempContent;
   }
@@ -113,23 +105,34 @@ const send = (tempContent) => {
   const selfMessage = {
     self:true,
     content:content.value,
+    avatar: user.avatar
   }
   messages.push(selfMessage);
-  isLoad.value = true;
-  doGet("/gpt/agent",{problem:content.value,knowledgeId:knowledgeId.value}).then((resp) => {
-    if(resp.data.code === 1){
-      const aiMessage = {
-        self:false,
-        content:resp.data.data,
-        urls: extractUrls(resp.data.data)
-      }
-      content.value = '';
-      messages.push(aiMessage);
-      isLoad.value = false;
-    }else{
-      ElMessage.error('请求繁忙');
-    }
+
+  const aiMessage = reactive({
+    self:false,
+    content:'',
+    urls: '',
   })
+  messages.push(aiMessage);
+
+  // const url = `http://120.46.95.186:8888/gpt/agent?problem=${encodeURIComponent(content.value)}&knowledgeId=${encodeURIComponent(knowledgeId.value)}`;
+  const url = `http://localhost:8888/gpt/agent?problem=${encodeURIComponent(content.value)}&knowledgeId=${encodeURIComponent(knowledgeId.value)}`;
+  fetchEventSource(url,
+      {
+        method: 'GET',
+        async onmessage(event) {
+          aiMessage.content += decodeUnicode(event.data.replace(/"/g, ''));
+          aiMessage.urls = extractUrls(aiMessage.content);
+        },
+        onerror: () => {
+          console.log('error');
+          this.onclose();
+        },
+        onclose: () => {
+          content.value = ''
+          console.log('close');
+        }})
 }
 function extractUrls(text) {
   // 正则表达式匹配常见的图片文件扩展名
@@ -144,30 +147,41 @@ function extractUrls(text) {
 
   return urls;
 }
+
+// 解码包含Unicode转义序列的字符串
+function decodeUnicode(str) {
+  return str.replace(/\\u[\dA-Fa-f]{4}/g, function (match) {
+    return String.fromCharCode(parseInt(match.substr(2), 16));
+  });
+}
 </script>
 <style lang="scss" scoped>
+img{
+  border-radius: 50%; /* 将图片变为圆形的关键属性 */
+  object-fit: cover; /* 保持图片的宽高比并裁剪超出部分 */
+}
+.ai-chat-outer-dic{
+  width: 600px;
+}
 .message-list {
   overflow-y: auto;
+  position: relative;
 }
 .message {
-  display: flex;
   margin-bottom: 10px;
-  position: relative;
 }
 
 .message-content {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
+  align-items: flex-start;
+  width: 500px;
 }
 /*区分自己和别人的消息的样式*/
 .leftMessage > * {
-  flex: 0 0 auto;
   align-self: flex-start;
 }
 .rightMessage > * {
-  flex: 0 0 auto;
   align-self: flex-end;
 }
 .content {
@@ -185,12 +199,19 @@ function extractUrls(text) {
   }
   .username{
     order: 2;
+    color: #7ec699;
   }
 }
+.leftUser {
+  justify-content: flex-start;
+}
 
+.rightUser {
+  justify-content: flex-end;
+}
 .username {
   font-weight: bold;
-  color: var(--text-color);
+  color: rgb(15, 201, 238);
 }
 .items-center{
   text-align: center;
@@ -212,10 +233,11 @@ function extractUrls(text) {
   -webkit-backdrop-filter: blur(15px) saturate(180%);
   padding: 15px;
   font-size: 14px;
-  width: 80%;
   background: var(--main-beside-color);
   flex: 1;
+  color: var(--common-color);
   border-radius: 14.06px 14.06px 14.06px 14.06px;
+  background: white;
 }
 .problem:hover{
   border: var(--common-color) 1px solid;

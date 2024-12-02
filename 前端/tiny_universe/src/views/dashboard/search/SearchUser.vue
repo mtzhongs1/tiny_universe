@@ -1,29 +1,31 @@
 <template>
-<div>
+<div style="display: flex;justify-content: center;">
+  <div class="userDiv">
   <div v-if="!isEmpty(users)">
-    <div class="followers" v-for="(user,index) in users" :key="index" >
-      <el-space style="margin: 20px">
-        <el-avatar @click="toUser(user.id)" fit="cover" :size="80" :src="user.avatar" />
-        <p>{{user.username}}</p>
-      </el-space>
+      <div class="followers" v-for="(user,index) in users" :key="index" >
+        <el-space style="margin: 20px">
+          <el-avatar @click="toUser(user.id)" fit="cover" :size="80" :src="user.avatar" />
+          <p>{{user.username}}</p>
+        </el-space>
 
-      <div @click="follow(user)" class="guan">
-        <el-button v-if="user.isFollow" class="follow-btn" type="primary">关注</el-button>
-        <el-button v-else class="qu-guan" type="success">已关注</el-button>
+        <div @click="follow(user)" class="guan">
+          <el-button v-if="user.isFollow" class="follow-btn" type="primary">关注</el-button>
+          <el-button v-else class="qu-guan" type="success">已关注</el-button>
+        </div>
       </div>
+      <el-pagination style="padding-left: 45%"
+                     v-model:current-page="page.pageNum"
+                     :page-size="page.pageSize"
+                     :size="users.length"
+                     :total = "page.total"
+                     layout="total, prev, pager, next"
+                     @current-change="handleCurrentChange"
+                     v-show="!isEmpty(users)"
+      />
     </div>
-    <el-pagination style="padding-left: 45%"
-                   v-model:current-page="page.pageNum"
-                   :page-size="page.pageSize"
-                   :size="users.length"
-                   :total = "page.total"
-                   layout="total, prev, pager, next"
-                   @current-change="handleCurrentChange"
-                   v-show="!isEmpty(users)"
-    />
-  </div>
-  <div v-else style="height: 400px;display:flex;justify-content: center;align-items: center">
-    <el-empty description="没有该用户哦~" />
+    <div v-else style="height: 400px;display:flex;justify-content: center;align-items: center">
+      <el-empty description="没有该用户哦~" />
+    </div>
   </div>
 </div>
 </template>
@@ -90,13 +92,13 @@ const follow = (user) => {
 }
 </script>
 <style scoped>
-.UserDiv {
-  max-height: 1000px;
+.userDiv {
+  width: 95vw;
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 14.06px 14.06px 14.06px 14.06px; /* 转换 rpx 到 px */
   background: var(--main-beside-color);
-  margin-bottom: 20px;
+  margin: 30px 30px;
 }
 .followers{
   position: relative;

@@ -20,7 +20,7 @@ public class FilterConfig {
         //排除
         registrationBean.addInitParameter("excludedUris","/email/sendMailCode,/user/login,/user/register,/ws/*,/doc.html,/swagger-resources,/swagger-ui.html,/webjars/**," +
                 "/swagger-resources/**,/v2/**,/ws/**," +
-                "/gpt/sse/produceProblem/**,/gpt/rag/produceProblem/**");
+                "/gpt/sse/produceProblem/**,/gpt/rag/produceProblem/**,/gpt/agent/**");
         return registrationBean;
     }
 

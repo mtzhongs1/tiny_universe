@@ -1,15 +1,15 @@
-package com.ailu.server.config;
-
-import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-/**
- * @Description: TODO:待放开
- * @Author: ailu
- * @Date: 2023/12/22 21:59
- */
+// package com.ailu.server.config;
+//
+// import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+//
+// /**
+//  * @Description: TODO:待放开
+//  * @Author: ailu
+//  * @Date: 2023/12/22 21:59
+//  */
 //
 // @Configuration
 // public class XxlJobConfig {

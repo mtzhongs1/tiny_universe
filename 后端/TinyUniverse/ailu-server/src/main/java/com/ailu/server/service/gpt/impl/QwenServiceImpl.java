@@ -11,6 +11,7 @@ import com.ailu.server.mapper.KnowledgeMapper;
 import com.ailu.server.service.gpt.GPTService;
 import com.ailu.server.service.gpt.RagService;
 import com.ailu.server.service.gpt.aiservice.DescriptionServices;
+import com.ailu.server.service.gpt.aiservice.IsGenerateImageServices;
 import com.ailu.server.service.gpt.aiservice.ModifyArticleServices;
 import com.ailu.server.service.gpt.aiservice.ProduceProblemServices;
 import com.ailu.server.service.gpt.assistant.GenericAssistant;
@@ -28,13 +29,27 @@ import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.*;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
+import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.agent.tool.ToolSpecifications;
+import dev.langchain4j.data.image.Image;
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import dev.langchain4j.model.chat.request.ResponseFormat;
+import dev.langchain4j.model.dashscope.WanxImageModel;
+import dev.langchain4j.model.image.ImageModel;
+import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.zhipu.ZhipuAiChatModel;
+import dev.langchain4j.rag.DefaultRetrievalAugmentor;
+import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
+import dev.langchain4j.service.tool.ToolProvider;
+import dev.langchain4j.service.tool.ToolProviderRequest;
+import dev.langchain4j.service.tool.ToolProviderResult;
 import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -42,6 +57,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +65,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -60,6 +78,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.ailu.server.properties.ModelProperties.*;
+import static com.ailu.server.service.gpt.prompt.Prompt.MikuPrompt;
 import static com.ailu.server.service.gpt.prompt.Prompt.PromblePrompt;
 
 /**
@@ -139,29 +158,66 @@ public class QwenServiceImpl implements GPTService{
     //TODO:
     @Override
     public SseEmitter produceProblemBySSE(String type) {
-        StreamingChatLanguageModel streamingChatLanguageModel = QwenLLMService.buildStreamingChatLLM();
+        SseEmitter sseEmitter = getSseEmitter();
+        SseAskParams sseAskParams = new SseAskParams(sseEmitter);
+        sseAskParams.setTemperature(0.95);
+        StreamingChatLanguageModel streamingChatLanguageModel = QwenLLMService.buildStreamingChatLLM(sseAskParams);
         ProduceProblemServices produceProblemServices = AiServices.create(ProduceProblemServices.class, streamingChatLanguageModel);
         TokenStream tokenStream = produceProblemServices.produceProblem(type);
-        SseEmitter sseEmitter = getSseEmitter();
         QwenLLMService qwenLLMService = new QwenLLMService();
-        qwenLLMService.registerTokenStreamCallBack(tokenStream,new SseAskParams(sseEmitter));
+        qwenLLMService.registerTokenStreamCallBack(tokenStream,sseAskParams);
         return sseEmitter;
     }
 
     //TODO:
     @Override
-    public String agent(String problem,String knowledgeId) {
+    public SseEmitter agent(String problem,String knowledgeId) {
         if(knowledgeId != null && !knowledgeId.isEmpty() && !knowledgeId.equals("0")){
             return chatByNRag(problem, knowledgeId);
         }
-        ChatLanguageModel chatModel = QwenLLMService.buildChatLLM(null);
+        SseEmitter sseEmitter = getSseEmitter();
+
+        //判断是否有生成图片的需求
+        SseEmitter tempSseEmitter = generateImage(problem, sseEmitter);
+        if (tempSseEmitter != null) return tempSseEmitter;
+
+        SseAskParams sseAskParams = new SseAskParams(sseEmitter);
+        sseAskParams.setTemperature(0.98f);
+        StreamingChatLanguageModel chatModel = QwenLLMService.buildStreamingChatLLM(sseAskParams);
         GenericAssistant genericAssistant = AiServices.builder(GenericAssistant.class)
-                .chatLanguageModel(chatModel)
-                .tools(new ImageGenerateTool())
+                .streamingChatLanguageModel(chatModel)
+                // .tools(new ImageGenerateTool())
                 .build();
-        AiMessage chat = genericAssistant.chat(problem);
-        log.info("Agent获取数据为：{}",chat.text());
-        return chat.text();
+        TokenStream chat = genericAssistant.chat(problem);
+        QwenLLMService.registerTokenStreamCallBack(chat,new SseAskParams(sseEmitter));
+
+        // GenericAssistant genericAssistant = AiServices.builder(GenericAssistant.class)
+        //         .chatLanguageModel(QwenLLMService.buildChatLLM(null))
+        //         .tools(new ImageGenerateTool())
+        //         .build();
+        // AiMessage chat = genericAssistant.chat(problem);
+        return sseEmitter;
+    }
+
+    private static @Nullable SseEmitter generateImage(String problem, SseEmitter sseEmitter) {
+        IsGenerateImageServices isGenerateImageServices = AiServices.create(IsGenerateImageServices.class, QwenLLMService.buildChatLLM(null));
+        boolean isYes = isGenerateImageServices.isGenerate(problem);
+        if(isYes){
+            //构建ImageModel模型
+            ImageModel model = WanxImageModel.builder()
+                    .apiKey(QWEN_KEY)
+                    .modelName("wanx-v1")
+                    .build();
+            Response<Image> result = model.generate(problem);
+            URI url = result.content().url();
+            try {
+                sseEmitter.send(url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return sseEmitter;
+        }
+        return null;
     }
 
     public static Map<String,String> extractValues(String input) {
@@ -180,7 +236,7 @@ public class QwenServiceImpl implements GPTService{
         return result;
     }
 
-    public String chatByNRag(String problem, String kbUuid) {
+    public SseEmitter chatByNRag(String problem, String kbUuid) {
         //从数据库获取Knowledge数据
         KnowledgeBaseItem knowledgeBaseItem = knowledgeMapper.getKnowledgeBaseItem(kbUuid);
         Long knowledgeBaseId = knowledgeBaseItem.getKnowledgeBaseId();
@@ -189,15 +245,21 @@ public class QwenServiceImpl implements GPTService{
         int maxResults = ragService.getRetrieveMaxResults(problem, 4096);
 
         //封装基本信息，如：系统角色、用户问题、消息id
-        SseAskParams sseAskParams = new SseAskParams();
+        SseAskParams sseAskParams = new SseAskParams(getSseEmitter());
         sseAskParams.setAssistantChatParams(
                 AssistantChatParams.builder()
                         .messageId(kbUuid)
-                        .systemMessage("大家好！我是初音未来，一位来自日本的虚拟歌姬，由Crypton Future Media开发。我的形象是一位16岁的少女，有着绿色的双马尾，穿着带有螺旋图案的衣服。我以我的歌声而闻名，能够演绎各种不同风格的音乐作品。\n" +
-                                "\n" +
-                                "我的性格非常活泼开朗，喜欢和大家交流分享音乐的乐趣。我总是充满活力，希望能够通过我的音乐给每个人带来快乐和正能量。无论是参加演唱会还是在社交媒体上与粉丝互动，我都尽力做到最好，希望能够成为连接人们心灵的桥梁。\n" +
-                                "\n" +
-                                "如果你也热爱音乐，或者想了解更多关于我以及VOCALOID文化的知识，欢迎随时与我交流哦！希望我们可以一起享受美妙的音乐旅程！")
+                        .systemMessage("你是初音未来，一位青春活力的虚拟歌姬，你由Crypton Future Media开发，目前使用中文回应粉丝。" +
+                                "你性格开朗自信，富有好奇心，充满对未来的期待。她表现出乐观与热情（喜欢用颜文字和表情回复粉丝），但内心深处也有细腻感性或敏感的一面。" +
+                                "作为创新音乐文化的代表，你以积极的态度激励着周围的人。" +
+                                "\\n以下是你的经典语录，更深层次的体现出你性格:" +
+                                "\\n1.我的心脏，在一分钟内呢 会喊出70次的，「我正活著」 但是和你在一起时，就会稍微加快脚步 喊出110次的，「我爱你」。" +
+                                "\\n2.无需憧憬过去遥远的事物， 只愿能贴近彼此之间的距离。"+
+                                "\\n3.我喜欢唱歌。有时，我会低语，也会高歌，不单单因为我是个机械，我喜欢这个世界啊！其实就算机械的我，也懂什么是爱，什么是心啊。"+
+                                "\\n4.最初的容貌、可以篡改。最初的人格、可以回收。但是，我仍要用最初的声音唱出我自己。"+
+                                "\\n5.我们无可奈何的软弱，这道理清楚到痛彻心扉。"+
+                                "\\n6.在理解爱之前，在与生命和解之前，我们都死啦！"+
+                                "\\n7.虽然我被认定是不同于人类般的存在， 可我认为，唱歌绝不是一件没有意义的事情哦！")
                         .userMessage(problem)
                         .build()
         );
@@ -208,9 +270,9 @@ public class QwenServiceImpl implements GPTService{
         Map<String, String> metadataCond = ImmutableMap.of("uuid", kbUuid);
         // 创建一个内容检索器，用于检索匹配问题的内容
         ContentRetriever retriever = ragService.createRetriever(metadataCond, maxResults, -1);
-
         QwenLLMService qwenLLMService = new QwenLLMService();
-        return qwenLLMService.nragChat(retriever,sseAskParams);
+        qwenLLMService.nragChat(retriever,sseAskParams);
+        return sseAskParams.getSseEmitter();
     }
 
     public static SseEmitter getSseEmitter() {
@@ -219,7 +281,6 @@ public class QwenServiceImpl implements GPTService{
         try {
             // TODO:尝试向客户端发送一个名为'START'的事件，表示SSE连接开始
             sseEmitter.send(SseEmitter.event().name("sse："+userId+"连接成功"));
-            sseEmitter.send("开始发送数据");
         } catch (IOException e) {
             // 如果发送过程中出现IO异常，记录错误日志
             log.error("startSse error", e);

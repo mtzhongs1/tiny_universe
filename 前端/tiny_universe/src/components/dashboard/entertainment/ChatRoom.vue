@@ -90,6 +90,7 @@ const sendMessage = () => {
   });
 }
 const connectWebSocket = () => {
+  // ws = new WebSocket("ws://120.46.95.186:8888/ws/" + user.id);
   ws = new WebSocket("ws://localhost:8888/ws/" + user.id);
   ws.addEventListener("open", onOpen.bind(instance), false);
   ws.addEventListener("close", onClose.bind(instance), false);

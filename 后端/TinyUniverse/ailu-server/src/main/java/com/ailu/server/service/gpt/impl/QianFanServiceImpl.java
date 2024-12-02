@@ -84,7 +84,7 @@ public class QianFanServiceImpl implements GPTService {
     }
 
     @Override
-    public String agent(String problem,String knowledgeId) {
+    public SseEmitter agent(String problem,String knowledgeId) {
         return null;
     }
 }

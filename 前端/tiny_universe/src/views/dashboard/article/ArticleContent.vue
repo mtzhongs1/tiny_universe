@@ -62,7 +62,7 @@
           <img src="@/assets/海报1.png" alt="" width="250px"/>
           <img src="@/assets/海报2.png" alt="" width="250px"/>
         </div>
-        <el-dialog v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
+        <el-dialog @close="closeColDialog" v-model="dialogVisible" title="请选择收藏夹" width="60%" center>
           <template #footer>
             <CreateCol></CreateCol>
             <ColList v-if="listIsAlive"></ColList>
@@ -195,6 +195,7 @@ const doCollection = () => {
   }
   // 收藏
   else{
+    articleActive.isCollection = true;
     dialogVisible.value = true;
   }
 }
@@ -235,9 +236,7 @@ const toUserDetail = (id) => {
 }
 
 const closeColDialog = (collections) => {
-  collections.value.forEach((collection) => {
-    collection.isChoosed = false;
-  })
+  reloadCol();
   dialogVisible.value = false;
 }
 watch(() => article.value.id,(newValue) => {

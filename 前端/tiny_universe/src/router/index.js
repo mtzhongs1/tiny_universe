@@ -13,7 +13,6 @@ import ArticleContent from "@/views/dashboard/article/ArticleContent.vue";
 import UserDetail from "@/views/dashboard/module/user/UserDetail.vue";
 import Search from "@/views/dashboard/article/Search.vue";
 import ArticleView from "@/views/dashboard/user/ArticleView.vue";
-import ShuoShuo from "@/views/dashboard/user/ShuoShuo.vue";
 import Fols from "@/views/dashboard/user/follow/Fols.vue";
 import Fans from "@/views/dashboard/user/follow/Fans.vue";
 import Follow from "@/views/dashboard/user/Follow.vue";
@@ -23,6 +22,7 @@ import SearchArticle from "@/views/dashboard/search/SearchArticle.vue";
 import SearchUser from "@/views/dashboard/search/SearchUser.vue";
 import BottleView from "@/views/dashboard/other/BottleView.vue";
 import SSEClassRoom from "@/views/dashboard/other/SSEClassRoom.vue";
+import FeedBack from "@/views/dashboard/home/FeedBack.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,6 +60,7 @@ const router = createRouter({
           ]
         },
         {path: 'user',name:'User',component:User},
+        {path: 'feedback',name:'FeedBack',component:FeedBack},
         {
           path: 'user_detail',
           name:'UserDetail',

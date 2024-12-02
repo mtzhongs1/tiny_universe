@@ -8,6 +8,7 @@
       active-text-color="#00f0fc"
       router
       :default-active="subItemPath[0]"
+      style="margin-top: -50px"
   >
     <!--@select="handleSelect" -->
     <el-menu-item :index="subItemPath[0]" id="文章" :route="{path:subItemPath[0],query:{content:content}}">

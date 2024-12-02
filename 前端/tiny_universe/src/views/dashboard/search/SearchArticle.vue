@@ -202,6 +202,9 @@ provide("closeColDialog",closeColDialog);
 provide('article',article);
 </script>
 <style scoped>
+.demo-tabs{
+  width: 95vw;
+}
 .article{
   background: var(--main-beside-color);
   padding: 20px 20px;

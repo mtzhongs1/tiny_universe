@@ -11,18 +11,17 @@
       >
         <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
         <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->
-        <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+userId">关注列表</el-menu-item>
-        <el-menu-item :index="'/dashboard/user_detail/follow/fans/'+userId">粉丝列表</el-menu-item>
+        <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+params.id">关注列表</el-menu-item>
+        <el-menu-item :index="'/dashboard/user_detail/follow/fans/'+params.id">粉丝列表</el-menu-item>
       </el-menu>
     </div>
     <router-view></router-view>
   </div>
 </template>
 <script setup>
-import {inject} from "vue";
-
-let userId = inject("userId");
-
+import {useRoute} from "vue-router";
+const route = useRoute();
+let params = route.params;
 </script>
 
 <style scoped>

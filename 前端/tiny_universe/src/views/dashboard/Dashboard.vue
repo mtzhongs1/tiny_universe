@@ -26,6 +26,10 @@
         <img alt="GitHub" class="github" src="../../assets/GitHub.svg" width="30">
       </a>
     </div>
+    <div class="ai-chat" @click="showDialog"></div>
+    <CommonDialog :dialogVisible="dialogVisible" :close-dialog="closeDialog">
+      <AiChat></AiChat>
+    </CommonDialog>
   </div>
 <!--  <el-button class="file-box" text>-->
 <!--    <el-button @click="uploadFile"></el-button>-->
@@ -33,8 +37,47 @@
 </template>
 <script setup>
 
+import * as live2d from 'live2d-render';
+import AiChat from "@/components/dashboard/home/AiChat.vue";
+import CommonDialog from "@/components/common/dialog/CommonDialog.vue";
+
+// 设置消息方法
+const setMessage = (msg, duration) => {
+  live2d.setMessageBox(msg, duration);
+};
+
+// 弹窗显示控制
+let dialogVisible = ref(false);
+
+// 显示弹窗的方法
+const showDialog = () => {
+  dialogVisible.value = true;
+};
+// 隐藏弹窗的方法
+
+const closeDialog = () => {
+  dialogVisible.value = false;
+};
+// 初始化 Live2D 模型
+
+onMounted(async () => {
+  await live2d.initializeLive2D({
+    BackgroundRGBA: [0.0, 0.0, 0.0, 0.0],
+    ShowToolBox: true,
+    ResourcesPath: '/public/miku/miku_pro_jp/runtime/miku_sample_t04.model3.json',
+    CanvasSize: {
+      width: 200,
+      height: 200 * 450 / 250
+    }
+  });
+
+  setMessage("欢迎回来！很高兴再次见到你！你想听我唱一首歌来庆祝你的回归？😄🎉🎶",3000);
+});
+// 提供 Live2D 消息设置方法
+provide("setMessage", setMessage);
+
 //导入区
-import {onMounted, ref, reactive, provide, computed, inject} from 'vue';
+import {onMounted, ref, reactive, provide, computed} from 'vue';
 import {doGet} from '@/http/httpRequest.js'
 // TODO：导入资源
 import Location from '@/components/dashboard/Location.vue';
@@ -163,11 +206,31 @@ let color = reactive({
 provide("user", user);
 provide("color", color);
 provide("userActive",userActive);
-const setMessage = inject("setMessage");
 
 </script>
 
 <style scoped>
+.ai-chat {
+  display: flex;
+  color: #a5e0ec;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10009;
+  opacity: 1;
+  transition: 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  position: fixed;
+  right: 163px;
+  top: 550px;
+  width: 25px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.close-btn:hover{
+  color: var(--common-color);
+}
+
 .headerDiv {
   width: 100%;
   height: var(--header-height);

@@ -26,12 +26,12 @@ public class GPTController {
     @Autowired
     private LLMFactory llmFactory;
 
-    @GetMapping("/chat")
-    public Result chat(String content) throws IOException{
-        GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
-        String chat = qwenServiceImpl.agent(content,null);
-        return Result.success(chat);
-    }
+    // @GetMapping("/chat")
+    // public Result<SseEmitter> chat(String content) throws IOException{
+    //     GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
+    //     SseEmitter sseEmitter = qwenServiceImpl.agent(content,null);
+    //     return Result.success(sseEmitter);
+    // }
 
     @GetMapping("/description")
     public Result description(Integer id,String content) throws IOException {
@@ -69,10 +69,10 @@ public class GPTController {
     }
 
     @GetMapping("/agent")
-    public Result agent(String problem,String knowledgeId){
+    public  SseEmitter agent(String problem,String knowledgeId){
         GPTService qwenServiceImpl = llmFactory.getLLMService("qwen");
-        String resposne = qwenServiceImpl.agent(problem,knowledgeId);
-        return Result.success(resposne);
+        SseEmitter sseEmitter = qwenServiceImpl.agent(problem,knowledgeId);
+        return sseEmitter;
     }
 
 }

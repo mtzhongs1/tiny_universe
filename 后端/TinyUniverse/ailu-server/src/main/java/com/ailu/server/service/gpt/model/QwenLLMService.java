@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import static com.ailu.server.properties.ModelProperties.*;
+import static com.ailu.server.service.gpt.impl.QwenServiceImpl.getSseEmitter;
 
 /**
  * @Description: 通义千问
@@ -55,48 +56,33 @@ public class QwenLLMService {
 
     }
 
-    public static StreamingChatLanguageModel buildStreamingChatLLM() {
+    public static StreamingChatLanguageModel buildStreamingChatLLM(SseAskParams sseAskParams) {
+        double temperature = 0.95;
+        String model = QWEN_MAX;
+        if (null != sseAskParams && sseAskParams.getTemperature() > 0 && sseAskParams.getTemperature() <= 1) {
+            temperature = sseAskParams.getTemperature();
+            if(StringUtils.isNotBlank(sseAskParams.getModelName())){
+                model = sseAskParams.getModelName();
+            }
+        }
         return QwenStreamingChatModel.builder()
                 .apiKey(QWEN_KEY)
-                .temperature(0.7f)
-                .modelName(QWEN_MAX)
+                .temperature((float) temperature)
+                .modelName(model)
                 .enableSearch(true)
                 .build();
     }
 
-    public void ragChat(ContentRetriever retriever,SseAskParams sseAskParams) {
-        // TODO:创建聊天记忆提供者，用于管理聊天历史记录
-        ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
+    public static ChatMemoryProvider buildChatMemoryProvider(){
+        return memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
                 .maxMessages(6)
                 .chatMemoryStore(MapDBChatMemoryStore.getSingleton())
                 .build();
-        // TODO:创建查询转换器，用于修改或扩展原始 Query来提高检索质量，这里使用将聊天记忆（以前的对话历史记录）压缩为简洁 Query的转换器
-        QueryTransformer queryTransformer = new CompressingQueryTransformer(buildChatLLM(sseAskParams));
-        // TODO:创建检索增强器，用于增强提示生成过程中的内容检索,作为 RAG 流程的入口点
-        RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor.builder()
-                .queryTransformer(queryTransformer)
-                .contentRetriever(retriever)
-                .build();
-        // TODO:构建聊天助理，包括流式聊天语言模型、检索增强器和聊天记忆提供者
-        IChatAssistant assistant = AiServices.builder(IChatAssistant.class)
-                .streamingChatLanguageModel(buildStreamingChatLLM())
-                .retrievalAugmentor(retrievalAugmentor)
-                .chatMemoryProvider(chatMemoryProvider)
-                .build();
-        AssistantChatParams assistantChatParams = sseAskParams.getAssistantChatParams();
-        // TODO: AI 服务中的返回类型。
-        TokenStream tokenStream;
-        // 根据是否有系统消息，选择不同的聊天方法
-        if (StringUtils.isNotBlank(assistantChatParams.getSystemMessage())) {
-            tokenStream = assistant.chat(assistantChatParams.getMessageId(), assistantChatParams.getSystemMessage(), assistantChatParams.getUserMessage());
-        } else {
-            tokenStream = assistant.chatWithoutSystemMessage(assistantChatParams.getMessageId(), assistantChatParams.getUserMessage());
-        }
-        registerTokenStreamCallBack(tokenStream, sseAskParams);
     }
 
-    public void registerTokenStreamCallBack(TokenStream tokenStream, SseAskParams sseAskParams) {
+    public static void registerTokenStreamCallBack(TokenStream tokenStream, SseAskParams sseAskParams) {
+        StringBuilder sb = new StringBuilder();
         SseEmitter sseEmitter = sseAskParams.getSseEmitter();
         tokenStream
                 .onNext((content) -> {
@@ -118,7 +104,7 @@ public class QwenLLMService {
                 .start();
     }
 
-    public String nragChat(ContentRetriever retriever,SseAskParams sseAskParams) {
+    public void nragChat(ContentRetriever retriever,SseAskParams sseAskParams) {
         // TODO:创建聊天记忆提供者，用于管理聊天历史记录
         ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
@@ -137,17 +123,17 @@ public class QwenLLMService {
                 // .streamingChatLanguageModel(buildStreamingChatLLM())
                 .retrievalAugmentor(retrievalAugmentor)
                 .chatMemoryProvider(chatMemoryProvider)
-                .chatLanguageModel(buildChatLLM(sseAskParams))
+                .streamingChatLanguageModel(buildStreamingChatLLM(sseAskParams))
                 .build();
         AssistantChatParams assistantChatParams = sseAskParams.getAssistantChatParams();
         // TODO: AI 服务中的返回类型。
-        String res;
+        TokenStream res;
         // 根据是否有系统消息，选择不同的聊天方法
         if (StringUtils.isNotBlank(assistantChatParams.getSystemMessage())) {
-            res = assistant.nchat(assistantChatParams.getMessageId(), assistantChatParams.getSystemMessage(), assistantChatParams.getUserMessage());
+            res = assistant.chat(assistantChatParams.getMessageId(), assistantChatParams.getSystemMessage(), assistantChatParams.getUserMessage());
         } else {
-            res = assistant.nchatWithoutSystemMessage(assistantChatParams.getMessageId(), assistantChatParams.getUserMessage());
+            res = assistant.chatWithoutSystemMessage(assistantChatParams.getMessageId(), assistantChatParams.getUserMessage());
         }
-        return res;
+        QwenLLMService.registerTokenStreamCallBack(res, sseAskParams);
     }
 }

@@ -31,9 +31,9 @@ import {inject, onMounted, reactive, ref} from "vue";
 import {doGet, doPostxwww} from "@/http/httpRequest.js";
 import {ElMessage} from "element-plus";
 import {newRoute} from "@/util/router.js";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {isEmpty} from "@/util/util.js";
-let userId = inject("userId");
+
 let fols = ref([]);
 let page = reactive(
     {
@@ -43,6 +43,9 @@ let page = reactive(
     }
 )
 let router = useRouter();
+let route = useRoute();
+let params = route.params;
+let userId = params.id;
 onMounted(() => {
   getFols();
 })

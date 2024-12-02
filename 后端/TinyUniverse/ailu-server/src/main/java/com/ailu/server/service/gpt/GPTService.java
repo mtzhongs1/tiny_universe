@@ -2,7 +2,6 @@ package com.ailu.server.service.gpt;
 
 import com.ailu.dto.article.ArticleModifyDTO;
 import com.ailu.entity.Problem;
-import com.ailu.result.Result;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -21,5 +20,5 @@ public interface GPTService {
     Problem produceProblem(String type);
     SseEmitter produceProblemBySSE(String type);
 
-    String agent(String problem,String knowledgeId);
+    SseEmitter agent(String problem, String knowledgeId);
 }

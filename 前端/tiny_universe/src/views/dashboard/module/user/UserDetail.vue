@@ -41,9 +41,9 @@
         >
           <!--      <el-menu-item :index="user.id+'/fols'">关注列表</el-menu-item>-->
           <!--      <el-menu-item :index="user.id+'/fans'">粉丝列表</el-menu-item>-->
-          <el-menu-item :index="'/dashboard/user_detail/article_view/'+params.id">文章</el-menu-item>
-          <el-menu-item :index="'/dashboard/user_detail/collection_view/'+params.id">收藏</el-menu-item>
-          <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+params.id">社交</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/article_view/'+params.userId">文章</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/collection_view/'+params.userId">收藏</el-menu-item>
+          <el-menu-item :index="'/dashboard/user_detail/follow/fols/'+params.userId">社交</el-menu-item>
         </el-menu>
         <router-view></router-view>
       </el-main>
@@ -63,7 +63,6 @@ const router = useRouter();
 const self = inject("user");
 const route = useRoute();
 const params = route.params;
-
 let user = reactive({
   id: '',
   avatar: '',

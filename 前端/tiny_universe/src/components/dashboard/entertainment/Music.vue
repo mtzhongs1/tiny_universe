@@ -3,16 +3,6 @@
     <el-col :span="24">
 <!--      <MusicPlayer></MusicPlayer>-->
     </el-col>
-<!--    <el-col :span="18" class="musicBox">-->
-<!--      <el-button style="margin:10px;position: absolute;right: 10px">上传本地音乐</el-button>-->
-<!--      <div class="musicList">-->
-<!--        <div v-for="(music,index) in musicList" :key="index">-->
-<!--          <span>-->
-<!--            <img src="../../../assets/音乐唱片.svg" style="width: 75px; height: 75px;">-->
-<!--          </span> music~-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </el-col>-->
   </el-row>
 </template>
 

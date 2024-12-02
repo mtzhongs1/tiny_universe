@@ -162,6 +162,8 @@ const toProblem = (type) => {
   if(!token){
     token = window.localStorage.getItem(getTokenName());
   }
+  // const eventSource = new EventSource("http://120.46.95.186:8888/gpt/sse/produceProblem"+
+  //     `?type=${type}`)
   const eventSource = new EventSource("http://localhost:8888/gpt/sse/produceProblem"+
       `?type=${type}`)
   // eventSource.addEventListener('produceProblem', function (event) {
